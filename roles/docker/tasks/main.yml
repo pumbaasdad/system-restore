@@ -1,0 +1,74 @@
+- name: Add docker group
+  group:
+    name: docker
+    state: present
+
+- name: Allow docker to run without sudo
+  user:
+    name: "{{ ansible_env.SUDO_USER }}"
+    group: docker
+    append: yes
+
+- name: Find most recent version of docker-compose
+  shell: git ls-remote --tags git://github.com/docker/compose | cut -f2 | grep -v docs | grep -v rc | cut -d/ -f3 | sort -Vr | head -n1
+  args:
+    warn: false
+  register: latest_docker_compose_version
+  changed_when: false
+
+- name: Check current docker-compose version.
+  command: docker-compose --version
+  register: docker_compose_current_version
+  changed_when: false
+  failed_when: false
+
+- name: Install Docker Compose.
+  get_url:
+    url: https://github.com/docker/compose/releases/download/{{ latest_docker_compose_version.stdout }}/docker-compose-Linux-x86_64
+    dest: /usr/local/bin/docker-compose
+    mode: 0755
+    force: yes 
+  when: >
+    docker_compose_current_version.stdout is not defined
+    or latest_docker_compose_version.stdout not in docker_compose_current_version.stdout
+
+- name: Install docker python modules
+  pip:
+    name: 
+      - docker
+      - docker-compose
+    state: latest
+
+# Docker compose can't set gateway and ip-range for macvlan network so create that network externally.
+- name: Create macvlan network
+  docker_network:
+    name: macvlan0
+    ipam_options:
+      subnet: "{{ macvlan_subnet }}"
+      iprange: "{{ macvlan_iprange }}"
+      gateway: "{{ macvlan_gateway }}"
+    driver: macvlan
+    driver_options:
+      parent: enp2s0
+
+- name: Add iptable rules
+  iptables:
+    action: insert
+    chain: "{{ item[0] }}"
+    in_interface: public0
+    ctstate: "{{ item[1].state }}"
+    jump: "{{ item[1].jump}}"
+  with_nested:
+    - [INPUT, DOCKER-USER]
+    - [{state: [], jump: DROP}, {state: [ESTABLISHED, RELATED], jump: ACCEPT}]
+  notify: restart netfilter-persistent
+
+- name: Install docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+
+- name: Start docker services
+  docker_service:
+    pull: yes
+    project_src: "{{ docker_compose_dir }}"

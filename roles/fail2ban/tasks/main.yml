@@ -1,0 +1,12 @@
+- name: Create fail2ban directories
+  file:
+    path: "{{ fail2ban_dir }}/{{ item }}.d"
+    state: directory
+  with_items:
+    - jail
+    - filter
+
+- name: Install jail.local
+  template:
+    src: jail.local.j2
+    dest: "{{ fail2ban_dir }}/jail.local"

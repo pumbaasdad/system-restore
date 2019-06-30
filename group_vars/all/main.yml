@@ -1,0 +1,7 @@
+variable_names: "{{ vars.keys() }}"
+role_vars: "{{ role_names | map('regex_replace', '^(.*)$', '\\1_role' ) | list | intersect(variable_names) | map('extract', vars) | list }}"
+apt_ppas: "{{ role_vars | selectattr('apt_ppa', 'defined') | map(attribute='apt_ppa') | list }}"
+deb_repos: "{{ role_vars | selectattr('deb_repo', 'defined') | map(attribute='deb_repo') | list }}"
+apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_key') | list }}"
+packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='packages', start=[]) | list }}"
+services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"

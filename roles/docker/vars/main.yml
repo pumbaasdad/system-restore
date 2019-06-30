@@ -1,0 +1,14 @@
+docker_role:
+  deb_repo:
+    url: "https://download.docker.com/linux/ubuntu"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+  packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - git
+    - software-properties-common
+    - docker-ce
+  service: docker
+TZ: America/Toronto

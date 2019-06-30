@@ -1,0 +1,5 @@
+- name: Install handbrake wrapper
+  copy:
+    src: transcode.sh
+    dest: /usr/local/bin/transcode
+    mode: 0755

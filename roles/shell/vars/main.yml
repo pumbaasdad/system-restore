@@ -1,0 +1,5 @@
+shell_role:
+  apt_ppa:
+    ppa: fish-shell/release-2
+  packages:
+    - fish

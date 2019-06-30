@@ -1,0 +1,4 @@
+dhcp_role:
+  packages:
+    - isc-dhcp-server
+  service: isc-dhcp-server

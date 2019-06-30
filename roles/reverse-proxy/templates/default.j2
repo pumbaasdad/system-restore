@@ -1,0 +1,7 @@
+server {
+        listen {{ nginx_port }} {{ 'ssl' if nginx_port == 443 else '' }} default_server;
+        server_name _;
+        client_max_body_size 0;
+        return {{ nginx_port }};
+}
+

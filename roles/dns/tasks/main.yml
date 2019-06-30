@@ -1,0 +1,182 @@
+- name: Calculate reverse zones
+  vars:
+    ipv4_network_as_list: "{{ (network.ipv4_subnet | ipaddr('network')).split('.') }}"
+    ipv4_required_bytes: "{{ (network.ipv4_subnet | ipaddr('prefix') | int) // 8 }}"
+    ipv6_network_as_list: "{{ (network.ipv6_subnet | ipaddr('network')).split(':') | reject('eq', '') | list }}"
+    ipv6_network_as_filled_list: "{{ ipv6_network_as_list + ['0000', '0000', '0000', '0000'] }}"
+    ipv6_network_as_formatted_list: "{{ ipv6_network_as_filled_list |
+            map('regex_replace', '^(.)$', '0\\1') |
+            map('regex_replace', '^(..)$', '0\\1') |
+            map('regex_replace', '^(...)$', '0\\1') |
+            join }}"
+    ipv6_required_bytes: "{{ (network.ipv6_subnet | ipaddr('prefix') | int) // 4 }}"
+  set_fact:
+    reverse_ipv4_zone: "{{ ipv4_network_as_list[:(ipv4_required_bytes | int)] | reverse | list | join('.') }}"
+    reverse_ipv6_zone: "{{ ipv6_network_as_formatted_list[:(ipv6_required_bytes | int)] | reverse | list | join('.') }}"
+
+- name: Install dnspython
+  local_action:
+    module: pip
+    name: dnspython
+
+- name: Install prerequsites
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - netaddr
+    - jinja2
+
+- name: Find DNS key files
+  find:
+    paths: /etc/bind
+    patterns: K{{ network.domain }}.{{ network.suffix }}.+157+*.{{ item }}
+  register: existing_dns_key_files
+  with_items:
+    - private
+    - key
+  changed_when: false
+
+- block:
+    - name: Delete old DNS key files
+      file:
+        state: absent
+        path: "{{ item }}"
+      with_items: "{{ existing_dns_key_files.results | map(attribute='files') | sum(start=[]) | map(attribute='path') | list }}"
+      when: existing_dns_key_files.results | map(attribute='matched') | list != [1, 1]
+
+    - name: Generate keys for DDNS
+      shell: dnssec-keygen -a HMAC-MD5 -b 128 -r /dev/urandom -n USER {{ resolve_search }}
+      register: dnssec_keygen
+      args:
+        chdir: /etc/bind
+      changed_when: false
+  when: existing_dns_key_files.results | map(attribute='matched') | list != [1, 1]
+
+- name: Get DDNS private key
+  shell: "grep 'Key: ' /etc/bind/K{{ network.domain }}.{{ network.suffix }}.+157+*.private | awk '{ print $2 }'"
+  register: ddns_private_key
+  changed_when: false
+
+- name: Get DDNS public key
+  shell: "cat /etc/bind/K{{ network.domain }}.{{ network.suffix }}.+157+*.key | awk '{ print $7 }'"
+  register: ddns_public_key
+  changed_when: false
+
+- name: Update ddns.key
+  template:
+    src: ddns.key.j2
+    dest: /etc/bind/ddns.key
+    owner: root
+    group: bind
+    mode: 0644
+  notify: Restart DNS
+
+- name: Update named.conf.local
+  template:
+    src: named.conf.local.j2
+    dest: /etc/bind/named.conf.local
+    owner: root
+    group: bind
+    mode: 0644
+  notify: Restart DNS
+
+- name: Install named.conf.options
+  template:
+    src: named.conf.options.j2
+    dest: /etc/bind/named.conf.options
+    owner: root
+    group: bind
+    mode: 0644
+  notify: Restart DNS
+
+- name: Install zone databases
+  template:
+    src: db.j2
+    dest: "{{ dns_db_dir }}/db.{{ item }}.{{ network.domain }}.{{ network.suffix }}"
+    owner: root
+    group: bind
+    mode: 0644
+    force: no
+  with_items:
+    - "{{ network.zones.keys() }}"
+  notify: Restart DNS
+
+- name: Install zone databases
+  template:
+    src: db.j2
+    dest: "{{ dns_db_dir }}/db.{{ item }}"
+    owner: root
+    group: bind
+    mode: 0644
+    force: no
+  with_items:
+    - "{{ network.domain }}.{{ network.suffix }}"
+    - "{{ reverse_ipv4_zone }}"
+    - "{{ reverse_ipv6_zone }}"
+  notify: Restart DNS
+
+- name: Delete old zones
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_fileglob:
+    - "{{ dns_db_dir }}/db*"
+  notify: Restart DNS
+  when: item.split('.')[1] not in network.zones.keys() and
+        item != dns_db_dir + '/db.' + reverse_ipv4_zone and
+        item != dns_db_dir + '/db.' + reverse_ipv6_zone and
+        item != dns_db_dir + '/db.' + network.domain + '.' + network.suffix and
+        (item | splitext)[1] != '.jnl'
+
+- name: Start DNS
+  service:
+    name: bind9
+    state: started
+
+- name: Restart DNS if necessary
+  meta: flush_handlers
+
+- name: Calculate DNS records
+  template:
+    src: dns.j2
+    dest: /etc/bind/records.txt
+
+- import_role:
+    name: ahuffman.resolv
+  vars:
+    resolv_nameservers:
+      - "{{ hostvars[inventory_hostname].ansible_default_ipv4.macaddress |
+            regex_replace(mac_regex, '::\\1X\\2:\\3ff:fe\\4:\\5\\6') |
+            regex_replace('X', mac_to_ipv6_interface_bit_flipper[
+              hostvars[inventory_hostname].ansible_default_ipv4.macaddress | regex_replace('.(.).*', '\\1') | int(base=16)
+            ]) }}"
+      - 127.0.0.1
+    resolv_search:
+      - "{{ network.domain }}.{{ network.suffix }}"
+
+- name: Update DNS records
+  vars:
+    line: "{{ item.split('|') }}"
+    zone: "{{ line.0 }}"
+    record: "{{ line.1 }}"
+    type: "{{ line.2 }}"
+    address: "{{ line.3 }}"
+  nsupdate:
+    key_name: "{{ network.domain }}.{{ network.suffix }}"
+    key_secret: "{{ ddns_public_key.stdout }}"
+    record: "{{ record }}"
+    server: "{{ dns_hostname }}"
+    type: "{{ type }}"
+    value: "{{ address }}"
+    zone: "{{ zone }}"
+  with_lines:
+    - cat /etc/bind/records.txt
+
+# TODO: Smarter log facility
+- name: Update /etc/rsyslog.d/50-default.conf
+  lineinfile:
+    path: /etc/rsyslog.d/50-default.conf
+    line: local1.*	/var/log/named.log
+    insertafter: EOF
+  notify:
+    - Restart rsyslog

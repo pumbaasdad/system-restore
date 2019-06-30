@@ -1,0 +1,78 @@
+{% set types = [
+    { 'self': 'ethernet', 'other': 'wifi', 'offset': 0 },
+    { 'self': 'wifi', 'other': 'ethernet', 'offset': 256 }
+] -%}
+
+{% set root_zone = [network.domain, network.suffix] | join('.') -%}
+
+{% for zonename in network.zones %}
+    {%- set zone = network.zones[zonename] %}
+    {%- set zonename = [zonename, root_zone] | join('.') %}
+    {%- set subnet = zone['ipv4_subnet'] %}
+
+    {%- set ipv6_prefix = zone['ipv6_prefix'] | ipaddr('network') %}
+    {%- if ipv6_prefix.split(':') | length() == 6 %}
+        {%- set ipv6_prefix = ipv6_prefix.split(':') | difference([ipv6_prefix.split(':')[5]]) | join(':') + ':' %}
+    {%- endif %}
+
+    {%- for type in types %}
+        {%- for hostname in zone['hosts'] %}
+            {%- set host = zone.hosts[hostname] %}
+
+            {%- set connector_type = '' %}
+            {%- if host[type.other] is defined %}
+                {%- set connector_type = type.self + '.' %}
+                {%- set hostname = [connector_type, hostname] | join %}
+            {%- endif %}
+
+            {%- if host[type.self] is defined -%}
+                {%- set ipv4_address = subnet | ipaddr(host.ipv4_offset + type.offset) | ipaddr('address') -%}
+                {{ zonename }}|{{ hostname }}|A|{{ ipv4_address }}{{ '\n' }}
+
+                {%- set zone_octets = reverse_ipv4_zone.split('.') | length %}
+                {%- set reverse_ipv4_route =  (ipv4_address.split('.') | reverse | list)[:(4 - (zone_octets | int))] | join('.') -%}
+                {{ reverse_ipv4_zone }}.in-addr.arpa|{{ reverse_ipv4_route }}|PTR|{{ hostname }}.{{ zonename }}{{ '\n' }}
+
+                {%- set computed_interface =
+                    host[type.self].mac |
+                    regex_replace(mac_regex, '::\\1X\\2:\\3ff:fe\\4:\\5\\6') |
+                    regex_replace('X', mac_to_ipv6_interface_bit_flipper[
+                        host[type.self].mac | regex_replace('.(.).*', '\\1') | int(base=16)
+                    ]) %}
+                {%- set interface = host[type.self].ipv6_interface | default(computed_interface) %}
+                {%- if interface | ipaddr('address') -%}
+                    {{ zonename }}|{{ hostname }}|AAAA|{{ zone.ipv6_prefix | ipaddr(interface | ipaddr('int')) | ipaddr('address') }}{{ '\n' }}
+
+                    {%- set ipv6_prefix_as_list = (zone.ipv6_prefix | ipaddr('network')).split(':') | reject('eq', '') | list %}
+                    {%- set ipv6_prefix_as_filled_list = (ipv6_prefix_as_list + ['0000', '0000', '0000', '0000'])[:4] %}
+                    {%- set ipv6_prefix_as_formatted_list = ipv6_prefix_as_filled_list |
+                        map('regex_replace', '^(.)$', '0\\1') |
+                        map('regex_replace', '^(..)$', '0\\1') |
+                        map('regex_replace', '^(...)$', '0\\1') |
+                        join %}
+                    {%- set reverse_prefix = ipv6_prefix_as_formatted_list | join | reverse | list | join('.') %}
+
+                    {%- set interface_as_list = interface.split(':') | reject('eq', '') | list %}
+                    {%- set interface_as_filled_list = ((['0000', '0000', '0000', '0000'] + interface_as_list) | reverse | list)[:4] | reverse | list %}
+                    {%- set interface_as_formatted_list = interface_as_filled_list |
+                        map('regex_replace', '^(.)$', '0\\1') |
+                        map('regex_replace', '^(..)$', '0\\1') |
+                        map('regex_replace', '^(...)$', '0\\1') |
+                        list %}
+                    {%- set reverse_interface = interface_as_formatted_list | join | reverse | list | join('.') %}
+
+                    {%- set reverse_ipv6_address = [reverse_interface, reverse_prefix] | join('.') %}
+                    {%- set reverse_ipv6_route = reverse_ipv6_address[:(62 - (reverse_ipv6_zone | list | length | int))] -%}
+
+                    {{ reverse_ipv6_zone }}.ip6.arpa|{{ reverse_ipv6_route }}|PTR|{{ hostname }}.{{ zonename }}{{ '\n' }}
+                {%- endif %}
+
+                {%- if host.aliases is defined %}
+                    {%- for alias in host.aliases -%}
+                        {{ root_zone }}|{{ connector_type }}{{ alias }}|CNAME|{{ hostname }}.{{ zonename }}.{{ '\n' }}
+                    {%- endfor %}
+                {%- endif %}
+            {%-endif %}
+        {%- endfor %}
+    {%- endfor  %}
+{% endfor %}

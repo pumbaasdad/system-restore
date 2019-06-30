@@ -1,0 +1,42 @@
+- name: Create the udev rule for the zwave stick
+  template:
+    src: zwave.rules.j2
+    dest: /etc/udev/rules.d/zwave.rules
+  notify: Reload udev rules
+
+- name: Create home assistant config dir
+  file:
+    path: "{{ hass_dir }}"
+    state: directory
+
+# Should this trigger a handler to restart docker-compose?
+- name: Install home assistant configuration
+  template:
+    src: configuration.yaml.j2
+    dest: "{{ hass_dir }}/configuration.yaml"
+
+- name: Install home assistant log
+  copy:
+    src: home-assistant.log
+    dest: "{{ hass_dir }}/home-assistant.log"
+    force: no
+
+- name: Install private home assistant reverse proxy
+  template:
+    src: private-reverse-proxy.j2
+    dest: "{{ private_reverse_proxy_dir }}/nginx/site-confs/hass-private"
+
+- name: Install public home assistant reverse proxy
+  template:
+    src: public-reverse-proxy.j2
+    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/hass-public"
+
+- name: Install fail2ban filter
+  template:
+    src: filter.local.j2
+    dest: "{{ fail2ban_dir }}/filter.d/ha.local"
+
+- name: Install fail2ban jail
+  template:
+    src: jail.conf.j2
+    dest: "{{ fail2ban_dir }}/jail.d/ha.conf"

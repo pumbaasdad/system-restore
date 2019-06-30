@@ -1,0 +1,13 @@
+dns_db_dir: /var/cache/bind
+
+dns_forwarders:
+  - 2001:4860:4860::8888
+  - 2001:4860:4860::8844
+  - 8.8.8.8
+  - 8.8.4.4
+  - "{{ isp_dns_forwarder_1 }}"
+  - "{{ isp_dns_forwarder_2 }}"
+
+dns_server: ns01
+dns_zone: infrastructure
+dns_hostname: "{{ dns_server }}.{{ dns_zone }}.{{ network.domain }}.{{ network.suffix }}"

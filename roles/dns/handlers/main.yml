@@ -1,0 +1,4 @@
+- name: Restart DNS
+  service:
+    name: bind9
+    state: restarted

@@ -1,0 +1,44 @@
+- name: Create reverse proxy config directories
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "{{ private_reverse_proxy_dir }}"
+    - "{{ public_reverse_proxy_dir }}"
+
+- name: Install nginx.conf
+  template:
+    src: nginx.conf.j2
+    dest: "{{ item }}/nginx/nginx.conf"
+  with_items:
+    - "{{ private_reverse_proxy_dir }}"
+    - "{{ public_reverse_proxy_dir }}"
+
+- name: Install private nginx default site-config
+  vars:
+    nginx_port: 80
+  template:
+    src: default.j2
+    dest: "{{ private_reverse_proxy_dir }}/nginx/site-confs/default"
+
+- name: Install public nginx default site-config
+  vars:
+    nginx_port: 443
+  template:
+    src: default.j2
+    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/default"
+
+- name: Install jails
+  template:
+    src: jail.conf.j2
+    dest: "{{ fail2ban_dir }}/jail.d/{{ item.name }}.conf"
+  with_items:
+    - name: nginx-http-auth
+      log: error
+      max_retry: 5
+    - name: nginx-badbots
+      log: access
+      max_retry: 2
+    - name: nginx-botsearch
+      log: access
+      max_retry: 5  

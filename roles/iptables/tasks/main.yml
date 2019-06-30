@@ -1,0 +1,10 @@
+- name: Create override directory
+  file:
+    path: /etc/systemd/system/netfilter-persistent.service.d
+    state: directory
+
+- name: Install systemd override file
+  copy:
+    src: override.conf
+    dest: /etc/systemd/system/netfilter-persistent.service.d/override.conf
+  notify: Reload systemd

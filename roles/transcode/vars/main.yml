@@ -1,0 +1,5 @@
+transcode_role:
+  apt_ppa:
+    ppa: stebbins/handbrake-releases 
+  packages:
+    - handbrake-cli

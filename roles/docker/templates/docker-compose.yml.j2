@@ -1,0 +1,127 @@
+      version: "3.7"
+      services:
+        duckdns:
+          image: linuxserver/duckdns
+          container_name: duckdns
+          environment:
+            - TZ={{ TZ }}
+            - SUBDOMAINS={{ duckdns_subdomain }}
+            - TOKEN={{ duckdns_token }}
+          networks:
+            - docker1
+          restart: unless-stopped
+        homeassistant:
+          container_name: hass
+          image: homeassistant/home-assistant
+          volumes:
+            - hass-config:/config
+          environment:
+            - TZ={{ TZ }}
+          networks:
+            macvlan0:
+                ipv4_address: {{ homeassistant_ip }}
+            private0:
+          devices:
+            - /dev/zwaveusbstick:/zwaveusbstick
+          restart: unless-stopped
+        letsencrypt:
+          container_name: letsencrypt 
+          image: linuxserver/letsencrypt
+          volumes:
+            - letsencrypt-config:/config
+            - private-nginx-config:/config/nginx
+            - private-nginx-log:/config/log/nginx
+            - public-nginx-log:/config/log/nginx-public
+            - {{ docker_compose_dir }}/hass/home-assistant.log:/config/log/hass/home-assistant.log
+            - fail2ban-jails:/etc/fail2ban/jail.d
+          ports:
+            - 80:80
+          environment:
+            - EMAIL={{ letsencrypt_email }}
+            - SUBDOMAINS=wildcard
+            - URL={{ letsencrypt_url }}
+            - VALIDATION=duckdns
+            - DUCKDNSTOKEN={{ duckdns_token }}
+            - TZ={{ TZ }}
+            - DHLEVEL=2048
+            - PUID=1000
+            - PGID=999
+          networks:
+            - docker1 
+            - private0
+          cap_add:
+            - NET_ADMIN
+          restart: unless-stopped
+        public-nginx:
+          container_name: public-nginx
+          image: linuxserver/nginx
+          volumes:
+            - letsencrypt-config:/config
+            - public-nginx-config:/config/nginx
+            - public-nginx-log:/config/log/nginx
+          ports:
+            - {{ public_port }}:443
+          environment:
+            - TZ={{ TZ }}
+            - DHLEVEL=2048
+            - PUID=1000
+            - PGID=999
+          networks:
+            - public0
+            - private0
+          restart: unless-stopped
+
+      networks:
+        docker1:
+          driver: bridge
+          driver_opts:
+            com.docker.network.bridge.name: docker1
+        macvlan0:
+          external:
+            name: macvlan0
+        private0:
+          driver: bridge
+          driver_opts:
+            com.docker.network.bridge.name: private0
+          internal: true
+        public0:
+          driver: bridge
+          driver_opts:
+            com.docker.network.bridge.name: public0
+
+      volumes:
+        hass-config:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/hass
+            o: bind
+        letsencrypt-config:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/letsencrypt
+            o: bind
+        fail2ban-jails:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/letsencrypt/fail2ban/jail.d
+            o: bind
+        public-nginx-config:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/nginx-public/nginx
+            o: bind
+        public-nginx-log:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/nginx-public/log/nginx
+            o: bind
+        private-nginx-config:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/nginx-private/nginx
+            o: bind
+        private-nginx-log:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/nginx-private/log/nginx
+            o: bind

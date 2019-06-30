@@ -1,0 +1,37 @@
+{% set ddns_key_name = network.domain + '.' + network.suffix %}
+include "/etc/bind/ddns.key";
+
+{% for zone in network.zones %}
+{% set fwd_zone = zone + '.' + network.domain + '.' + network.suffix %}
+zone "{{ fwd_zone }}"
+{
+    type master;
+    notify no;
+    file "{{ dns_db_dir + '/db.' + fwd_zone }}";
+    allow-update { key {{ ddns_key_name }}; };
+};
+
+{% endfor %}
+zone "{{ network.domain }}.{{ network.suffix }}"
+{
+    type master;
+    notify no;
+    file "{{ dns_db_dir + '/db.' + network.domain + '.' + network.suffix }}";
+    allow-update { key {{ ddns_key_name }}; };
+};
+
+zone "{{ reverse_ipv4_zone }}.in-addr.arpa"
+{
+    type master;
+    notify no;
+    file "{{ dns_db_dir + '/db.' + reverse_ipv4_zone }}";
+    allow-update { key {{ ddns_key_name }}; };
+};
+
+zone "{{ reverse_ipv6_zone }}.ip6.arpa"
+{
+    type master;
+    notify no;
+    file "{{ dns_db_dir + '/db.' + reverse_ipv6_zone }}";
+    allow-update { key {{ ddns_key_name }}; };
+};

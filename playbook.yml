@@ -1,0 +1,76 @@
+- hosts: all
+  become: true
+  vars:
+    # TODO: Move these to roles
+    cloud_print_connector_file: /etc/systemd/system/cloud-print-connector.service
+    plexupdate_dir: /repos/plexupdate
+  pre_tasks:
+    - name: Add apt keys
+      apt_key:
+        url: "{{ item.url }}"
+      with_items: "{{ apt_keys }}"
+
+    - name: Add PPAs
+      apt_repository:
+        repo: "ppa:{{ item.ppa }}"
+        codename: "{{ item.codename | default(ansible_distribution_release) }}"
+      with_items: "{{ apt_ppas }}"
+
+    - name: Add deb repos
+      apt_repository:
+        repo: "deb [arch=amd64] {{ item.url }} {{ item.codename | default(ansible_distribution_release) }} {{ item.channel | default('stable') }}"
+      with_items: "{{ deb_repos }}"
+
+    - name: Install packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: true
+
+    - name: Upgrade packages
+      apt:
+        upgrade: true
+
+  roles:
+    # TODO: backup(duplicity)
+    #         pretend it's not preinstalled
+    #         mount backups from the NAS... initial implementation can share logic with mounting media, but, if anyone needs to access backups, need to mount here
+    #         version 0.7.13.1
+    #         figure out minimum install
+    - dhcp
+    - docker
+    - dns
+    - media-rip
+    - media-server
+    - print-server
+    - shell
+    - system-config
+    - transcode
+
+  post_tasks:
+    - name: Start services on boot
+      service:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      with_items: "{{ services }}"
+
+    - name: Remove unused packages
+      apt:
+        autoremove: yes
+
+  handlers:
+
+    - name: Restart rsyslog
+      service:
+        name: rsyslog
+        state: restarted
+
+    - name: Reload systemd
+      systemd:
+        daemon_reload: yes
+
+# TODO: Setup ansible to run in cron job... need to be smart about setting the shell.  Running in cron there won't be a sudo user.  This probalby goes in the system-config module
+# TODO: Create docker file that will run this playbook on a clean sysytem
+# TODO: Write a bash script that will install docker, awscli and anything else necessary, then run the docker container.
+# TODO: Set static IP

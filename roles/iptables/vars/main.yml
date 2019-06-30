@@ -1,0 +1,4 @@
+iptables_role:
+  packages:
+    - iptables-persistent
+    - netfilter-persistent

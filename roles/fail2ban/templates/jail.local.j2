@@ -1,0 +1,26 @@
+# This is the custom version of the jail.conf for fail2ban
+# Feel free to modify this and add additional filters
+# Then you can drop the new filter conf files into the fail2ban-filters
+# folder and restart the container
+
+[DEFAULT]
+
+sender = {{ fail2ban_email }}
+destemail = {{ fail2ban_email }}
+
+action = %(action_mwl)s
+
+# "bantime" is the number of seconds that a host is banned.
+bantime  = 600
+
+# A host is banned if it has generated "maxretry" during the last "findtime"
+# seconds.
+findtime  = 600
+
+# "maxretry" is the number of failures before a host get banned.
+maxretry = 5
+
+
+[ssh]
+
+enabled = false

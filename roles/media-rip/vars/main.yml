@@ -1,0 +1,14 @@
+media-rip_role:
+  packages:
+    - build-essential
+    - libavcodec-dev
+    - libc6-dev
+    - libexpat1-dev
+    - libgl1-mesa-dev
+    - libqt4-dev
+    - libssl-dev
+    - pkg-config
+
+makemkv_packages:
+    - bin
+    - oss

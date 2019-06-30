@@ -1,0 +1,2 @@
+private_reverse_proxy_dir: "{{ docker_compose_dir }}/nginx-private"
+public_reverse_proxy_dir: "{{ docker_compose_dir }}/nginx-public"
