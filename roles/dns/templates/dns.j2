@@ -5,9 +5,8 @@
 
 {% set root_zone = [network.domain, network.suffix] | join('.') -%}
 
-{% for zonename in network.zones %}
-    {%- set zone = network.zones[zonename] %}
-    {%- set zonename = [zonename, root_zone] | join('.') %}
+{% for zone in network.zones %}
+    {%- set zonename = [zone.name, root_zone] | join('.') %}
     {%- set subnet = zone['ipv4_subnet'] %}
 
     {%- set ipv6_prefix = zone['ipv6_prefix'] | ipaddr('network') %}
@@ -16,8 +15,8 @@
     {%- endif %}
 
     {%- for type in types %}
-        {%- for hostname in zone['hosts'] %}
-            {%- set host = zone.hosts[hostname] %}
+        {%- for host in zone['hosts'] %}
+            {%- set hostname = host.name %}
 
             {%- set connector_type = '' %}
             {%- if host[type.other] is defined %}

@@ -6,3 +6,11 @@ dns_role:
 octet_regex: "[0-9a-fA-F]{2}"
 mac_regex: "([0-9a-fA-F])[0-9a-fA-F]:({{ octet_regex }}):({{ octet_regex }}):({{ octet_regex }}):({{ octet_regex }}):({{ octet_regex }})"
 mac_to_ipv6_interface_bit_flipper: ["2", "3", "0", "1", "6", "7", "4", "5", "a", "b", "8", "9", "e","f", "c", "d"]
+
+zone_names: "{{ network | json_query('zones[*].name') }}"
+
+dns_zone_query: "zones[?name=='{{dns_zone}}'] | [0]"
+dns_zone_result: "{{ network | json_query(dns_zone_query) }}"
+dns_host_query: "hosts[?name=='{{dns_server}}'] | [0]"
+dns_host_result: "{{ dns_zone_result | json_query(dns_host_query) }}"
+dns_host_ip: "{{ dns_zone_result.ipv4_subnet | ipaddr(dns_host_result.ipv4_offset) | ipaddr('address') }}"

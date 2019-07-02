@@ -2,7 +2,7 @@
 include "/etc/bind/ddns.key";
 
 {% for zone in network.zones %}
-{% set fwd_zone = zone + '.' + network.domain + '.' + network.suffix %}
+{% set fwd_zone = zone.name + '.' + network.domain + '.' + network.suffix %}
 zone "{{ fwd_zone }}"
 {
     type master;

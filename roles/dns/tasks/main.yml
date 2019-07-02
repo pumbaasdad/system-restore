@@ -97,8 +97,7 @@
     group: bind
     mode: 0644
     force: no
-  with_items:
-    - "{{ network.zones.keys() }}"
+  with_items: "{{ zone_names }}"
   notify: Restart DNS
 
 - name: Install zone databases
@@ -122,7 +121,7 @@
   with_fileglob:
     - "{{ dns_db_dir }}/db*"
   notify: Restart DNS
-  when: item.split('.')[1] not in network.zones.keys() and
+  when: item.split('.')[1] not in zone_names and
         item != dns_db_dir + '/db.' + reverse_ipv4_zone and
         item != dns_db_dir + '/db.' + reverse_ipv6_zone and
         item != dns_db_dir + '/db.' + network.domain + '.' + network.suffix and

@@ -17,7 +17,7 @@ log-facility local0;
 
 subnet {{ network.ipv4_subnet | ipaddr('network') }} netmask {{ network.ipv4_subnet | ipaddr('netmask') }} {
     authoritative;
-    range {{ network.dhcpv4_subnet | ipaddr('1') | ipaddr('address') }} {{ network.dhcpv4_subnet | ipaddr('-2') | ipaddr('address') }};
+    range {{ network.dhcpv4_subnet | ipaddr(1) | ipaddr('address') }} {{ network.dhcpv4_subnet | ipaddr('-2') | ipaddr('address') }};
     option domain-name-servers {{ nameservers | join(', ') }};
     option domain-name "{{ [network.domain, network.suffix] | join('.') }}";
     option routers {{ routers | join(', ') }};
@@ -27,9 +27,8 @@ subnet {{ network.ipv4_subnet | ipaddr('network') }} netmask {{ network.ipv4_sub
     { 'self': 'ethernet', 'other': 'wifi', 'offset': 0 },
     { 'self': 'wifi', 'other': 'ethernet', 'offset': 256 }
 ] %}
-{% for zonename in network.zones %}
-    {%- for hostname in network.zones[zonename].hosts %}
-        {%-  set host =  network.zones[zonename].hosts[hostname] %}
+{% for zone in network.zones %}
+    {%- for host in zone.hosts %}
         {%- for type in types %}
 
             {%- set connector_type = '' %}
@@ -39,9 +38,9 @@ subnet {{ network.ipv4_subnet | ipaddr('network') }} netmask {{ network.ipv4_sub
 
             {%- if host[type.self] is defined %}
 
-    host {{ connector_type }}{{ hostname }}.{{ zonename }} {
+    host {{ connector_type }}{{ host.name }}.{{ zone.name }} {
         hardware ethernet {{ host[type.self].mac }};
-        fixed-address {{ connector_type }}{{ hostname }}.{{ zonename }}.{{ network.domain }}.{{ network.suffix }};
+        fixed-address {{ connector_type }}{{ host.name }}.{{ zone.name }}.{{ network.domain }}.{{ network.suffix }};
     }
             {% endif %}
         {% endfor %}

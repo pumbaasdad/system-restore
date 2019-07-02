@@ -9,7 +9,7 @@ $TTL	604800
 
 @			IN	NS	{{ dns_hostname }}.
 {% if item == dns_zone %}
-{{ dns_server }}                    IN      A       {{ network.zones[dns_zone].ipv4_subnet | ipaddr(network.zones[dns_zone].hosts[dns_server].ipv4_offset) | ipaddr('address') }}
+{{ dns_server }}                    IN      A       {{ dns_host_ip }} 
 {% elif item == network.domain + "." + network.suffix %}
-{{ dns_server }}.{{ dns_zone }}     IN      A       {{ network.zones[dns_zone].ipv4_subnet | ipaddr(network.zones[dns_zone].hosts[dns_server].ipv4_offset) | ipaddr('address') }}
+{{ dns_server }}.{{ dns_zone }}     IN      A       {{ dns_host_ip }}
 {% endif %}
