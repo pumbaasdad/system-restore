@@ -39,18 +39,6 @@
       - docker-compose
     state: latest
 
-# Docker compose can't set gateway and ip-range for macvlan network so create that network externally.
-- name: Create macvlan network
-  docker_network:
-    name: macvlan0
-    ipam_options:
-      subnet: "{{ macvlan_subnet }}"
-      iprange: "{{ macvlan_iprange }}"
-      gateway: "{{ macvlan_gateway }}"
-    driver: macvlan
-    driver_options:
-      parent: enp2s0
-
 - name: Add iptable rules
   iptables:
     action: insert

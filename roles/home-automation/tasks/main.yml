@@ -24,7 +24,7 @@
 - name: Install private home assistant reverse proxy
   template:
     src: private-reverse-proxy.j2
-    dest: "{{ private_reverse_proxy_dir }}/nginx/site-confs/hass-private"
+    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/hass-private"
 
 - name: Install public home assistant reverse proxy
   template:

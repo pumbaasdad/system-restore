@@ -18,9 +18,8 @@
           environment:
             - TZ={{ TZ }}
           networks:
-            macvlan0:
-                ipv4_address: {{ homeassistant_ip }}
-            private0:
+            - docker2
+            - private0
           devices:
             - /dev/zwaveusbstick:/zwaveusbstick
           restart: unless-stopped
@@ -35,7 +34,7 @@
             - {{ docker_compose_dir }}/hass/home-assistant.log:/config/log/hass/home-assistant.log
             - fail2ban-jails:/etc/fail2ban/jail.d
           ports:
-            - 80:80
+            - {{ internal_host_address }}:80:80
           environment:
             - EMAIL={{ letsencrypt_email }}
             - SUBDOMAINS=wildcard
@@ -60,7 +59,8 @@
             - public-nginx-config:/config/nginx
             - public-nginx-log:/config/log/nginx
           ports:
-            - {{ public_port }}:443
+            - {{ external_host_address }}:{{ public_port }}:443
+            - {{ external_host_address }}:80:80
           environment:
             - TZ={{ TZ }}
             - DHLEVEL=2048
@@ -85,6 +85,8 @@
             - PASSPHRASE:{{ volumerize_passphrase }}
             - TZ={{ TZ }}
             - VOLUMERIZE_JOBBER_TIME=0 30 0 * * 1
+          networks:
+            - docker1
           restart: unless-stopped
 
       networks:
@@ -92,9 +94,6 @@
           driver: bridge
           driver_opts:
             com.docker.network.bridge.name: docker1
-        macvlan0:
-          external:
-            name: macvlan0
         private0:
           driver: bridge
           driver_opts:
@@ -104,6 +103,10 @@
           driver: bridge
           driver_opts:
             com.docker.network.bridge.name: public0
+        docker2:
+          driver: bridge
+          driver_opts:
+            com.docker.network.bridge.name: docker2
 
       volumes:
         hass-config:

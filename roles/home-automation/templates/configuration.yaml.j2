@@ -12,6 +12,8 @@ homeassistant:
   time_zone: UTC
   # Customization file
   customize: !include customize.yaml
+  auth_mfa_modules:
+    - type: totp
 
 # Show links to resources in log and frontend
 introduction:
