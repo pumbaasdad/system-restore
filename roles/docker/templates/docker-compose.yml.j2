@@ -70,6 +70,22 @@
             - public0
             - private0
           restart: unless-stopped
+        volumerize:
+          container_name: volumerize
+          image: blacklabelops/volumerize
+          volumes:
+            - volumerize-cache:/volumerize-cache
+            - volumerize-credentials:/credentials
+            - hass-storage:/source/hass/storage:ro
+            - letsencrypt-etc:/source/letsencrypt/etc:ro
+            - secrets:/source/secrets:ro
+          environment:
+            - VOLUMERIZE_SOURCE=/source
+            - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
+            - PASSPHRASE:{{ volumerize_passphrase }}
+            - TZ={{ TZ }}
+            - VOLUMERIZE_JOBBER_TIME=0 30 0 * * 1
+          restart: unless-stopped
 
       networks:
         docker1:
@@ -95,10 +111,20 @@
           driver_opts:
             device: {{ docker_compose_dir }}/hass
             o: bind
+        hass-storage:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/hass/.storage
+            o: bind
         letsencrypt-config:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/letsencrypt
+            o: bind
+        letsencrypt-etc:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/letsencrypt/etc
             o: bind
         fail2ban-jails:
           driver: local
@@ -124,4 +150,19 @@
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/nginx-private/log/nginx
+            o: bind
+        volumerize-cache:
+          driver: local
+          driver_opts:
+            device: {{ volumerize_dir }}/cache
+            o: bind
+        volumerize-credentials:
+          driver: local
+          driver_opts:
+            device: {{ volumerize_dir }}/credentials
+            o: bind
+        secrets:
+          driver: local
+          driver_opts:
+            device: {{ secrets_dir }}
             o: bind

@@ -32,11 +32,7 @@
         upgrade: true
 
   roles:
-    # TODO: backup(duplicity)
-    #         pretend it's not preinstalled
-    #         mount backups from the NAS... initial implementation can share logic with mounting media, but, if anyone needs to access backups, need to mount here
-    #         version 0.7.13.1
-    #         figure out minimum install
+    - backup
     - dhcp
     - docker
     - dns
