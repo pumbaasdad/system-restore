@@ -52,6 +52,13 @@
   notify: restart netfilter-persistent
 
 - name: Install docker-compose.yml
+  vars:
+    external_zone: "{{ network | json_query('zones[?hosts[*].external] | [0]') }}"
+    external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
+    external_ip: "{{ external_zone.ipv4_subnet | ipaddr(external_host.ipv4_offset) | ipaddr('address') }}"
+    internal_zone: "{{ network | json_query('zones[?hosts[*].internal] | [0]') }}"
+    internal_host: "{{ internal_zone | json_query('hosts[?internal] | [0]') }}"
+    internal_ip: "{{ internal_zone.ipv4_subnet | ipaddr(internal_host.ipv4_offset) | ipaddr('address') }}"
   template:
     src: docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"

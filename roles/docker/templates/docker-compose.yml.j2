@@ -34,7 +34,7 @@
             - {{ docker_compose_dir }}/hass/home-assistant.log:/config/log/hass/home-assistant.log
             - fail2ban-jails:/etc/fail2ban/jail.d
           ports:
-            - {{ internal_host_address }}:80:80
+            - {{ internal_ip }}:80:80
           environment:
             - EMAIL={{ letsencrypt_email }}
             - SUBDOMAINS=wildcard
@@ -59,8 +59,8 @@
             - public-nginx-config:/config/nginx
             - public-nginx-log:/config/log/nginx
           ports:
-            - {{ external_host_address }}:{{ public_port }}:443
-            - {{ external_host_address }}:80:80
+            - {{ external_ip }}:{{ public_port }}:443
+            - {{ external_ip }}:80:80
           environment:
             - TZ={{ TZ }}
             - DHLEVEL=2048
