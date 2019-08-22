@@ -88,6 +88,24 @@
           networks:
             - docker1
           restart: unless-stopped
+        unifi:
+          image: linuxserver/unifi-controller
+          container_name: unifi
+          environment:
+            - PUID=1000
+            - PGID=999
+          volumes:
+            - unifi:/config
+          ports:
+            - 3478:3478/udp
+            - 10001:10001/udp
+            - 8080:8080
+            - 8081:8081
+            - 8443:8443
+            - 8843:8843
+            - 8880:8880
+            - 6789:6789
+          restart: unless-stopped
 
       networks:
         docker1:
@@ -114,58 +132,76 @@
           driver_opts:
             device: {{ docker_compose_dir }}/hass
             o: bind
+            type: none
         hass-storage:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/hass/.storage
             o: bind
+            type: none
         letsencrypt-config:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/letsencrypt
             o: bind
+            type: none
         letsencrypt-etc:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/letsencrypt/etc
             o: bind
+            type: none
         fail2ban-jails:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/letsencrypt/fail2ban/jail.d
             o: bind
+            type: none
         public-nginx-config:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/nginx-public/nginx
             o: bind
+            type: none
         public-nginx-log:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/nginx-public/log/nginx
             o: bind
+            type: none
         private-nginx-config:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/nginx-private/nginx
             o: bind
+            type: none
         private-nginx-log:
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/nginx-private/log/nginx
             o: bind
+            type: none
         volumerize-cache:
           driver: local
           driver_opts:
             device: {{ volumerize_dir }}/cache
             o: bind
+            type: none
         volumerize-credentials:
           driver: local
           driver_opts:
             device: {{ volumerize_dir }}/credentials
             o: bind
+            type: none
         secrets:
           driver: local
           driver_opts:
             device: {{ secrets_dir }}
             o: bind
+            type: none
+        unifi:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/unifi
+            o: bind
+            type: none
