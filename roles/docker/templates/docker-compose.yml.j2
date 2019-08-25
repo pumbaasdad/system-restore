@@ -79,6 +79,7 @@
             - hass-storage:/source/hass/storage:ro
             - letsencrypt-etc:/source/letsencrypt/etc:ro
             - secrets:/source/secrets:ro
+            - unifi-backup:/source/unifi-backup
           environment:
             - VOLUMERIZE_SOURCE=/source
             - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
@@ -105,6 +106,8 @@
             - 8843:8843
             - 8880:8880
             - 6789:6789
+          networks:
+            - docker1
           restart: unless-stopped
 
       networks:
@@ -203,5 +206,11 @@
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/unifi
+            o: bind
+            type: none
+        unifi-backup:
+          driver: local
+          driver_opts:
+            device: {{ docker_compose_dir }}/unifi/data/backup
             o: bind
             type: none
