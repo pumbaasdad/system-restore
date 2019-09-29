@@ -8,13 +8,12 @@
 
 - name: Install prerequsites
   apt:
-    name: "{{ item }}"
+    name:
+      - curl
+      - git
+      - wget
     state: latest
     update_cache: true
-  with_items:
-    - curl
-    - git
-    - wget
 
 - name: Find most recent version of plex
   shell: curl https://plex.tv/api/downloads/5.json | grep -o '"label"[^}]*' | grep 'Ubuntu' | grep '64-bit' | grep -oP '"url":"\K[^"]*' | grep -oP 'plexmediaserver_\K[^_]*'

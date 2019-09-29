@@ -29,7 +29,7 @@
 
     - name: Upgrade packages
       apt:
-        upgrade: true
+        upgrade: yes
 
     - name: Install jmespath
       local_action:

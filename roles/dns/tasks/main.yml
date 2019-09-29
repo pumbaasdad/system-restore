@@ -21,10 +21,9 @@
 
 - name: Install prerequsites
   pip:
-    name: "{{ item }}"
-  with_items:
-    - netaddr
-    - jinja2
+    name:
+      - netaddr
+      - jinja2
 
 - name: Find DNS key files
   find:

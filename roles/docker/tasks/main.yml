@@ -64,6 +64,6 @@
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
 
 - name: Start docker services
-  docker_service:
+  docker_compose:
     pull: yes
     project_src: "{{ docker_compose_dir }}"
