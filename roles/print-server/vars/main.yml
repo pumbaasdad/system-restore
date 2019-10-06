@@ -1,9 +1,1 @@
-print-server_role:
-  packages:
-    - avahi-daemon
-    - cups
-    - google-cloud-print-connector
-    - libavahi-client3
-    - libcups2
-    - libsnmp30
-  service: cloud-print-connector
+cups_dir: "{{ docker_compose_dir }}/cups"

@@ -1,4 +1,6 @@
 dependencies:
+- role: backup
 - role: iptables
 - role: home-automation
 - role: media-server
+- role: print-server

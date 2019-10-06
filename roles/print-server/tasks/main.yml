@@ -1,15 +1,4 @@
-# TODO: Update cupsd.conf
-
-- name: Download cloud-print-connector systemd service file
-  get_url:
-    url: https://raw.githubusercontent.com/google/cloud-print-connector/master/systemd/cloud-print-connector.service
-    dest: "{{ cloud_print_connector_file }}"
-
-- name: Update cloud-print-connector systemd service file
-  replace:
-    path: "{{ cloud_print_connector_file }}"
-    regexp: ^{{ item.var }}=.*$
-    replace: "{{ item.var }}={{ item.value }}"
-  with_items:
-    - { var: ExecStart, value: /usr/bin/gcp-cups-connector }
-    - { var: User, value: root }
+- name: Create cups config dir
+  file:
+    path: "{{ cups_dir }}"
+    state: directory

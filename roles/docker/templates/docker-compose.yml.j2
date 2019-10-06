@@ -135,6 +135,25 @@
           networks:
             - docker1
           restart: unless-stopped
+        cups:
+          image: korylprince/cups-gcp-cups:v1.0.1
+          container_name: cups
+          environment:
+            - CUPS_USER={{ cups_user }}
+            - CUPS_PASS={{ cups_pass }}
+            - XMPP_JID={{ gcp_xmpp_jid }}
+            - REFRESH_TOKEN={{ gcp_refresh_token }}
+            - PROXY_NAME={{ gcp_proxy_name }}
+            - TZ={{ TZ }}
+          volumes:
+            - cups:/cups
+          ports:
+            - 631:631
+          networks:
+            - docker1
+          devices:
+            - /dev/bus/usb/{{ usb_printer_bus }}/{{ usb_printer_device }}
+          restart: unless-stopped
 
       networks:
         docker1:
@@ -250,5 +269,11 @@
           driver: local
           driver_opts:
             device: {{ media_server_dir }}
+            o: bind
+            type: none
+        cups:
+          driver: local
+          driver_opts:
+            device: {{ cups_dir }}
             o: bind
             type: none
