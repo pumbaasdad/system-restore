@@ -36,12 +36,10 @@
         name: jmespath
 
   roles:
-    - backup
     - dhcp
     - docker
     - dns
     - media-rip
-    - print-server
     - shell
     - system-config
     - transcode
