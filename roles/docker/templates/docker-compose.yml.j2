@@ -31,7 +31,7 @@
             - private-nginx-config:/config/nginx
             - private-nginx-log:/config/log/nginx
             - public-nginx-log:/config/log/nginx-public
-            - {{ docker_compose_dir }}/hass/home-assistant.log:/config/log/hass/home-assistant.log
+            - {{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log
             - fail2ban-jails:/etc/fail2ban/jail.d
           ports:
             - {{ internal_ip }}:80:80
@@ -178,55 +178,55 @@
         hass-config:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/hass
+            device: {{ hass_dir }}
             o: bind
             type: none
         hass-storage:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/hass/.storage
+            device: {{ hass_dir }}/.storage
             o: bind
             type: none
         letsencrypt-config:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/letsencrypt
+            device: {{ letsencrypt_dir }}
             o: bind
             type: none
         letsencrypt-etc:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/letsencrypt/etc
+            device: {{ letsencrypt_dir }}/etc
             o: bind
             type: none
         fail2ban-jails:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/letsencrypt/fail2ban/jail.d
+            device: {{ fail2ban_dir }}/jail.d
             o: bind
             type: none
         public-nginx-config:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/nginx-public/nginx
+            device: {{ public_reverse_proxy_dir }}/nginx
             o: bind
             type: none
         public-nginx-log:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/nginx-public/log/nginx
+            device: {{ public_reverse_proxy_dir }}/log/nginx
             o: bind
             type: none
         private-nginx-config:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/nginx-private/nginx
+            device: {{ private_reverse_proxy_dir }}/nginx
             o: bind
             type: none
         private-nginx-log:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/nginx-private/log/nginx
+            device: {{ private_reverse_proxy_dir }}/log/nginx
             o: bind
             type: none
         volumerize-cache:
@@ -250,13 +250,13 @@
         unifi:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/unifi
+            device: {{ unifi_dir }}
             o: bind
             type: none
         unifi-backup:
           driver: local
           driver_opts:
-            device: {{ docker_compose_dir }}/unifi/data/backup
+            device: {{ unifi_dir }}/data/backup
             o: bind
             type: none
         media:

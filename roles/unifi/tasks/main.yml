@@ -1,0 +1,4 @@
+- name: Create unifi directory
+  file:
+    path: "{{ unifi_dir }}"
+    state: directory
