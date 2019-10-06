@@ -3,7 +3,6 @@
   vars:
     # TODO: Move these to roles
     cloud_print_connector_file: /etc/systemd/system/cloud-print-connector.service
-    plexupdate_dir: /repos/plexupdate
   pre_tasks:
     - name: Add apt keys
       apt_key:
