@@ -1,2 +1,1 @@
-media-server_role:
-  service: plexmediaserver
+media_server_dir: "{{ docker_compose_dir }}/plex"

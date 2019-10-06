@@ -42,8 +42,7 @@
     - docker
     - dns
     - media-rip
-    - media-server
-    - print-server
+    # - print-server
     - shell
     - system-config
     - transcode
