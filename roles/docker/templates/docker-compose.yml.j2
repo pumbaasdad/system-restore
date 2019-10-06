@@ -109,6 +109,32 @@
           networks:
             - docker1
           restart: unless-stopped
+        plex:
+          image: linuxserver/plex
+          container_name: plex
+          environment:
+            - PUID=1000
+            - PGID=999
+            - VERSION=docker
+          volumes:
+            - plex_config:/config
+            - media:/media
+          ports:
+            - 32400:32400
+            - 32400:32400/udp
+            - 32469:32469
+            - 32469:32469/udp
+            - 1900:1900/udp
+            - 3005:3005
+            - 8324:8324
+            - 32410:32410/udp
+            - 32411:32411/udp
+            - 32412:32412/udp
+            - 32413:32413/udp
+            - 32414:32414/udp
+          networks:
+            - docker1
+          restart: unless-stopped
 
       networks:
         docker1:
@@ -212,5 +238,17 @@
           driver: local
           driver_opts:
             device: {{ docker_compose_dir }}/unifi/data/backup
+            o: bind
+            type: none
+        media:
+          driver: local
+          driver_opts:
+            device: ":{{ nas_media_dir }}"
+            o: addr={{ nas_address }},rw
+            type : nfs
+        plex_config:
+          driver: local
+          driver_opts:
+            device: {{ media_server_dir }}
             o: bind
             type: none
