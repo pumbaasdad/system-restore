@@ -1,0 +1,11 @@
+{
+  "name": "wsl-ssh-pageant",
+  "version": "0.0.1",
+  "description": "",
+  "main": "wsl-ssh-pageant.js.js",
+  "author": "Andrew Kowpak",
+  "license": "ISC",
+  "dependencies": {
+    "child-process-promise": "^2.2.1"
+  }
+}
