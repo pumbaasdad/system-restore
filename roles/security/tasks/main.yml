@@ -7,4 +7,6 @@
   template:
     src: authorized_keys.j2
     dest: /home/{{ ansible_env.SUDO_USER }}/.ssh/authorized_keys
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
     mode: 0600
