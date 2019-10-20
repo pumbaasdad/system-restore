@@ -1,39 +1,36 @@
 - hosts: all
   become: true
-  vars:
-    # TODO: Move these to roles
-    cloud_print_connector_file: /etc/systemd/system/cloud-print-connector.service
-  pre_tasks:
-    - name: Add apt keys
-      apt_key:
-        url: "{{ item.url }}"
-      with_items: "{{ apt_keys }}"
-
-    - name: Add PPAs
-      apt_repository:
-        repo: "ppa:{{ item.ppa }}"
-        codename: "{{ item.codename | default(ansible_distribution_release) }}"
-      with_items: "{{ apt_ppas }}"
-
-    - name: Add deb repos
-      apt_repository:
-        repo: "deb [arch=amd64] {{ item.url }} {{ item.codename | default(ansible_distribution_release) }} {{ item.channel | default('stable') }}"
-      with_items: "{{ deb_repos }}"
-
-    - name: Install packages
-      apt:
-        name: "{{ packages }}"
-        state: present
-        update_cache: true
-
-    - name: Upgrade packages
-      apt:
-        upgrade: yes
-
-    - name: Install jmespath
-      local_action:
-        module: pip
-        name: jmespath
+#  pre_tasks:
+#    - name: Add apt keys
+#      apt_key:
+#        url: "{{ item.url }}"
+#      with_items: "{{ apt_keys }}"
+#
+#    - name: Add PPAs
+#      apt_repository:
+#        repo: "ppa:{{ item.ppa }}"
+#        codename: "{{ item.codename | default(ansible_distribution_release) }}"
+#      with_items: "{{ apt_ppas }}"
+#
+#    - name: Add deb repos
+#      apt_repository:
+#        repo: "deb [arch=amd64] {{ item.url }} {{ item.codename | default(ansible_distribution_release) }} {{ item.channel | default('stable') }}"
+#      with_items: "{{ deb_repos }}"
+#
+#    - name: Install packages
+#      apt:
+#        name: "{{ packages }}"
+#        state: present
+#        update_cache: true
+#
+#    - name: Upgrade packages
+#      apt:
+#        upgrade: yes
+#
+#    - name: Install jmespath
+#      local_action:
+#        module: pip
+#        name: jmespath
 
   roles:
     - security
