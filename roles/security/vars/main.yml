@@ -3,5 +3,6 @@ security_role:
     ppa: yubico/stable
   packages:
     - libpam-yubico
+    - openssh-server
     - scdaemon
     - yubikey-manager
