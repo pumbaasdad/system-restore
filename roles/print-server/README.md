@@ -25,4 +25,12 @@ simple, cloud printing is used instead.  In order to setup cloud printing, follo
 
 
 These steps only need to be run once.  If the system is being restored from scratch, the previous values of the
-environment variables may be used. 
+environment variables may be used.
+
+# Required Variables
+
+ * usb_printer_vendor: Vendor code of the USB printer
+ * usb_printer_product: Product code of the USB printer
+ * usb_printer_serial: Serial number of the USB printer
+ 
+ The values of these variables can be found the `udevadm info` command.

@@ -152,7 +152,7 @@
           networks:
             - docker1
           devices:
-            - /dev/bus/usb/{{ usb_printer_bus }}/{{ usb_printer_device }}
+            - /dev/usbprinter:/dev/bus/usb/001/002
           restart: unless-stopped
 
       networks:
