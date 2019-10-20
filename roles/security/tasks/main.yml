@@ -1,10 +1,11 @@
-- name: Create key directories
+- name: Create user config directories
   file:
     path: /home/{{ ansible_env.SUDO_USER }}/{{ item }}
     state: directory
     owner: "{{ ansible_env.SUDO_USER }}"
     group: "{{ ansible_env.SUDO_USER }}"
   with_items:
+    - .gnupg
     - .ssh
     - .yubico
 
@@ -28,3 +29,16 @@
   file:
     path: /etc/pam.d
     state: directory
+
+- name: Update pam.d files
+  template:
+    src: pam.{{ item }}.j2
+    dest: /etc/pam.d/{{ item }}
+  with_items:
+    - sshd
+    - login
+
+- name: Update gpg-agent.conf
+  copy:
+    src: gpg-agent.conf
+    dest:  /home/{{ ansible_env.SUDO_USER }}/.gnupg/gpg-agent.conf 
