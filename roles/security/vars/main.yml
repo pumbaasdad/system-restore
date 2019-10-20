@@ -1,0 +1,7 @@
+security_role:
+  apt_ppa:
+    ppa: yubico/stable
+  packages:
+    - libpam-yubico
+    - scdaemon
+    - yubikey-manager
