@@ -1,8 +1,5 @@
 - hosts: all
   become: true
-  vars:
-    # TODO: Move these to roles
-    cloud_print_connector_file: /etc/systemd/system/cloud-print-connector.service
   pre_tasks:
     - name: Add apt keys
       apt_key:
@@ -36,6 +33,7 @@
         name: jmespath
 
   roles:
+    - security
     - dhcp
     - docker
     - dns

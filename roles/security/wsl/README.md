@@ -51,3 +51,9 @@ scheduled task on login to do the following:
  bunch of unfriendly behaviour when running this script in the fish shell.  This solution works and appears to be
  reliable.  Worth noting, in order to prevent the `socat` process from closing with the final WSL shell, Windows 10 had
  to be upgraded beyond 1803 (it is known to work with 1903 and has not been tested with 1809).
+ 
+### Useful Links
+
+ * https://justyn.io/blog/using-a-yubikey-for-gpg-in-wsl-windows-subsystem-for-linux-on-windows-10/
+ * https://github.com/drduh/YubiKey-Guide
+ * https://codingnest.com/how-to-use-gpg-with-yubikey-wsl/
