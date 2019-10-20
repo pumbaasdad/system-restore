@@ -2,6 +2,8 @@
   file:
     path: /home/{{ ansible_env.SUDO_USER }}/{{ item }}
     state: directory
+    owner: "{{ ansible_env.SUDO_USER }}"
+    group: "{{ ansible_env.SUDO_USER }}"
   with_items:
     - .ssh
     - .yubico
@@ -21,3 +23,8 @@
     owner: "{{ ansible_env.SUDO_USER }}"
     group: "{{ ansible_env.SUDO_USER }}"
     mode: 0600
+
+- name: Create pam.d directory
+  file:
+    path: /etc/pam.d
+    state: directory
