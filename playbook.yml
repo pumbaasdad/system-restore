@@ -38,7 +38,7 @@
 #    - docker
 #    - dns
 #    - media-rip
-#    - shell
+    - shell
 #    - system-config
 #    - transcode
 
