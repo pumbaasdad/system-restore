@@ -1,0 +1,9 @@
+security_role:
+  apt_ppa:
+    ppa: yubico/stable
+  packages:
+    - libpam-yubico
+    - openssh-server
+    - scdaemon
+    - yubikey-manager
+  service: sshd
