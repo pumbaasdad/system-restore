@@ -6,3 +6,4 @@ security_role:
     - openssh-server
     - scdaemon
     - yubikey-manager
+  service: sshd

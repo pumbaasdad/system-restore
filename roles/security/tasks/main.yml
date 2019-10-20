@@ -50,4 +50,4 @@
   copy:
     src: sshd_config
     dest: /etc/sshd_config
-  #notify: Restart SSHD
+  notify: Restart SSHD
