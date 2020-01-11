@@ -15,6 +15,9 @@ max-lease-time 345600;
 
 log-facility local0;
 
+subnet {{ dhcp_docker_subnet | ipaddr('network') }} netmask {{ dhcp_docker_subnet | ipaddr('netmask') }} {
+}
+
 subnet {{ network.ipv4_subnet | ipaddr('network') }} netmask {{ network.ipv4_subnet | ipaddr('netmask') }} {
     authoritative;
     range {{ network.dhcpv4_subnet | ipaddr(1) | ipaddr('address') }} {{ network.dhcpv4_subnet | ipaddr('-2') | ipaddr('address') }};

@@ -150,6 +150,23 @@
           devices:
             - /dev/usbprinter:/dev/bus/usb/001/002
           restart: unless-stopped
+        dhcp:
+          image: networkboot/dhcpd
+          container_name: dhcp
+          volumes:
+            - dhcp:/data
+          networks:
+            dhcp0:
+              ipv4_address: "{{ dhcp_docker_ip }}"
+          restart: unless-stopped
+        dhcp-relay:
+          image: joharohl/dhcp-helper
+          container_name: dhcp-relay
+          network_mode: host
+          cap_add:
+            - NET_ADMIN
+          command: -s {{ dhcp_docker_ip }}
+          restart: unless-stopped
 
       networks:
         docker1:
@@ -169,6 +186,14 @@
           driver: bridge
           driver_opts:
             com.docker.network.bridge.name: docker2
+        dhcp0:
+          driver: bridge
+          driver_opts:
+            com.docker.network.bridge.name: dhcp0
+          ipam:
+            driver: default
+            config:
+              - subnet: "{{ dhcp_docker_subnet }}"
 
       volumes:
         hass-config:
@@ -271,5 +296,11 @@
           driver: local
           driver_opts:
             device: {{ cups_dir }}
+            o: bind
+            type: none
+        dhcp:
+          driver: local
+          driver_opts:
+            device: {{ dhcp_dir }}
             o: bind
             type: none
