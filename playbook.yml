@@ -34,7 +34,6 @@
 
   roles:
     - security
-    - dhcp
     - docker
     - dns
     - media-rip
@@ -64,8 +63,3 @@
     - name: Reload systemd
       systemd:
         daemon_reload: yes
-
-# TODO: Setup ansible to run in cron job... need to be smart about setting the shell.  Running in cron there won't be a sudo user.  This probalby goes in the system-config module
-# TODO: Create docker file that will run this playbook on a clean sysytem
-# TODO: Write a bash script that will install docker, awscli and anything else necessary, then run the docker container.
-# TODO: Set static IP

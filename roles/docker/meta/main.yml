@@ -1,5 +1,6 @@
 dependencies:
 - role: backup
+- role: dhcp
 - role: home-automation
 - role: iptables
 - role: media-server

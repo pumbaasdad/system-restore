@@ -1,19 +1,9 @@
+- name: Create dhcp directory
+  file:
+    path: "{{ dhcp_dir }}"
+    state: directory
+
 - name: Update dhcpd.conf
   template:
     src: dhcpd.conf.j2
-    dest: /etc/dhcp/dhcpd.conf
-  notify: Restart DHCP
-
-- name: Start DHCP
-  service:
-    name: isc-dhcp-server
-    state: started
-
-# TODO: Smarter log facility
-- name: Update /etc/rsyslog.d/50-default.conf
-  lineinfile:
-    path: /etc/rsyslog.d/50-default.conf
-    line: local0.*	/var/log/dhcp.log
-    insertafter: EOF
-  notify:
-    - Restart rsyslog
+    dest: "{{ dhcp_dir }}/dhcpd.conf"
