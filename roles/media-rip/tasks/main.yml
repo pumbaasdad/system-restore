@@ -25,7 +25,7 @@
   with_items: "{{ makemkv_packages }}"
 
 - name: Configure MakeMKV Packages
-  command: ./configure
+  command: ./configure --disable-gui
   args:
     creates: /system_setup/makemkv/makemkv-oss-{{ most_recent_makemkv.stdout }}/config.status
     chdir: /system_setup/makemkv/makemkv-oss-{{ most_recent_makemkv.stdout }}
