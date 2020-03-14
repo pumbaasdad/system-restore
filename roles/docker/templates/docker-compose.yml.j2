@@ -135,21 +135,6 @@
           networks:
             - docker1
           restart: unless-stopped
-        cups:
-          image: jsoled/cups-airprint
-          container_name: cups
-          environment:
-            - CUPSADMIN={{ cups_user }}
-            - CUPSPASSWORD={{ cups_pass }}
-          volumes:
-            - cups:/config
-          ports:
-            - 631:631
-          networks:
-            - docker1
-          devices:
-            - /dev/usbprinter:/dev/bus/usb/001/002
-          restart: unless-stopped
         dhcp:
           image: networkboot/dhcpd
           container_name: dhcp
