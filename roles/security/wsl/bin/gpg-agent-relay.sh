@@ -1,5 +1,11 @@
 #!/bin/bash
 
+OLDPID=$(pidof socat)
+
+if [ ! -z "${OLDPID}" ]; then
+    exit 0
+fi
+
 GPGDIR="${HOME}/.gnupg"
 USERNAME=akowpak
 # I use the same username for wsl and windows, but feel free to modify the paths below if that isn't the case

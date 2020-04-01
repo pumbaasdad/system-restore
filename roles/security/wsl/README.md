@@ -40,17 +40,12 @@ Despite my best efforts to get this to run when WSL opened, the most reliable so
 scheduled task on login to do the following:
 
  * `node <path to wsl-ssh-pageant.js/run-in-background.js>`
- * `wsl nohup <path to gpg-agent-relay.sh> &`
+
+Then run bin/gpg-agent-relay.sh at the end of fish.config.
  
- Because I didn't want the wsl-ssh-pageant terminal to be open in the foreground, I needed to find some way to run it in
- the background.  Every solution I found required using the Windows scripting agent, which was blocked by my anti-virus
- software.  I improvised and used node.
- 
- Theoretically, it should be possible to run `gpg-agent-relay.sh` when opening WSL.  The original script that this copy
- is based on actually does that.  However, the original script was meant to be run with a bash shell, and, there was a
- bunch of unfriendly behaviour when running this script in the fish shell.  This solution works and appears to be
- reliable.  Worth noting, in order to prevent the `socat` process from closing with the final WSL shell, Windows 10 had
- to be upgraded beyond 1803 (it is known to work with 1903 and has not been tested with 1809).
+Because I didn't want the wsl-ssh-pageant terminal to be open in the foreground, I needed to find some way to run it in
+the background.  Every solution I found required using the Windows scripting agent, which was blocked by my anti-virus
+software.  I improvised and used node.
  
 ### Useful Links
 
