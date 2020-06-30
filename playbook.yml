@@ -25,7 +25,7 @@
 
     - name: Upgrade packages
       apt:
-        upgrade: yes
+        upgrade: "yes"
 
     - name: Install jmespath
       local_action:
@@ -39,7 +39,6 @@
     - media-rip
     - shell
     - system-config
-    - transcode
 
   post_tasks:
     - name: Start services on boot
