@@ -3,7 +3,7 @@ dependencies:
 - role: dhcp
 - role: home-automation
 - role: iptables
+- role: media-rip
 - role: media-server
-- role: print-server
 - role: transcode
 - role: unifi

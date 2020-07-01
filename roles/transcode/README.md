@@ -1,6 +1,6 @@
 This role creates the configuration directory for a transcoder that will be run in a docker container.  The `handbrake`
 transcoder will be used.  It's user interface can be accessed on port 5800.  The container is configured to
-automatically transcode files that are placed in the transcoder input directory, and will place the output in the
+automatically transcode files that are placed in the media-rip output directory, and will place the output in the
 transcoder output directory.
 
 # Required Variables
@@ -8,9 +8,7 @@ transcoder output directory.
  * transcode_dir: The configuration directory created by this role.  Defaults to `{{ docker_compose_dir }}/transcode`
  * transcode_nas_dir: A directory on the NAS that contains transcoder input and output directories.  Defaults to
    `{{ nas_media_dir }}/transcode`
- * transcode_input_dir: A directory on the NAS that the transcoder will watch for files to automatically transcode.
-   Defaults to `{{ transcode_nas_dir }}/raw`.
- * transcode_output_dir: A directory on the NAS where the output of transcodes will be placed.  Defaults to
+  * transcode_output_dir: A directory on the NAS where the output of transcodes will be placed.  Defaults to
    `{{ transcode_nas_dir }}/output`.
  * transcode_keep_app_running: If the `handbrake` process should be restarted if it crashes.  Defaults to `1` (yes).
  * transcode_preset: The preset that `handbrake` will use us when automatically transcoding.  Defaults to
