@@ -152,6 +152,26 @@
             - NET_ADMIN
           command: -s {{ dhcp_docker_ip }}
           restart: unless-stopped
+        makemkv:
+          image: jlesage/makemkv
+          container_name: makemkv
+          ports:
+            - 5801:5800
+          environment:
+            - USER_ID=1000
+            - GROUP_ID=999
+            - TZ={{ TZ }}
+            - KEEP_APP_RUNNING={{ media_rip_keep_app_running }}
+            - AUTO_DISC_RIPPER=1
+          volumes:
+            - media_rip_destination:/output
+            - {{ media_rip_config_dir }}:/config
+          networks:
+            - docker1
+          devices:
+            - {{ optical_drives.results[0].stat.lnk_source }}:{{ optical_drives.results[0].stat.lnk_source }}
+            - {{ optical_drives.results[1].stat.lnk_source }}:{{ optical_drives.results[1].stat.lnk_source }}
+          restart: unless-stopped
         handbrake:
           image: jlesage/handbrake
           container_name: handbrake
@@ -169,8 +189,10 @@
             - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
           volumes:
             - {{ transcode_dir }}:/config
-            - transcode_source:/watch
+            - media_rip_destination:/watch
             - transcode_destination:/output
+            # This is temporary.  Remove this and the transcoder_source when all the pre-ripped content is transcoded
+            - transcode_source:/watch2
           networks:
             - docker1
           restart: unless-stopped
@@ -299,16 +321,16 @@
             device: {{ media_server_dir }}
             o: bind
             type: none
-        cups:
-          driver: local
-          driver_opts:
-            device: {{ cups_dir }}
-            o: bind
-            type: none
         dhcp:
           driver: local
           driver_opts:
             device: {{ dhcp_dir }}
+            o: bind
+            type: none
+        media_rip_destination:
+          driver: local
+          driver_opts:
+            device: {{ media_rip_output_dir }}
             o: bind
             type: none
         transcode_source:

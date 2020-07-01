@@ -1,79 +1,13 @@
-- name: Find latest version of MakeMKV
-  shell: curl http://www.makemkv.com/download/history.html | grep -oP "<li>MakeMKV v\K[^ ]*" | head -n1
-  args:
-    warn: false
-  register: most_recent_makemkv
-  changed_when: false
+- name: Create the udev rule for the optical drive
+  template:
+    src: scsi.rules.j2
+    dest: /etc/udev/rules.d/scsi.rules
+  notify: Reload udev rules
 
-- name: Make config directory
+- name: Create media-rip directories
   file:
-    path: /system_setup/makemkv
+    path: "{{ item }}"
     state: directory
-
-- name: Download MakeMKV
-  get_url:
-    url: http://www.makemkv.com/download/makemkv-{{ item }}-{{ most_recent_makemkv.stdout }}.tar.gz
-    dest: /system_setup/makemkv/makemkv-{{ item }}-{{ most_recent_makemkv.stdout }}.tar.gz
-  with_items: "{{ makemkv_packages }}"
-
-- name: Extract MakeMKV Packages
-  unarchive:
-    remote_src: yes
-    src: /system_setup/makemkv/makemkv-{{ item }}-{{ most_recent_makemkv.stdout }}.tar.gz
-    dest: /system_setup/makemkv
-    list_files: true
-  with_items: "{{ makemkv_packages }}"
-
-- name: Configure MakeMKV Packages
-  command: ./configure --disable-gui
-  args:
-    creates: /system_setup/makemkv/makemkv-oss-{{ most_recent_makemkv.stdout }}/config.status
-    chdir: /system_setup/makemkv/makemkv-oss-{{ most_recent_makemkv.stdout }}
-
-- name: Accept MakeMKV EULA
-  lineinfile:
-    path: /system_setup/makemkv/makemkv-bin-{{ most_recent_makemkv.stdout }}/tmp/eula_accepted
-    create: true
-    line: accepted
-
-- name: Get EULA acceptance data
-  stat:
-    path: /system_setup/makemkv/makemkv-bin-{{ most_recent_makemkv.stdout }}/tmp/eula_accepted
-  register: makemkv_eula_stat
-
-- name: Get makemkv install date
-  stat:
-    path: /usr/bin/makemkvcon
-  register: makemkvcon_stat
-
-- name: Instal MakeMKV
-  make:
-    chdir: /system_setup/makemkv/makemkv-{{ item.0 }}-{{ most_recent_makemkv.stdout }}
-    target: "{{ item.1 }}"
-  with_nested:
-    - "{{ makemkv_packages }}"
-    - ['all', 'install']
-  when: (not makemkvcon_stat.stat.exists) or (makemkvcon_stat.stat.ctime < makemkv_eula_stat.stat.ctime) 
-
-- name: Find MakeMKV registration code
-  shell: curl -s "https://www.makemkv.com/forum/viewtopic.php?f=5&t=1053" | grep -oP '<code>\K[^<]*'
-  args:
-    warn: false
-  changed_when: false
-  register: makemkv_reg_code
-
-- name: Update MakeMKV registration code
-  lineinfile:
-    path: /home/{{ ansible_env.SUDO_USER }}/.MakeMKV/settings.conf
-    regexp: '^app_key="'
-    line: 'app_key="{{ makemkv_reg_code.stdout }}"'
-    create: true
-    owner: "{{ ansible_env.SUDO_USER }}"
-    group: "{{ ansible_env.SUDO_USER }}"
-  when: makemkv_reg_code.stdout | length > 0
-
-- name: Install MakeMKV wrapper
-  copy:
-    src: rip.sh
-    dest: /usr/local/bin/rip
-    mode: 0755
+  with_items:
+    - "{{ media_rip_config_dir }}"
+    - "{{ media_rip_output_dir }}"
