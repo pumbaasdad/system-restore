@@ -152,6 +152,28 @@
             - NET_ADMIN
           command: -s {{ dhcp_docker_ip }}
           restart: unless-stopped
+        handbrake:
+          image: jlesage/handbrake
+          container_name: handbrake
+          ports:
+            - 5800:5800
+          environment:
+            - USER_ID=1000
+            - GROUP_ID=999
+            - TZ={{ TZ }}
+            - KEEP_APP_RUNNING={{ transcode_keep_app_running }}
+            - AUTOMATED_CONVERSION_PRESET={{ transcode_preset }}
+            - AUTOMATED_CONVERSION_KEEP_SOURCE={{ transcode_keep_source_file }}
+            - AUTOMATED_CONVERSION_OUTPUT_SUBDIR={{ transcode_output_subdir }}
+            - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME={{ transcode_input_stability_seconds }}
+            - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
+          volumes:
+            - {{ transcode_dir }}:/config
+            - transcode_source:/watch
+            - transcode_destination:/output
+          networks:
+            - docker1
+          restart: unless-stopped
 
       networks:
         docker1:
@@ -289,3 +311,15 @@
             device: {{ dhcp_dir }}
             o: bind
             type: none
+        transcode_source:
+          driver: local
+          driver_opts:
+            device: ":{{ transcode_input_dir }}"
+            o: addr={{ nas_address }},rw
+            type : nfs
+        transcode_destination:
+          driver: local
+          driver_opts:
+            device: ":{{ transcode_output_dir }}"
+            o: addr={{ nas_address }},rw
+            type : nfs

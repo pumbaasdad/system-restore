@@ -5,4 +5,5 @@ dependencies:
 - role: iptables
 - role: media-server
 - role: print-server
+- role: transcode
 - role: unifi
