@@ -5,7 +5,8 @@ The container is configured to automatically rip any media inserted into the PC.
 # Required Variables
 
  * optical_vendor: The vendor of the optical drive that will be used by `MakeMKV`.  This string will be used in a `udev`
-   rule to identify the drive.
+   rule to identify the drive.  This information can be obtained by running the command `sudo udevadm info -a /dev/sr#`
+   where `sr#` is the optical drive.
  * media_rip_dir: The directory used for media rip operations.  Defaults to `{{ docker_compose_dir }}/media-rip`.
  * media_rip_config_dir: The directory where the docker container will store any information that it needs to persist.
    Defaults to `{{ media_rip_dir }}/config`.
