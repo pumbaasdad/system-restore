@@ -1,4 +1,6 @@
-dns_db_dir: /var/cache/bind
+dns_dir: "{{ docker_compose_dir }}/dns"
+dns_config_dir: "{{ dns_dir }}/config"
+dns_cache_dir: "{{ dns_dir }}/cache"
 
 dns_forwarders:
   - 2001:4860:4860::8888

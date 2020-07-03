@@ -1,4 +1,18 @@
-- name: Restart DNS
-  service:
-    name: bind9
-    state: restarted
+- name: Update DNS records
+  vars:
+    line: "{{ item.split('|') }}"
+    zone: "{{ line.0 }}"
+    record: "{{ line.1 }}"
+    type: "{{ line.2 }}"
+    address: "{{ line.3 }}"
+  nsupdate:
+    key_name: "{{ network.domain }}.{{ network.suffix }}"
+    key_secret: "{{ ddns_public_key.stdout }}"
+    record: "{{ record }}"
+    server: "{{ dns_hostname }}"
+    type: "{{ type }}"
+    value: "{{ address }}"
+    zone: "{{ zone }}"
+    port: 25000
+  with_lines:
+    - cat {{ dns_config_dir }}/records.txt
