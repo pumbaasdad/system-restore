@@ -33,8 +33,9 @@
     or latest_docker_compose_version.stdout not in docker_compose_current_version.stdout
 
 - name: Install docker python modules
-  pip:
-    name: 
+  local_action:
+    module: pip
+    name:
       - docker
       - docker-compose
     state: latest

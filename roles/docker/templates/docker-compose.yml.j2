@@ -196,6 +196,18 @@
           networks:
             - docker1
           restart: unless-stopped
+        dns:
+          image: resystit/bind9
+          container_name: bind9
+          ports:
+            - "53:53"
+            - "53:53/udp"
+          volumes:
+            - {{ dns_config_dir }}:/etc/bind
+            - {{ dns_cache_dir }}:/var/cache/bind
+          networks:
+            - docker1
+          restart: unless-stopped
 
       networks:
         docker1:

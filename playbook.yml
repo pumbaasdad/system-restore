@@ -35,7 +35,6 @@
   roles:
     - security
     - docker
-    - dns
     - shell
     - system-config
 
@@ -52,12 +51,6 @@
         autoremove: yes
 
   handlers:
-
-    - name: Restart rsyslog
-      service:
-        name: rsyslog
-        state: restarted
-
     - name: Reload systemd
       systemd:
         daemon_reload: yes

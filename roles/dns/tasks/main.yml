@@ -1,3 +1,20 @@
+- name: Create dns config directory
+  file:
+    path: "{{ dns_config_dir }}"
+    state: directory
+
+- name: Create dns cache directory
+  file:
+    path: "{{ dns_cache_dir }}"
+    state: directory
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
+
+- name: Disable systemd-resolved
+  service:
+    name: systemd-resolved
+    enabled: no
+
 - name: Calculate reverse zones
   vars:
     ipv4_network_as_list: "{{ (network.ipv4_subnet | ipaddr('network')).split('.') }}"
@@ -14,20 +31,17 @@
     reverse_ipv4_zone: "{{ ipv4_network_as_list[:(ipv4_required_bytes | int)] | reverse | list | join('.') }}"
     reverse_ipv6_zone: "{{ ipv6_network_as_formatted_list[:(ipv6_required_bytes | int)] | reverse | list | join('.') }}"
 
-- name: Install dnspython
+- name: Install prerequsites
   local_action:
     module: pip
-    name: dnspython
-
-- name: Install prerequsites
-  pip:
     name:
+      - dnspython
       - netaddr
       - jinja2
 
 - name: Find DNS key files
   find:
-    paths: /etc/bind
+    paths: "{{ dns_config_dir }}"
     patterns: K{{ network.domain }}.{{ network.suffix }}.+157+*.{{ item }}
   register: existing_dns_key_files
   with_items:
@@ -47,97 +61,103 @@
       shell: dnssec-keygen -a HMAC-MD5 -b 128 -r /dev/urandom -n USER {{ resolve_search }}
       register: dnssec_keygen
       args:
-        chdir: /etc/bind
+        chdir: "{{ dns_config_dir }}"
       changed_when: false
   when: existing_dns_key_files.results | map(attribute='matched') | list != [1, 1]
 
 - name: Get DDNS private key
-  shell: "grep 'Key: ' /etc/bind/K{{ network.domain }}.{{ network.suffix }}.+157+*.private | awk '{ print $2 }'"
+  shell: "grep 'Key: ' {{ dns_config_dir }}/K{{ network.domain }}.{{ network.suffix }}.+157+*.private | awk '{ print $2 }'"
   register: ddns_private_key
   changed_when: false
 
 - name: Get DDNS public key
-  shell: "cat /etc/bind/K{{ network.domain }}.{{ network.suffix }}.+157+*.key | awk '{ print $7 }'"
+  shell: "cat {{ dns_config_dir }}/K{{ network.domain }}.{{ network.suffix }}.+157+*.key | awk '{ print $7 }'"
   register: ddns_public_key
   changed_when: false
 
 - name: Update ddns.key
   template:
     src: ddns.key.j2
-    dest: /etc/bind/ddns.key
-    owner: root
-    group: bind
+    dest: "{{ dns_config_dir }}/ddns.key"
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
     mode: 0644
-  notify: Restart DNS
+
+- name: Install default files
+  copy:
+    src: "{{ item }}"
+    dest: "{{ dns_config_dir }}"
+    force: no
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
+    mode: 0644
+  with_items:
+    - bind.keys
+    - db.0
+    - db.127
+    - db.255
+    - db.empty
+    - db.local
+    - db.root
+    - named.conf
+    - named.conf.default-zones
 
 - name: Update named.conf.local
   template:
     src: named.conf.local.j2
-    dest: /etc/bind/named.conf.local
-    owner: root
-    group: bind
+    dest: "{{ dns_config_dir }}/named.conf.local"
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
     mode: 0644
-  notify: Restart DNS
 
 - name: Install named.conf.options
   template:
     src: named.conf.options.j2
-    dest: /etc/bind/named.conf.options
-    owner: root
-    group: bind
+    dest: "{{ dns_config_dir }}/named.conf.options"
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
     mode: 0644
-  notify: Restart DNS
 
 - name: Install zone databases
   template:
     src: db.j2
-    dest: "{{ dns_db_dir }}/db.{{ item }}.{{ network.domain }}.{{ network.suffix }}"
-    owner: root
-    group: bind
+    dest: "{{ dns_cache_dir }}/db.{{ item }}.{{ network.domain }}.{{ network.suffix }}"
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
     mode: 0644
     force: no
   with_items: "{{ zone_names }}"
-  notify: Restart DNS
 
 - name: Install zone databases
   template:
     src: db.j2
-    dest: "{{ dns_db_dir }}/db.{{ item }}"
-    owner: root
-    group: bind
+    dest: "{{ dns_cache_dir }}/db.{{ item }}"
+    owner: "{{ dns_user }}"
+    group: "{{ dns_group }}"
     mode: 0644
     force: no
   with_items:
     - "{{ network.domain }}.{{ network.suffix }}"
     - "{{ reverse_ipv4_zone }}"
     - "{{ reverse_ipv6_zone }}"
-  notify: Restart DNS
 
 - name: Delete old zones
   file:
     state: absent
     path: "{{ item }}"
   with_fileglob:
-    - "{{ dns_db_dir }}/db*"
-  notify: Restart DNS
+    - "{{ dns_cache_dir }}/db*"
   when: item.split('.')[1] not in zone_names and
-        item != dns_db_dir + '/db.' + reverse_ipv4_zone and
-        item != dns_db_dir + '/db.' + reverse_ipv6_zone and
-        item != dns_db_dir + '/db.' + network.domain + '.' + network.suffix and
+        item != dns_cache_dir + '/db.' + reverse_ipv4_zone and
+        item != dns_cache_dir + '/db.' + reverse_ipv6_zone and
+        item != dns_cache_dir + '/db.' + network.domain + '.' + network.suffix and
         (item | splitext)[1] != '.jnl'
-
-- name: Start DNS
-  service:
-    name: bind9
-    state: started
-
-- name: Restart DNS if necessary
-  meta: flush_handlers
 
 - name: Calculate DNS records
   template:
     src: dns.j2
-    dest: /etc/bind/records.txt
+    dest: "{{ dns_config_dir }}/records.txt"
+  notify: Update DNS records
 
 - import_role:
     name: ahuffman.resolv
@@ -149,32 +169,6 @@
               hostvars[inventory_hostname].ansible_default_ipv4.macaddress | regex_replace('.(.).*', '\\1') | int(base=16)
             ]) }}"
       - 127.0.0.1
+      - "{{ dns_forwarders | ipv4 | first }}"
     resolv_search:
       - "{{ network.domain }}.{{ network.suffix }}"
-
-- name: Update DNS records
-  vars:
-    line: "{{ item.split('|') }}"
-    zone: "{{ line.0 }}"
-    record: "{{ line.1 }}"
-    type: "{{ line.2 }}"
-    address: "{{ line.3 }}"
-  nsupdate:
-    key_name: "{{ network.domain }}.{{ network.suffix }}"
-    key_secret: "{{ ddns_public_key.stdout }}"
-    record: "{{ record }}"
-    server: "{{ dns_hostname }}"
-    type: "{{ type }}"
-    value: "{{ address }}"
-    zone: "{{ zone }}"
-  with_lines:
-    - cat /etc/bind/records.txt
-
-# TODO: Smarter log facility
-- name: Update /etc/rsyslog.d/50-default.conf
-  lineinfile:
-    path: /etc/rsyslog.d/50-default.conf
-    line: local1.*	/var/log/named.log
-    insertafter: EOF
-  notify:
-    - Restart rsyslog
