@@ -24,4 +24,9 @@ options {
 
     auth-nxdomain no;    # conform to RFC1035
     listen-on { any; };
+
+    allow-recursion {
+        {{ network.ipv4_subnet }};
+        {{ network.ipv6_subnet }};
+    };
 };
