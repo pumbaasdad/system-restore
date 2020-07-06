@@ -13,6 +13,5 @@
     type: "{{ type }}"
     value: "{{ address }}"
     zone: "{{ zone }}"
-    port: 25000
   with_lines:
     - cat {{ dns_config_dir }}/records.txt
