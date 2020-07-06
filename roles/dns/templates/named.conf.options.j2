@@ -26,6 +26,8 @@ options {
     listen-on { any; };
 
     allow-recursion {
+        localhost;
+        localnets;
         {{ network.ipv4_subnet }};
         {{ network.ipv6_subnet }};
     };

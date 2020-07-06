@@ -13,8 +13,6 @@ option domain-name-servers ns1.example.org, ns2.example.org;
 default-lease-time 172800;
 max-lease-time 345600;
 
-log-facility local0;
-
 subnet {{ dhcp_docker_subnet | ipaddr('network') }} netmask {{ dhcp_docker_subnet | ipaddr('netmask') }} {
 }
 
