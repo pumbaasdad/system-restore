@@ -2,9 +2,8 @@ dependencies:
 - role: backup
 - role: dhcp
 - role: dns
-- role: home-automation
 - role: iptables
-- role: media-rip
 - role: media-server
 - role: transcode
+- role: udev
 - role: unifi

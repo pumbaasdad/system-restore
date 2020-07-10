@@ -2,7 +2,7 @@
   template:
     src: zwave.rules.j2
     dest: /etc/udev/rules.d/zwave.rules
-  notify: Reload udev rules
+  register: zwave_udev_rules
 
 - name: Create home assistant config dir
   file:
