@@ -7,3 +7,4 @@
   template:
     src: dhcpd.conf.j2
     dest: "{{ dhcp_dir }}/dhcpd.conf"
+  register: dhcp_conf
