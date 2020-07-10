@@ -55,14 +55,12 @@
         state: absent
         path: "{{ item }}"
       with_items: "{{ existing_dns_key_files.results | map(attribute='files') | sum(start=[]) | map(attribute='path') | list }}"
-      when: existing_dns_key_files.results | map(attribute='matched') | list != [1, 1]
 
     - name: Generate keys for DDNS
       shell: dnssec-keygen -a HMAC-MD5 -b 128 -r /dev/urandom -n USER {{ resolve_search }}
       register: dnssec_keygen
       args:
         chdir: "{{ dns_config_dir }}"
-      changed_when: false
   when: existing_dns_key_files.results | map(attribute='matched') | list != [1, 1]
 
 - name: Get DDNS private key
@@ -82,6 +80,7 @@
     owner: "{{ dns_user }}"
     group: "{{ dns_group }}"
     mode: 0644
+  register: ddns_key
 
 - name: Install default files
   copy:
@@ -101,6 +100,7 @@
     - db.root
     - named.conf
     - named.conf.default-zones
+  register: dns_default_files
 
 - name: Update named.conf.local
   template:
@@ -109,6 +109,7 @@
     owner: "{{ dns_user }}"
     group: "{{ dns_group }}"
     mode: 0644
+  register: named_conf_local
 
 - name: Install named.conf.options
   template:
@@ -117,8 +118,9 @@
     owner: "{{ dns_user }}"
     group: "{{ dns_group }}"
     mode: 0644
+  register: named_conf_options
 
-- name: Install zone databases
+- name: Install {{ network.domain }}.{{ network.suffix }} databases
   template:
     src: db.j2
     dest: "{{ dns_cache_dir }}/db.{{ item }}.{{ network.domain }}.{{ network.suffix }}"
@@ -127,6 +129,7 @@
     mode: 0644
     force: no
   with_items: "{{ zone_names }}"
+  register: dns_sub_zone_databases
 
 - name: Install zone databases
   template:
@@ -140,6 +143,7 @@
     - "{{ network.domain }}.{{ network.suffix }}"
     - "{{ reverse_ipv4_zone }}"
     - "{{ reverse_ipv6_zone }}"
+  register: dns_zone_databases
 
 - name: Delete old zones
   file:

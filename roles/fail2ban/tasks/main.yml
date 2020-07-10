@@ -10,3 +10,4 @@
   template:
     src: jail.local.j2
     dest: "{{ fail2ban_dir }}/jail.local"
+  register: fail2ban_jail
