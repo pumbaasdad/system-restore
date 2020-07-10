@@ -72,11 +72,12 @@
     src: docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
 
-- name: Pull docker containers
+- name: Create docker containers
   docker_compose:
     pull: yes
     project_src: "{{ docker_compose_dir }}"
-    recreate: never
+    debug: true
+  register: compose
 
 - name: Restart homeassistant
   docker_compose:
@@ -84,7 +85,9 @@
     restarted: yes
     services:
       - homeassistant
-  when: hass_configuration.changed
+  when: >
+    hass_configuration.changed and
+    (compose.actions | selectattr('service', 'equalto', 'homeassistant') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
 
 - name: Restart letsencrypt
   docker_compose:
@@ -93,12 +96,13 @@
     services:
       - letsencrypt
   when: >
-    fail2ban_jail.changed or
-    fail2ban_hass_filter.changed or
-    fail2ban_hass_jail.changed or
-    (fail2ban_nginx_jail.results | map(attribute='changed') | list) is any or
-    (reverse_proxy_conf.results | selectattr('item', 'equalto', private_reverse_proxy_dir) | first).changed or
-    private_reverse_proxy_site_conf_default.changed
+    (fail2ban_jail.changed or
+     fail2ban_hass_filter.changed or
+     fail2ban_hass_jail.changed or
+     (fail2ban_nginx_jail.results | map(attribute='changed') | list) is any or
+     (reverse_proxy_conf.results | selectattr('item', 'equalto', private_reverse_proxy_dir) | first).changed or
+     private_reverse_proxy_site_conf_default.changed) and
+    (compose.actions | selectattr('service', 'equalto', 'letsencrypt') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
 
 - name: Restart public-nginx
   docker_compose:
@@ -107,14 +111,15 @@
     services:
       - public-nginx
   when: >
-    fail2ban_jail.changed or
-    fail2ban_hass_filter.changed or
-    fail2ban_hass_jail.changed or
-    (fail2ban_nginx_jail.results | map(attribute='changed') | list) is any or
-    (reverse_proxy_conf.results | selectattr('item', 'equalto', public_reverse_proxy_dir) | first).changed or
-    public_reverse_proxy_site_conf_default.changed or
-    hass_private_reverse_proxy.changed or
-    hass_public_reverse_proxy.changed
+    (fail2ban_jail.changed or
+     fail2ban_hass_filter.changed or
+     fail2ban_hass_jail.changed or
+     (fail2ban_nginx_jail.results | map(attribute='changed') | list) is any or
+     (reverse_proxy_conf.results | selectattr('item', 'equalto', public_reverse_proxy_dir) | first).changed or
+     public_reverse_proxy_site_conf_default.changed or
+     hass_private_reverse_proxy.changed or
+     hass_public_reverse_proxy.changed) and
+    (compose.actions | selectattr('service', 'equalto', 'public-nginx') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
 
 - name: Restart dhcp
   docker_compose:
@@ -122,7 +127,9 @@
     restarted: yes
     services:
       - dhcp
-  when: dhcp_conf.changed
+  when: >
+    dhcp_conf.changed and
+    (compose.actions | selectattr('service', 'equalto', 'dhcp') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
 
 - name: Restart dns
   docker_compose:
@@ -131,14 +138,11 @@
     services:
       - dns
   when: >
-    ddns_key.changed or
-    (dns_default_files.results | map(attribute='changed') | list) is any or
-    named_conf_local.changed or
-    named_conf_options.changed or
-    (dns_zone_databases.results | map(attribute='changed') | list) is any or
-    dns_sub_zone_databases.changed or
-    dns_zone_databases.changed
-
-- name: Recreate docker containers
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
+    (ddns_key.changed or
+     (dns_default_files.results | map(attribute='changed') | list) is any or
+     named_conf_local.changed or
+     named_conf_options.changed or
+     (dns_zone_databases.results | map(attribute='changed') | list) is any or
+     dns_sub_zone_databases.changed or
+     dns_zone_databases.changed) and
+    (compose.actions | selectattr('service', 'equalto', 'dns') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
