@@ -1,0 +1,3 @@
+dependencies:
+- role: home-automation
+- role: media-rip
