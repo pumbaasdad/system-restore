@@ -11,4 +11,3 @@ docker_role:
     - software-properties-common
     - docker-ce
   service: docker
-TZ: America/Toronto
