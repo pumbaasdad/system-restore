@@ -13,10 +13,10 @@ These options were not used because:
  1. The YubiKey 5 series only allow 2 of OTP, Static Password, HMAC-SHA1 Challenge-Response or OATH-HOTP.  Because I
  have use cases that require OTP and Static Passwords, and because SSH keys provide a backup method for accessing the
  machine, this solution was acceptable.
- 1. There currently appears to be an issue accessing Ed25519 keys stored on a YubiKey when SSHing from a chromebook.
+ 1. ~~There currently appears to be an issue accessing Ed25519 keys stored on a YubiKey when SSHing from a chromebook.
  Since I can't currently access the SSH key from the chromebook, I'm allowing YubiKey MFA as an acceptable alternative
  when using my chromebook.  The side effect of this means that accessing the server when connectivity is down will
- require a Windows or Linux machine that is capable of accessing the SSH key.
+ require a Windows or Linux machine that is capable of accessing the SSH key.~~
  
  I specifically chose not to require the YubiKey for `sudo` access.  It seems like there is enough security in place to
  prevent bad actors from gaining shell access.  If someone makes it that far, they likely have the YubiKey, and, the
