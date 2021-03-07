@@ -145,7 +145,7 @@
               ipv4_address: "{{ dhcp_docker_ip }}"
           restart: unless-stopped
         dhcp-relay:
-          image: joharohl/dhcp-helper
+          image: pumbaasdad/dhcp-helper
           container_name: dhcp-relay
           network_mode: host
           cap_add:
