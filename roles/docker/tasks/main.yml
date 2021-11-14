@@ -9,6 +9,18 @@
     groups: docker
     append: yes
 
+- name: Update daemon.json
+  template:
+    src: daemon.json.js
+    dest: /etc/docker/daemon.json
+  register: docker_daemon_updated
+
+- name: Restart docker daemon
+  service:
+    name: docker
+    state: restarted
+  when: docker_daemon_updated.changed
+
 - name: Find most recent version of docker-compose
   shell: git ls-remote --tags git://github.com/docker/compose | cut -f2 | grep -v docs | grep -v rc | cut -d/ -f3 | sort -Vr | head -n1
   args:
@@ -71,6 +83,12 @@
   template:
     src: docker-compose.yml.j2
     dest: "{{ docker_compose_dir }}/docker-compose.yml"
+
+- name: Stop docker containers
+  docker_compose:
+    project_src: "{{ docker_compose_dir }}"
+    stopped: yes
+  when: docker_daemon_updated.changed
 
 - name: Create docker containers
   docker_compose:

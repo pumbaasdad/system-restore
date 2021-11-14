@@ -1,1 +1,2 @@
 TZ: America/Toronto
+docker_address_pool_size: 24
