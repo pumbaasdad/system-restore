@@ -3,6 +3,11 @@
     path: "{{ dhcp_dir }}"
     state: directory
 
+- name: Install prerequsites
+  local_action:
+    module: pip 
+    name: netaddr
+
 - name: Update dhcpd.conf
   template:
     src: dhcpd.conf.j2

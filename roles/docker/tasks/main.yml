@@ -6,7 +6,7 @@
 - name: Allow docker to run without sudo
   user:
     name: "{{ ansible_env.SUDO_USER }}"
-    group: docker
+    groups: docker
     append: yes
 
 - name: Find most recent version of docker-compose
