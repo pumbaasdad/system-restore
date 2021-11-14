@@ -12,7 +12,7 @@
           restart: unless-stopped
         homeassistant:
           container_name: hass
-          image: homeassistant/home-assistant
+          image: ghcr.io/home-assistant/home-assistant
           volumes:
             - hass-config:/config
           environment:
@@ -72,7 +72,7 @@
           restart: unless-stopped
         volumerize:
           container_name: volumerize
-          image: motionbank/volumerize
+          image: fekide/volumerize
           volumes:
             - volumerize-cache:/volumerize-cache
             - volumerize-credentials:/credentials
