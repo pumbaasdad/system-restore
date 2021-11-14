@@ -20,8 +20,6 @@
           networks:
             - docker2
             - private0
-          devices:
-            - /dev/zwaveusbstick:/zwaveusbstick
           restart: unless-stopped
         letsencrypt:
           container_name: letsencrypt 
@@ -81,6 +79,7 @@
             - letsencrypt-etc:/source/letsencrypt/etc:ro
             - secrets:/source/secrets:ro
             - unifi-backup:/source/unifi-backup
+            - zwave-config:/source/zwave-config
           environment:
             - VOLUMERIZE_SOURCE=/source
             - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
@@ -208,6 +207,28 @@
             - {{ dns_cache_dir }}:/var/cache/bind
           networks:
             - docker1
+          restart: unless-stopped
+        zwavejs2mqtt:
+          image: zwavejs/zwavejs2mqtt:latest
+          container_name: zwavejs2mqtt
+          ports:
+            - "8091:8091"
+            - "3000:3000"
+          volumes:
+            - zwave-config:/usr/src/app/store
+          environment:
+            - SESSION_SECRET={{ zwave_session_secret }}
+            - KEY_S0_Legacy={{ zwave_s0_legacy_key }}
+            - KEY_S2_Unauthenticated={{ zwave_s2_unauthenticated_key }}
+            - KEY_S2_Authenticated={{ zwave_s2_authenticated_key }}
+            - KEY_S2_AccessControl={{ zwave_s2_access_control_key }}
+            - TZ={{ TZ }}
+          networks:
+            - docker2
+          devices:
+            - /dev/zwaveusbstick:/dev/zwave
+          tty: true
+          stop_signal: SIGINT
           restart: unless-stopped
 
       networks:
@@ -362,3 +383,10 @@
             device: ":{{ transcode_output_dir }}"
             o: addr={{ nas_address }},rw
             type : nfs
+        zwave-config:
+          driver: local
+          driver_opts:
+            device: {{ zwave_dir }}
+            o: bind
+            type: none
+
