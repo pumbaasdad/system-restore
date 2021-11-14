@@ -67,8 +67,9 @@
             - PUID=1000
             - PGID=999
           networks:
-            - public0
-            - private0
+            public0:
+            private0:
+              ipv4_address: {{ reverse_proxy_private0_ipv4_address }}
           restart: unless-stopped
         volumerize:
           container_name: volumerize
@@ -219,6 +220,10 @@
           driver_opts:
             com.docker.network.bridge.name: private0
           internal: true
+          ipam:
+            driver: default
+            config:
+              - subnet: "{{ docker_private0_subnet }}"
         public0:
           driver: bridge
           driver_opts:
