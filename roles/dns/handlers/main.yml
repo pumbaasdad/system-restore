@@ -9,7 +9,7 @@
     key_name: "{{ network.domain }}.{{ network.suffix }}"
     key_secret: "{{ ddns_public_key.stdout }}"
     record: "{{ record }}"
-    server: "{{ dns_hostname }}"
+    server: "127.0.0.1"
     type: "{{ type }}"
     value: "{{ address }}"
     zone: "{{ zone }}"

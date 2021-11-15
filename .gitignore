@@ -2,3 +2,4 @@ network.yml
 secrets.yml
 *.retry
 .idea
+playbook.test.yml
