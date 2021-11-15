@@ -75,7 +75,7 @@
           volumes:
             - volumerize-cache:/volumerize-cache
             - volumerize-credentials:/credentials
-            - hass-storage:/source/hass/storage:ro
+            - hass-config:/source/hass:ro
             - letsencrypt-etc:/source/letsencrypt/etc:ro
             - secrets:/source/secrets:ro
             - unifi-backup:/source/unifi-backup
@@ -267,12 +267,6 @@
           driver: local
           driver_opts:
             device: {{ hass_dir }}
-            o: bind
-            type: none
-        hass-storage:
-          driver: local
-          driver_opts:
-            device: {{ hass_dir }}/.storage
             o: bind
             type: none
         letsencrypt-config:
