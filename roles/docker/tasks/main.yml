@@ -11,7 +11,7 @@
 
 - name: Update daemon.json
   template:
-    src: daemon.json.js
+    src: daemon.json.j2
     dest: /etc/docker/daemon.json
   register: docker_daemon_updated
 
@@ -96,6 +96,16 @@
     project_src: "{{ docker_compose_dir }}"
     debug: true
   register: compose
+
+- name: Restart zwavejs2mqtt
+  docker_compose:
+    project_src: "{{ docker_compose_dir }}"
+    restarted: yes
+    services:
+      - homeassistant
+  when: >
+    zwave_configuration.changed and
+    (compose.actions | selectattr('service', 'equalto', 'zwavejs2mqtt') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
 
 - name: Restart homeassistant
   docker_compose:
