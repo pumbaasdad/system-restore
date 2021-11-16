@@ -1,1 +1,2 @@
 hass_dir: "{{ docker_compose_dir }}/hass"
+hass_db_dir: "{{ docker_compose_dir }}/hass-db"
