@@ -15,6 +15,7 @@
           image: ghcr.io/home-assistant/home-assistant
           volumes:
             - hass-config:/config
+            - hass-db:/db
           environment:
             - TZ={{ TZ }}
           networks:
@@ -267,6 +268,12 @@
           driver: local
           driver_opts:
             device: {{ hass_dir }}
+            o: bind
+            type: none
+        hass-db:
+          driver: local
+          driver_opts:
+            device: {{ hass_db_dir }}
             o: bind
             type: none
         letsencrypt-config:
