@@ -81,6 +81,7 @@
             - secrets:/source/secrets:ro
             - unifi-backup:/source/unifi-backup
             - zwave-config:/source/zwave-config
+            - /var/run/docker.sock:/var/run/docker.sock
           environment:
             - VOLUMERIZE_SOURCE=/source
             - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
