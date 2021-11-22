@@ -24,7 +24,7 @@
           restart: unless-stopped
         letsencrypt:
           container_name: letsencrypt 
-          image: linuxserver/letsencrypt
+          image: linuxserver/swag
           volumes:
             - letsencrypt-config:/config
             - private-nginx-config:/config/nginx
