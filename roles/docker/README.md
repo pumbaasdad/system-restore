@@ -227,16 +227,6 @@ configurations required to access sites from the public internet and the local n
 
 The directory where logs from the `nginx` server that is exposed to the public internet are written.
 
-### private-nginx-config
-
-This directory is deprecated.  It is still mounted by the `letsencrypt` container, theoretically to generate keys for
-an internal only reverse proxy.  This volume will be removed in the future.
-
-### private-nginx-log
-
-This directory is deprecated.  It is still mounted by the `letsencrypt` container, theoretically to allow `fail2ban` to
-analyze logs for an internal facing `nginx` server.  It will be removed in the future.
-
 ### volumerize-cache
 
 This directory stores the `volumerize` cache used to generate incremental backups. 
@@ -274,10 +264,6 @@ This directory stores the dhcp server configuration.
 ### media_rip_destination
 
 This directory is used to store the files created by ripping CDs and DVDs.
-
-### transcode_source
-
-This directory is deprecated and will be removed in the future.
 
 ### transcode_destination
 

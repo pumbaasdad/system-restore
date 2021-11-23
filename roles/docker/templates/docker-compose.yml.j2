@@ -27,8 +27,6 @@
           image: linuxserver/swag
           volumes:
             - letsencrypt-config:/config
-            - private-nginx-config:/config/nginx
-            - private-nginx-log:/config/log/nginx
             - public-nginx-log:/config/log/nginx-public
             - {{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log
             - fail2ban-jails:/etc/fail2ban/jail.d
@@ -198,8 +196,6 @@
             - {{ transcode_dir }}:/config
             - media_rip_destination:/watch
             - transcode_destination:/output
-            # This is temporary.  Remove this and the transcoder_source when all the pre-ripped content is transcoded
-            - transcode_source:/watch2
           networks:
             - docker1
           restart: unless-stopped
@@ -312,18 +308,6 @@
             device: {{ public_reverse_proxy_dir }}/log/nginx
             o: bind
             type: none
-        private-nginx-config:
-          driver: local
-          driver_opts:
-            device: {{ private_reverse_proxy_dir }}/nginx
-            o: bind
-            type: none
-        private-nginx-log:
-          driver: local
-          driver_opts:
-            device: {{ private_reverse_proxy_dir }}/log/nginx
-            o: bind
-            type: none
         volumerize-cache:
           driver: local
           driver_opts:
@@ -378,12 +362,6 @@
             device: {{ media_rip_output_dir }}
             o: bind
             type: none
-        transcode_source:
-          driver: local
-          driver_opts:
-            device: ":{{ transcode_input_dir }}"
-            o: addr={{ nas_address }},rw
-            type : nfs
         transcode_destination:
           driver: local
           driver_opts:
