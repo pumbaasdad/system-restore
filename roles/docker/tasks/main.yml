@@ -102,7 +102,7 @@
     project_src: "{{ docker_compose_dir }}"
     restarted: yes
     services:
-      - homeassistant
+      - zwavejs2mqtt
   when: >
     zwave_configuration.changed and
     (compose.actions | selectattr('service', 'equalto', 'zwavejs2mqtt') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
