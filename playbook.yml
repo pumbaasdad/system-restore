@@ -32,6 +32,17 @@
         module: pip
         name: jmespath
 
+    - name: Include role secrets
+      include_vars: "{{ path }}"
+      vars:
+        params:
+          files: "{{ secrets_files }}"
+          paths: "{{ 'roles/' + item + '/vars' }}"
+          skip: true
+        path: "{{ lookup('first_found', params) }}"
+      when: path | length > 0
+      loop: "{{ ansible_role_names }}"
+
   roles:
     - security
     - docker
