@@ -1,9 +1,16 @@
 dependencies:
 - role: backup
+- role: certificates
+- role: ddns
 - role: dhcp
 - role: dns
+- role: fail2ban
+- role: home-automation
 - role: iptables
+- role: media-rip
 - role: media-server
+- role: reverse-proxy
 - role: transcode
 - role: udev
 - role: unifi
+- role: zwave

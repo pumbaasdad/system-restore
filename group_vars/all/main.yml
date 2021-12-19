@@ -6,5 +6,9 @@ apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_
 packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='packages', start=[]) | list }}"
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 
+lastpass_secrets_path: Infrastructure/Secrets
+
 secrets_files:
   - lastpass.yml
+
+resolve_search: "{{ network.domain }}.{{ network.suffix }}"

@@ -32,16 +32,16 @@
         module: pip
         name: jmespath
 
-    - name: Include role secrets
+    - name: Include secrets
       include_vars: "{{ path }}"
       vars:
         params:
           files: "{{ secrets_files }}"
-          paths: "{{ 'roles/' + item + '/vars' }}"
+          paths: "{{ item + '/secrets' }}"
           skip: true
         path: "{{ lookup('first_found', params) }}"
       when: path | length > 0
-      loop: "{{ ansible_role_names }}"
+      loop: "{{ (['roles/'] | product(ansible_role_names) | map('join') | list) + ['.'] }}"
 
   roles:
     - security

@@ -1,3 +1,5 @@
+# Description
+
 This role uses `docker-compose` to run a number of services on the target machine.  It creates several docker networks
 in an attempt to isolate the blast radius should any container be compromised.  The resulting infrastructure looks like
 this:
@@ -318,17 +320,19 @@ This container is given an explicit IP address because the DHCP server and the r
 
 This container is given the `NET_ADMIN` capacity to allow it to listen to multicast traffic.
 
-# Required Variables
+# Initial Setup
 
-The following variables are required by this role.  Variable provided by roles on which this container depends are not
-listed.
+You must configure a port on your router that will forward traffic to the server being configured.  The port that
+receives that traffic must be set in the `public_port` variable. 
 
-- TZ: The timezone in which the docker host is running.  Defaults to `https://download.docker.com/linux/ubuntu`
-- docker_address_pool_size: The CIDR suffix specifying how many addresses a docker network will be given.  Defaults to
-  `24`, meaning each docker network will be allocated 256 IP addresses.
-- docker_address_pool_subnet: The subnet from which docker networks will be allocated.
-- docker_private0_subnet: The subnet that will be used for the `private0` network
-- docker_compose_dir: The directory where `docker-compse.yml` will be installed.
-- secrets_dir: The path to the `group_vars/all` directory on the docker host.
-- public_port: The port that has been setup on your router to forward packets to the interface connected to the
-  `public0` network.
+# Variables
+
+| Variable                   | Required | Description                                                                                                        | Default          |
+|:---------------------------|:---------|:-------------------------------------------------------------------------------------------------------------------|:-----------------|
+| TZ                         | No       | The timezone in which the docker host is running.                                                                  | America/Toronto  |
+| docker_address_pool_size   | No       | The CIDR suffix specifying how many addresses a docker network will be given.                                      | 24               |
+| docker_address_pool_subnet | Yes      | The subnet from which docker networks will be allocated.                                                           |                  |
+| docker_private0_subnet     | Yes      | The subnet that will be used for the `private0` network.                                                           |                  |
+| public_port                | Yes      | The port that has been setup on your router to forward packets to the interface connected to the`public0` network. |                  |
+| nas_address                | Yes      | The IP of the NAS used by docker.                                                                                  |                  |
+| secrets_dir                | Yes      | The path to the `group_vars/all` directory on the docker host.                                                     |                  |

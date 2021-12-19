@@ -1,4 +1,4 @@
 dependencies:
+- role: ddns
 - role: reverse-proxy
 - role: fail2ban
-- role: zwave

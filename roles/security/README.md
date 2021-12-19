@@ -1,3 +1,5 @@
+# Description
+
 This role installs and configures security software specifically, it will:
 
  1. Enable `gpg-agent` forwarding
@@ -22,11 +24,18 @@ These options were not used because:
  prevent bad actors from gaining shell access.  If someone makes it that far, they likely have the YubiKey, and, the
  extra layer of security would be pointless.  Also, if any mistake is made in configuring `sudo` access with the
  YubiKey, it would be quite impossible to fix the issue, since elevated privileges would be required to fix the issue.
- 
- ### Required Variables ###
- 
- * ssh_authorized_key: An SSH key that may be used by the user running ansible to access the machine via SSH.
- * yubikey_token_id: The token ID associated with a YubiKey that the user running ansible may use to access the machine. 
- * yubico_api_client_id: Client ID to authenticate with the [YubiCloud service](https://upgrade.yubico.com/getapikey/). 
- * yubico_api_secret_key: Secrete key to authenticate with the
- [YubiCloud service](https://upgrade.yubico.com/getapikey/).
+
+# Initial Setup
+
+You must have already an SSH key that you plan to use to authenticate with your server.
+
+You must have signed up a [YubiCloud service](https://upgrade.yubico.com/getapikey/) API key.
+
+# Variables
+
+| Variable              | Required | Description                                                                                         | Default |
+|:----------------------|:---------|:----------------------------------------------------------------------------------------------------|:--------|
+| ssh_authorized_key    | Yes      | An SSH key that may be used by the user running ansible to access the machine via SSH.              |         |
+| yubikey_token_id      | Yes      | The token ID associated with a YubiKey that the user running ansible may use to access the machine. |         |
+| yubico_api_client_id  | Yes      | The client ID generated when signing up for the YubiCloud service.                                  |         |
+| yubico_api_secret_key | Yes      | The secret key generated with signing up for the YubiCloud service.                                 |         |

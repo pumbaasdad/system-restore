@@ -19,6 +19,14 @@ The playbook will also install the latest version of `ansible` on the provisione
 
 Information about variables that must be available to ansible, as well as any manual intial setup steps can be found in
 the README files under the `roles` directory.
+
+## Required Variables
+
+The following variables must be defined for the playbook to run:
+
+| Variable           | Description                                                                                                 |
+|:-------------------|:------------------------------------------------------------------------------------------------------------|
+| docker_compose_dir | The root directory that will contain configuration for all services running on the server being configured. |
  
 # Running
 
@@ -59,3 +67,16 @@ The roles defined in this project define both defaults and variables.  The inten
 default can be overwritten, and the playbook will still execute as expected.  Anything defined as a variable is meant
 to represent constants so magic numbers do not appear through the project.  Overwriting these values will result in
 undefined behaviour.  
+
+## Secrets
+
+Secrets are stored in the cloud.  These are loaded in files stored in the `secrets` directory at the root of this
+repository and in `secrets` directories within each role.  One file from each of these directories will be loaded based
+upon where the secrets are stored.  Currently, the only supported storage location is [LastPass](www.lastpass.com).
+Secrets defined in these files can be overridden by extra vars provided on the command line (i.e. `-e var=value`).
+
+### LastPass
+
+Entries in LastPass should have the same name as the variable that they are being loaded into.  Entries must also be
+prefixed with a path to maintain LastPass hygiene.  The path is specified by the variable `lastpass_secrets_path` which
+defaults to `Infrastructure/Secrets`.
