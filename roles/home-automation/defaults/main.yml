@@ -1,2 +1,5 @@
 hass_dir: "{{ docker_compose_dir }}/hass"
 hass_db_dir: "{{ docker_compose_dir }}/hass-db"
+
+google_assistant_project_id: "{{ secrets['google_assistant_project_id'] }}"
+google_assistant_api_key: "{{ secrets['google_assistant_api_key'] }}"

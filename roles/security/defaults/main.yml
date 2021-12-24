@@ -1,0 +1,5 @@
+ssh_authorized_key: "{{ secrets['ssh_authorized_key'] }}"
+
+yubikey_token_id: "{{ secrets['yubikey_token_id'] }}"
+yubico_api_client_id: "{{ secrets['yubico_api_client_id'] }}"
+yubico_api_secret_key: "{{ secrets['yubico_api_secret_key'] }}"

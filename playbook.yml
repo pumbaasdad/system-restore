@@ -1,6 +1,24 @@
 - hosts: all
   become: true
   pre_tasks:
+    - name: Include secrets
+      include_vars: "{{ path }}"
+      vars:
+        params:
+          files: "{{ secrets_files }}"
+          paths: secrets
+          skip: true
+        path: "{{ lookup('first_found', params) }}"
+
+    - name: Load secrets
+      set_fact:
+        secrets: "{{ secrets_dictionary }}"
+        network: "{{ secret_network.network }}"
+
+    - name: Load network configuration
+      set_fact:
+        network: "{{ secret_network.network }}"
+
     - name: Add apt keys
       apt_key:
         url: "{{ item.url }}"
@@ -31,17 +49,6 @@
       local_action:
         module: pip
         name: jmespath
-
-    - name: Include secrets
-      include_vars: "{{ path }}"
-      vars:
-        params:
-          files: "{{ secrets_files }}"
-          paths: "{{ item + '/secrets' }}"
-          skip: true
-        path: "{{ lookup('first_found', params) }}"
-      when: path | length > 0
-      loop: "{{ (['roles/'] | product(ansible_role_names) | map('join') | list) + ['.'] }}"
 
   roles:
     - security

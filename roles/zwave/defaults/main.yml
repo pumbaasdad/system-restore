@@ -1,1 +1,9 @@
 zwave_dir: "{{ docker_compose_dir }}/zwave"
+
+zwave_vendor: "{{ secrets['zwave_vendor'] }}"
+zwave_product: "{{ secrets['zwave_product'] }}"
+zwave_session_secret: "{{ secrets['zwave_session_secret'] }}"
+zwave_s0_legacy_key: "{{ secrets['zwave_s0_legacy_key'] }}"
+zwave_s2_unauthenticated_key: "{{ secrets['zwave_s2_unauthenticated_key'] }}"
+zwave_s2_authenticated_key: "{{ secrets['zwave_s2_authenticated_key'] }}"
+zwave_s2_access_control_key: "{{ secrets['zwave_s2_access_control_key'] }}"

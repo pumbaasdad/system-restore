@@ -1,2 +1,10 @@
 TZ: America/Toronto
 docker_address_pool_size: 24
+
+docker_address_pool_subnet: "{{ secrets['docker_address_pool_subnet'] }}"
+docker_private0_subnet: "{{ secrets['docker_private0_subnet'] }}"
+
+public_port: "{{ secrets['public_port'] }}"
+nas_address: "{{ secrets['nas_address'] }}"
+
+secrets_dir: "{{ secrets['secrets_dir'] }}"

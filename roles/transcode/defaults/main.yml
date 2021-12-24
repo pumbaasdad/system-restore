@@ -8,3 +8,5 @@ transcode_keep_source_file: 0
 transcode_output_subdir: "SAME_AS_SRC"
 transcode_input_stability_seconds: 30
 transcode_input_check_seconds: 60
+
+nas_media_dir: "{{ secrets['nas_media_dir'] }}"
