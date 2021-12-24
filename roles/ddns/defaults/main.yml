@@ -1,0 +1,2 @@
+duckdns_subdomain: "{{ secrets['duckdns_subdomain'] }}"
+duckdns_token: "{{ secrets['duckdns_token'] }}"

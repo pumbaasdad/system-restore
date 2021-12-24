@@ -1,2 +1,8 @@
 private_reverse_proxy_dir: "{{ docker_compose_dir }}/nginx-private"
 public_reverse_proxy_dir: "{{ docker_compose_dir }}/nginx-public"
+
+reverse_proxy_private0_ipv4_address: "{{ secrets['reverse_proxy_private0_ipv4_address'] }}"
+
+hass_google_assistant_api: "{{ secrets['hass_google_assistant_api'] }}"
+hass_auth_authorize: "{{ secrets['hass_auth_authorize'] }}"
+hass_auth_token: "{{ secrets['hass_auth_token'] }}"

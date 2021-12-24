@@ -1,1 +1,5 @@
 volumerize_dir: "{{ docker_compose_dir }}/volumerize"
+
+volumerize_passphrase: "{{ secrets['volumerize_passphrase'] }}"
+volumerize_email: "{{ secrets['volumerize_email'] }}"
+volumerize_google_drive_dir: "{{ secrets['volumerize_google_drive_dir'] }}"

@@ -12,3 +12,5 @@ secrets_files:
   - lastpass.yml
 
 resolve_search: "{{ network.domain }}.{{ network.suffix }}"
+
+docker_compose_dir: "{{ secrets['docker_compose_dir'] }}"

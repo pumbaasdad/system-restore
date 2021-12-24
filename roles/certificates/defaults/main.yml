@@ -1,0 +1,2 @@
+letsencrypt_email: "{{ secrets['letsencrypt_email'] }}"
+letsencrypt_url: "{{ secrets['letsencrypt_url'] }}"
