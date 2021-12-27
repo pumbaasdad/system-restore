@@ -1,5 +1,10 @@
-variable_names: "{{ vars.keys() }}"
-role_vars: "{{ ansible_role_names | map('regex_replace', '^(.*)$', '\\1_role' ) | list | intersect(variable_names) | map('extract', vars) | list }}"
+role_var_names: "{{ lookup('varnames', '_role$').split(',') }}"
+role_vars: "{%- set temp_role_vars = [] -%}
+            {%- for role_var in role_var_names -%}
+            {%- set _ = temp_role_vars.append(lookup('vars', role_var)) -%}
+            {%- endfor -%}
+            {{- temp_role_vars -}}"
+
 apt_ppas: "{{ role_vars | selectattr('apt_ppa', 'defined') | map(attribute='apt_ppa') | list }}"
 deb_repos: "{{ role_vars | selectattr('deb_repo', 'defined') | map(attribute='deb_repo') | list }}"
 apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_key') | list }}"
