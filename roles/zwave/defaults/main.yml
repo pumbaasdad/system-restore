@@ -7,3 +7,5 @@ zwave_s0_legacy_key: "{{ secrets['zwave_s0_legacy_key'] }}"
 zwave_s2_unauthenticated_key: "{{ secrets['zwave_s2_unauthenticated_key'] }}"
 zwave_s2_authenticated_key: "{{ secrets['zwave_s2_authenticated_key'] }}"
 zwave_s2_access_control_key: "{{ secrets['zwave_s2_access_control_key'] }}"
+
+zwave_usbstick_symlink: zwaveusbstick

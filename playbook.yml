@@ -50,6 +50,16 @@
         module: pip
         name: jmespath
 
+    - name: Create udev symlinks
+      template:
+        src: rules.j2
+        dest: "/etc/udev/rules.d/ansible.rules"
+      register: udev_symlinks
+
+    - name: Reload udev rules
+      shell: "udevadm control --reload-rules && udevadm trigger"
+      when: udev_symlinks.changed
+
   roles:
     - security
     - docker

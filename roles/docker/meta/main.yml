@@ -11,6 +11,5 @@ dependencies:
 - role: media-server
 - role: reverse-proxy
 - role: transcode
-- role: udev
 - role: unifi
 - role: zwave

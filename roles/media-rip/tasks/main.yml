@@ -1,9 +1,3 @@
-- name: Create the udev rule for the optical drive
-  template:
-    src: scsi.rules.j2
-    dest: /etc/udev/rules.d/scsi.rules
-  register: scsi_udev_rules
-
 - name: Create media-rip directories
   file:
     path: "{{ item }}"
@@ -11,3 +5,11 @@
   with_items:
     - "{{ media_rip_config_dir }}"
     - "{{ media_rip_output_dir }}"
+
+- name: Find optical drives
+  stat:
+    path: "{{ item }}"
+  with_items:
+    - /dev/{{ media_rip_block_device_symlink }}
+    - /dev/{{ media_rip_scsi_generic_device_symlink }}
+  register: optical_drives

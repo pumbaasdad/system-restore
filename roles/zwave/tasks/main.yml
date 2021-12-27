@@ -1,9 +1,3 @@
-- name: Create the udev rule for the zwave stick
-  template:
-    src: zwave.rules.j2
-    dest: /etc/udev/rules.d/zwave.rules
-  register: zwave_udev_rules
-
 - name: Create zwave config dir
   file:
     path: "{{ zwave_dir }}"

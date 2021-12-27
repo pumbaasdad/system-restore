@@ -1,0 +1,10 @@
+media_rip_role:
+  udev_devices:
+    - subsystem: block
+      attrs:
+        vendor: "{{ optical_vendor }}"
+      symlink: "{{ media_rip_block_device_symlink }}"
+    - subsystem: scsi_generic
+      attrs:
+        vendor: "{{ optical_vendor }}"
+      symlink: "{{ media_rip_scsi_generic_device_symlink }}"
