@@ -229,7 +229,7 @@
           networks:
             - docker2
           devices:
-            - /dev/zwaveusbstick:/dev/zwave
+            - /dev/{{ zwave_usbstick_symlink }}:/dev/zwave
           tty: true
           stop_signal: SIGINT
           restart: unless-stopped

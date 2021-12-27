@@ -3,4 +3,7 @@ media_rip_config_dir: "{{ media_rip_dir }}/config"
 media_rip_output_dir: "{{ media_rip_dir }}/output"
 media_rip_keep_app_running: 1
 
+media_rip_block_device_symlink: optical1
+media_rip_scsi_generic_device_symlink: "{{ media_rip_block_device_symlink }}_generic"
+
 optical_vendor: "{{ secrets['optical_vendor'] }}"

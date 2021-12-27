@@ -64,14 +64,6 @@
     - [{state: [], jump: DROP}, {state: [ESTABLISHED, RELATED], jump: ACCEPT}]
   notify: restart netfilter-persistent
 
-- name: Find optical drives
-  stat:
-    path: "{{ item }}"
-  with_items:
-    - /dev/optical1
-    - /dev/optical1_generic
-  register: optical_drives
-
 - name: Install docker-compose.yml
   vars:
     external_zone: "{{ network | json_query('zones[?hosts[*].external] | [0]') }}"

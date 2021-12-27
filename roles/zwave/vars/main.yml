@@ -1,0 +1,7 @@
+zwave_rip_role:
+  udev_devices:
+    - subsystem: tty
+      attrs:
+        idVendor: "{{ zwave_vendor }}"
+        idProduct: "{{ zwave_product }}"
+      symlink: "{{ zwave_usbstick_symlink }}"
