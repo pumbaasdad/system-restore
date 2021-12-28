@@ -14,14 +14,6 @@
     group: "{{ ansible_env.SUDO_USER }}"
     mode: 0600
 
-- name: Create system config directories
-  file:
-    path: /etc/{{ item }}
-    state: directory
-  with_items:
-    - pam.d
-    - ssh
-
 - name: Update pam.d files
   template:
     src: pam.{{ item }}.j2
