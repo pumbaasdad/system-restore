@@ -44,14 +44,6 @@
     docker_compose_current_version.stdout is not defined
     or latest_docker_compose_version.stdout not in docker_compose_current_version.stdout
 
-- name: Install docker python modules
-  local_action:
-    module: pip
-    name:
-      - docker
-      - docker-compose
-    state: latest
-
 - name: Add iptable rules
   iptables:
     action: insert

@@ -19,3 +19,8 @@ dns_role:
     - path: "{{ dns_cache_dir }}"
       owner: "{{ dns_user }}"
       group: "{{ dns_group }}"
+  local_pip_modules:
+    - dnspython
+    - netaddr
+    - jinja2
+    - jmespath

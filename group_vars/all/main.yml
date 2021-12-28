@@ -12,6 +12,7 @@ packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='pac
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
 directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
+local_pip_modules: "{{ role_vars | selectattr('local_pip_modules', 'defined') | map(attribute='local_pip_modules') | flatten }}"
 
 lastpass_secrets_path: Infrastructure/Secrets
 
