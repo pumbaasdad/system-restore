@@ -1,3 +1,5 @@
 dhcp_role:
   directories:
     - path: "{{ dhcp_dir }}"
+  local_pip_modules:
+    - netaddr

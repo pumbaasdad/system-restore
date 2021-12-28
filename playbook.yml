@@ -45,10 +45,11 @@
       apt:
         upgrade: "yes"
 
-    - name: Install jmespath
+    - name: Install local python prerequsites
       local_action:
         module: pip
-        name: jmespath
+        name: "{{ local_pip_modules }}"
+        state: latest
 
     - name: Create udev symlinks
       template:

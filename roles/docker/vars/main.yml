@@ -11,3 +11,7 @@ docker_role:
     - software-properties-common
     - docker-ce
   service: docker
+  local_pip_modules:
+    - docker
+    - docker-compose
+    - jmespath

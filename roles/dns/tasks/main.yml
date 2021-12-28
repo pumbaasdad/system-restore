@@ -19,14 +19,6 @@
     reverse_ipv4_zone: "{{ ipv4_network_as_list[:(ipv4_required_bytes | int)] | reverse | list | join('.') }}"
     reverse_ipv6_zone: "{{ ipv6_network_as_formatted_list[:(ipv6_required_bytes | int)] | reverse | list | join('.') }}"
 
-- name: Install prerequsites
-  local_action:
-    module: pip
-    name:
-      - dnspython
-      - netaddr
-      - jinja2
-
 - name: Find DNS key files
   find:
     paths: "{{ dns_config_dir }}"
