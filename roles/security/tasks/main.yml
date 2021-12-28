@@ -1,14 +1,3 @@
-- name: Create user config directories
-  file:
-    path: /home/{{ ansible_env.SUDO_USER }}/{{ item }}
-    state: directory
-    owner: "{{ ansible_env.SUDO_USER }}"
-    group: "{{ ansible_env.SUDO_USER }}"
-  with_items:
-    - .gnupg
-    - .ssh
-    - .yubico
-
 - name: Update authorized_keys
   template:
     src: authorized_keys.j2

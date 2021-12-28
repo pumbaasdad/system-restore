@@ -60,6 +60,14 @@
       shell: "udevadm control --reload-rules && udevadm trigger"
       when: udev_symlinks.changed
 
+    - name: Create directories
+      file:
+        path: "{{ item.path }}"
+        state: directory
+        owner: "{{ item.owner | default(omit) }}"
+        group: "{{ item.group | default(omit) }}"
+      loop: "{{ directories }}"
+
   roles:
     - security
     - docker

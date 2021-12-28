@@ -12,3 +12,10 @@ dns_host_ip: "{{ dns_zone_result.ipv4_subnet | ipaddr(dns_host_result.ipv4_offse
 
 dns_user: "100"
 dns_group: "101"
+
+dns_role:
+  directories:
+    - path: "{{ dns_config_dir }}"
+    - path: "{{ dns_cache_dir }}"
+      owner: "{{ dns_user }}"
+      group: "{{ dns_group }}"

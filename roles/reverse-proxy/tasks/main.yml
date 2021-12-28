@@ -1,11 +1,3 @@
-- name: Create reverse proxy config directories
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ private_reverse_proxy_dir }}"
-    - "{{ public_reverse_proxy_dir }}"
-
 - name: Install nginx.conf
   template:
     src: nginx.conf.j2

@@ -7,3 +7,13 @@ security_role:
     - scdaemon
     - yubikey-manager
   service: sshd
+  directories:
+    - path: /home/{{ ansible_env.SUDO_USER }}/.gnupg
+      owner: "{{ ansible_env.SUDO_USER }}"
+      group: "{{ ansible_env.SUDO_USER }}"
+    - path: /home/{{ ansible_env.SUDO_USER }}/.ssh
+      owner: "{{ ansible_env.SUDO_USER }}"
+      group: "{{ ansible_env.SUDO_USER }}"
+    - path: /home/{{ ansible_env.SUDO_USER }}/.yubico
+      owner: "{{ ansible_env.SUDO_USER }}"
+      group: "{{ ansible_env.SUDO_USER }}"

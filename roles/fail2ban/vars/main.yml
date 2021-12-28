@@ -1,0 +1,4 @@
+fail2ban_role:
+  directories:
+    - path: "{{ fail2ban_dir }}/jail.d"
+    - path: "{{ fail2ban_dir }}/filter.d"

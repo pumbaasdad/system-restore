@@ -1,7 +1,0 @@
-- name: Create volumerize directories
-  file:
-    path: "{{ volumerize_dir }}/{{ item }}"
-    state: directory
-  with_items:
-    - cache
-    - credentials

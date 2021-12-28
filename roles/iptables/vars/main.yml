@@ -2,3 +2,5 @@ iptables_role:
   packages:
     - iptables-persistent
     - netfilter-persistent
+  directories:
+    - path: /etc/systemd/system/netfilter-persistent.service.d

@@ -1,0 +1,3 @@
+media_server_role:
+  directories:
+    - path: "{{ media_server_dir }}"

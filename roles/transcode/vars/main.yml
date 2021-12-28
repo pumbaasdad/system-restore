@@ -1,0 +1,3 @@
+transcode_role:
+  directories:
+    - path: "{{ transcode_dir }}"
