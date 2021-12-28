@@ -2,3 +2,11 @@ fail2ban_role:
   directories:
     - path: "{{ fail2ban_dir }}/jail.d"
     - path: "{{ fail2ban_dir }}/filter.d"
+  files:
+    - src: "roles/fail2ban/templates/jail.local.j2"
+      dest: "{{ fail2ban_dir }}/jail.local"
+  files_changed_by_tasks: "{{ fail2ban_installed_jails.results | default([]) + fail2ban_installed_filters.results | default([]) }}"
+  docker:
+    service:
+      name: letsencrypt
+      config_dir: "{{ fail2ban_dir }}"

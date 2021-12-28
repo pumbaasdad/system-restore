@@ -1,5 +1,7 @@
 - hosts: all
   become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   pre_tasks:
     - name: Include secrets
       include_vars: "{{ path }}"
@@ -18,6 +20,25 @@
     - name: Load network configuration
       set_fact:
         network: "{{ secret_network.network }}"
+
+    - name: Create groups
+      group:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ user_group_names }}"
+
+    - name: Add users to groups
+      user:
+        name: "{{ item.1 }}"
+        groups: "{{ item.0 }}"
+        append: yes
+      loop: "{{ unique_user_group_mappings }}"
+
+    - name: Install local python prerequsites
+      local_action:
+        module: pip
+        name: "{{ local_pip_modules }}"
+        state: latest
 
     - name: Add apt keys
       apt_key:
@@ -45,21 +66,18 @@
       apt:
         upgrade: "yes"
 
-    - name: Install local python prerequsites
-      local_action:
-        module: pip
-        name: "{{ local_pip_modules }}"
+    - name: Install python modules
+      pip:
+        name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
         state: latest
+        virtualenv: "{{ item }}"
+      loop: "{{ virtual_environments }}"
 
-    - name: Create udev symlinks
-      template:
-        src: rules.j2
-        dest: "/etc/udev/rules.d/ansible.rules"
-      register: udev_symlinks
-
-    - name: Reload udev rules
-      shell: "udevadm control --reload-rules && udevadm trigger"
-      when: udev_symlinks.changed
+    - name: Disable services
+      service:
+        name: "{{ item }}"
+        enabled: no
+      loop: "{{ disabled_services }}"
 
     - name: Create directories
       file:
@@ -69,11 +87,62 @@
         group: "{{ item.group | default(omit) }}"
       loop: "{{ directories }}"
 
+    - name: Install configuration files
+      template:
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
+        force: "{{ item.force | default(omit) }}"
+        owner: "{{ item.owner | default(omit) }}"
+        group: "{{ item.group | default(omit) }}"
+        mode: "{{ item.mode | default(omit) }}"
+      loop: "{{ files }}"
+      loop_control:
+        label: "{{ item.label | default(item) }}"
+      register: changed_files
+      notify: "{{ item.notify | default(omit) }}"
+
+    - import_role:
+        name: fail2ban
+      vars:
+        fail2ban_jails: "{{ intrusion_jails }}"
+        fail2ban_filters: "{{ intrusion_filters }}"
+
+    - import_role:
+        name: reverse-proxy
+      vars:
+        reverse_proxy_public_site_configs: "{{ public_site_configs }}"
+        reverse_proxy_private_site_configs: "{{ private_site_configs }}"
+
+    - import_role:
+        name: udev
+      vars:
+        udev_devices: "{{ all_udev_devices }}"
+
+    - import_role:
+        name: iptables
+      vars:
+        iptables_rules: "{{ iptable_rules }}"
+
+    - import_role:
+        name: home-automation
+      vars:
+        home_automation_trusted_proxies: "{{ trusted_proxy_ips }}"
+
   roles:
     - security
-    - docker
     - shell
     - system-config
+    - backup
+    - certificates
+    - ddns
+    - dhcp
+    - dns
+    - media-rip
+    - media-server
+    - transcode
+    - unifi
+    - zwave
+    - docker
 
   post_tasks:
     - name: Start services on boot
@@ -86,8 +155,3 @@
     - name: Remove unused packages
       apt:
         autoremove: yes
-
-  handlers:
-    - name: Reload systemd
-      systemd:
-        daemon_reload: yes

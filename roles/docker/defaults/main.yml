@@ -8,3 +8,5 @@ public_port: "{{ secrets['public_port'] }}"
 nas_address: "{{ secrets['nas_address'] }}"
 
 secrets_dir: "{{ secrets['secrets_dir'] }}"
+
+docker_virtual_env: "{{ docker_compose_dir }}/.venv/docker"

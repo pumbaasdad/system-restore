@@ -7,3 +7,10 @@ zwave_rip_role:
       symlink: "{{ zwave_usbstick_symlink }}"
   directories:
     - path: "{{ zwave_dir }}"
+  files:
+    - src: roles/zwave/templates/settings.json.j2
+      dest: "{{ zwave_dir }}/settings.json"
+  docker:
+    service:
+      name: zwavejs2mqtt
+      config_dir: "{{ zwave_dir }}"

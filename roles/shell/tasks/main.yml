@@ -1,15 +1,3 @@
-- name: Customize fish shell
-  copy:
-    src: "{{ item.prefix}}.fish"
-    dest: /home/{{ ansible_env.SUDO_USER }}/.config/fish/{{ item.dir }}/{{ item.prefix }}.fish
-    owner: "{{ ansible_env.SUDO_USER }}"
-    group: "{{ ansible_env.SUDO_USER }}"
-    mode: 0664
-  with_items:
-    - { prefix: config, dir: . }
-    - { prefix: fish_prompt, dir: functions }
-    - { prefix: fish_title, dir: functions }
-
 - name: Set as default shell
   user:
     name: "{{ ansible_env.SUDO_USER }}"

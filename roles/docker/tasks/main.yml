@@ -1,160 +1,24 @@
-- name: Add docker group
-  group:
-    name: docker
-    state: present
-
-- name: Allow docker to run without sudo
-  user:
-    name: "{{ ansible_env.SUDO_USER }}"
-    groups: docker
-    append: yes
-
-- name: Update daemon.json
-  template:
-    src: daemon.json.j2
-    dest: /etc/docker/daemon.json
-  register: docker_daemon_updated
-
-- name: Restart docker daemon
-  service:
-    name: docker
-    state: restarted
-  when: docker_daemon_updated.changed
-
-- name: Find most recent version of docker-compose
-  shell: git ls-remote --tags git://github.com/docker/compose | cut -f2 | grep -v docs | grep -v rc | cut -d/ -f3 | sort -Vr | head -n1
-  args:
-    warn: false
-  register: latest_docker_compose_version
-  changed_when: false
-
-- name: Check current docker-compose version.
-  command: docker-compose --version
-  register: docker_compose_current_version
-  changed_when: false
-  failed_when: false
-
-- name: Install Docker Compose.
-  get_url:
-    url: https://github.com/docker/compose/releases/download/{{ latest_docker_compose_version.stdout }}/docker-compose-Linux-x86_64
-    dest: /usr/local/bin/docker-compose
-    mode: 0755
-    force: yes 
-  when: >
-    docker_compose_current_version.stdout is not defined
-    or latest_docker_compose_version.stdout not in docker_compose_current_version.stdout
-
-- name: Add iptable rules
-  iptables:
-    action: insert
-    chain: "{{ item[0] }}"
-    in_interface: public0
-    ctstate: "{{ item[1].state }}"
-    jump: "{{ item[1].jump}}"
-  with_nested:
-    - [INPUT, DOCKER-USER]
-    - [{state: [], jump: DROP}, {state: [ESTABLISHED, RELATED], jump: ACCEPT}]
-  notify: restart netfilter-persistent
-
-- name: Install docker-compose.yml
+- name: Using docker virtual environment
   vars:
-    external_zone: "{{ network | json_query('zones[?hosts[*].external] | [0]') }}"
-    external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
-    external_ip: "{{ external_zone.ipv4_subnet | ipaddr(external_host.ipv4_offset) | ipaddr('address') }}"
-    internal_zone: "{{ network | json_query('zones[?hosts[*].internal] | [0]') }}"
-    internal_host: "{{ internal_zone | json_query('hosts[?internal] | [0]') }}"
-    internal_ip: "{{ internal_zone.ipv4_subnet | ipaddr(internal_host.ipv4_offset) | ipaddr('address') }}"
-  template:
-    src: docker-compose.yml.j2
-    dest: "{{ docker_compose_dir }}/docker-compose.yml"
+    ansible_python_interpreter: "{{ docker_virtual_env }}/bin/python3"
+  block:
+    - name: Create docker containers
+      docker_compose:
+        pull: yes
+        project_src: "{{ docker_compose_dir }}"
+        restarted: "{{ force_docker_compose_restart | default(false) }}"
+        debug: true
+      register: compose
 
-- name: Stop docker containers
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    stopped: yes
-  when: docker_daemon_updated.changed
-
-- name: Create docker containers
-  docker_compose:
-    pull: yes
-    project_src: "{{ docker_compose_dir }}"
-    debug: true
-  register: compose
-
-- name: Restart zwavejs2mqtt
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    restarted: yes
-    services:
-      - zwavejs2mqtt
-  when: >
-    zwave_configuration.changed and
-    (compose.actions | selectattr('service', 'equalto', 'zwavejs2mqtt') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
-
-- name: Restart homeassistant
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    restarted: yes
-    services:
-      - homeassistant
-  when: >
-    hass_configuration.changed and
-    (compose.actions | selectattr('service', 'equalto', 'homeassistant') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
-
-- name: Restart letsencrypt
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    restarted: yes
-    services:
-      - letsencrypt
-  when: >
-    (fail2ban_jail.changed or
-     fail2ban_hass_filter.changed or
-     fail2ban_hass_jail.changed or
-     (fail2ban_nginx_jail.results | map(attribute='changed') | list) is any or
-     (reverse_proxy_conf.results | selectattr('item', 'equalto', private_reverse_proxy_dir) | first).changed or
-     private_reverse_proxy_site_conf_default.changed) and
-    (compose.actions | selectattr('service', 'equalto', 'letsencrypt') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
-
-- name: Restart public-nginx
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    restarted: yes
-    services:
-      - public-nginx
-  when: >
-    (fail2ban_jail.changed or
-     fail2ban_hass_filter.changed or
-     fail2ban_hass_jail.changed or
-     (fail2ban_nginx_jail.results | map(attribute='changed') | list) is any or
-     (reverse_proxy_conf.results | selectattr('item', 'equalto', public_reverse_proxy_dir) | first).changed or
-     public_reverse_proxy_site_conf_default.changed or
-     hass_private_reverse_proxy.changed or
-     hass_public_reverse_proxy.changed) and
-    (compose.actions | selectattr('service', 'equalto', 'public-nginx') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
-
-- name: Restart dhcp
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    restarted: yes
-    services:
-      - dhcp
-  when: >
-    dhcp_conf.changed and
-    (compose.actions | selectattr('service', 'equalto', 'dhcp') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
-
-- name: Restart dns
-  docker_compose:
-    project_src: "{{ docker_compose_dir }}"
-    restarted: yes
-    services:
-      - dns
-  when: >
-    (ddns_key.changed or
-     (dns_default_files.results | map(attribute='changed') | list) is any or
-     named_conf_local.changed or
-     named_conf_options.changed or
-     (dns_zone_databases.results | map(attribute='changed') | list) is any or
-     dns_sub_zone_databases.changed or
-     dns_zone_databases.changed) and
-    (compose.actions | selectattr('service', 'equalto', 'dns') | selectattr('create', 'undefined') | selectattr('start', 'undefined') | list | length) == 0
+    - name: Restart docker containers
+      vars:
+        created_services: "{{ compose.actions | selectattr('create', 'defined') | map(attribute='service') }}"
+        started_services: "{{ compose.actions | selectattr('start', 'defined') | map(attribute='service') }}"
+        config_dir: "{{ docker_services | selectattr('name', 'equalto', item) | map(attribute='config_dir') | first }}"
+        config_changed: "{{ (all_changed_files | selectattr('dest', 'match', config_dir) | map(attribute='changed')) is any }}"
+      docker_compose:
+        project_src: "{{ docker_compose_dir }}"
+        restarted: "{{ config_changed }}"
+        services:
+          - "{{ item }}"
+      loop: "{{ docker_services_with_config | difference(created_services) | difference(started_services) }}"

@@ -2,3 +2,38 @@ reverse_proxy_role:
   directories:
     - path: "{{ private_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}"
+  files:
+    - src: roles/reverse-proxy/templates/nginx.conf.j2
+      dest: "{{ private_reverse_proxy_dir }}/nginx/nginx.conf"
+    - src: roles/reverse-proxy/templates/nginx.conf.j2
+      dest: "{{ public_reverse_proxy_dir }}/nginx/nginx.conf"
+  intrusion_detection:
+    jails:
+      - jail_name: nginx-http-auth
+        file: nginx-public/error.log
+        max_retries: 5
+        port: https
+      - jail_name: nginx-badbots
+        file: nginx-public/access.log
+        max_retries: 2
+        port: https
+      - jail_name: nginx-botsearch
+        file: nginx-public/access.log
+        max_retries: 5
+        port: https
+  reverse_proxy:
+    private_site_configs:
+      - src: roles/reverse-proxy/templates/default.j2
+        name: default
+        nginx_port: 80
+    public_site_configs:
+      - src: roles/reverse-proxy/templates/default.j2
+        name: default
+        nginx_port: 443
+    trusted_ips:
+      - "{{ reverse_proxy_private0_ipv4_address }}"
+  files_changed_by_tasks: "{{ reverse_proxy_public_site_config_installation.results | default([]) }}"
+  docker:
+    service:
+      name: public-nginx
+      config_dir: "{{ public_reverse_proxy_dir }}"

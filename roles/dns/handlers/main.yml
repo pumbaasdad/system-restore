@@ -1,17 +1,12 @@
-- name: Update DNS records
+- name: Update DNS zone serial numbers
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
   vars:
-    line: "{{ item.split('|') }}"
-    zone: "{{ line.0 }}"
-    record: "{{ line.1 }}"
-    type: "{{ line.2 }}"
-    address: "{{ line.3 }}"
-  nsupdate:
-    key_name: "{{ network.domain }}.{{ network.suffix }}"
-    key_secret: "{{ ddns_public_key.stdout }}"
-    record: "{{ record }}"
-    server: "127.0.0.1"
-    type: "{{ type }}"
-    value: "{{ address }}"
-    zone: "{{ zone }}"
-  with_lines:
-    - cat {{ dns_config_dir }}/records.txt
+    serial_number_increment: 1
+  loop: "{{ all_changed_files | selectattr('dest', 'match', '/tmp/db') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"
+  loop_control:
+    label: "{{ item.zone_name }}"

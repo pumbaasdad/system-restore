@@ -174,8 +174,8 @@
           networks:
             - docker1
           devices:
-            - {{ optical_drives.results[0].stat.lnk_source }}:{{ optical_drives.results[0].stat.lnk_source }}
-            - {{ optical_drives.results[1].stat.lnk_source }}:{{ optical_drives.results[1].stat.lnk_source }}
+            - "{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}"
+            - "{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}"
           restart: unless-stopped
         handbrake:
           image: jlesage/handbrake

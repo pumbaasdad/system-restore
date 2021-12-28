@@ -2,3 +2,25 @@ home_automation_role:
   directories:
     - path: "{{ hass_dir }}"
     - path: "{{ hass_db_dir }}"
+  files:
+    - src: roles/home-automation/files/home-assistant.log
+      dest: "{{ hass_dir }}/home-assistant.log"
+      force: no
+  intrusion_detection:
+    jails:
+      - jail_name: ha
+        file: hass/home-assistant.log
+    filters:
+      - src: roles/home-automation/templates/filter.local.j2
+        dest: ha.local
+  reverse_proxy:
+    public_site_configs:
+      - src: roles/home-automation/templates/private-reverse-proxy.j2
+        name: hass-private
+      - src: roles/home-automation/templates/public-reverse-proxy.j2
+        name: hass-public
+  docker:
+    service:
+      name: homeassistant
+      config_dir: "{{ hass_dir }}"
+  files_changed_by_tasks: "{{ [hass_config] | default([]) }}"

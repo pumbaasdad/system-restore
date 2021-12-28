@@ -1,40 +1,14 @@
-- name: Install nginx.conf
-  template:
-    src: nginx.conf.j2
-    dest: "{{ item }}/nginx/nginx.conf"
-  with_items:
-    - "{{ private_reverse_proxy_dir }}"
-    - "{{ public_reverse_proxy_dir }}"
-  register: reverse_proxy_conf
-
-- name: Install private nginx default site-config
+- name: Install public site configs
   vars:
-    nginx_port: 80
+    domain: "{{ reverse_proxy_public_domain }}"
   template:
-    src: default.j2
-    dest: "{{ private_reverse_proxy_dir }}/nginx/site-confs/default"
-  register: private_reverse_proxy_site_conf_default
+    src: "{{ item.src }}"
+    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}"
+  with_items: "{{ reverse_proxy_public_site_configs }}"
+  register: reverse_proxy_public_site_config_installation
 
-- name: Install public nginx default site-config
-  vars:
-    nginx_port: 443
+- name: Install private site configs
   template:
-    src: default.j2
-    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/default"
-  register: public_reverse_proxy_site_conf_default
-
-- name: Install jails
-  template:
-    src: jail.conf.j2
-    dest: "{{ fail2ban_dir }}/jail.d/{{ item.name }}.conf"
-  with_items:
-    - name: nginx-http-auth
-      log: error
-      max_retry: 5
-    - name: nginx-badbots
-      log: access
-      max_retry: 2
-    - name: nginx-botsearch
-      log: access
-      max_retry: 5
-  register: fail2ban_nginx_jail
+    src: "{{ item.src }}"
+    dest: "{{ private_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}"
+  with_items: "{{ reverse_proxy_private_site_configs }}"

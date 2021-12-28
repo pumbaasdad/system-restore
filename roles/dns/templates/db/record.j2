@@ -1,0 +1,1 @@
+{{- host_to_print  }}{{ '\t' * pad }}IN	{{ record.type }}	{{ [record.target_host, record.target_zone] | select() | join('.') }}{{ '\n' }}

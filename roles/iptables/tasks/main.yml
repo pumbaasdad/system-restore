@@ -1,5 +1,9 @@
-- name: Install systemd override file
-  copy:
-    src: override.conf
-    dest: /etc/systemd/system/netfilter-persistent.service.d/override.conf
-  notify: Reload systemd
+- name: Add iptable rules
+  iptables:
+    action: insert
+    chain: "{{ item.chain }}"
+    in_interface: "{{ item.in_interface }}"
+    ctstate: "{{ item.cstate }}"
+    jump: "{{ item.jump }}"
+  loop: "{{ iptables_rules }}"
+  notify: restart netfilter-persistent

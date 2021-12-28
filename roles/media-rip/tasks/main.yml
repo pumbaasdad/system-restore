@@ -1,7 +1,0 @@
-- name: Find optical drives
-  stat:
-    path: "{{ item }}"
-  with_items:
-    - /dev/{{ media_rip_block_device_symlink }}
-    - /dev/{{ media_rip_scsi_generic_device_symlink }}
-  register: optical_drives
