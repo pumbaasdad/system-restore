@@ -1,15 +1,3 @@
-- name: Create dns config directory
-  file:
-    path: "{{ dns_config_dir }}"
-    state: directory
-
-- name: Create dns cache directory
-  file:
-    path: "{{ dns_cache_dir }}"
-    state: directory
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
-
 - name: Disable systemd-resolved
   service:
     name: systemd-resolved

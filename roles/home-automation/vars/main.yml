@@ -1,0 +1,4 @@
+home_automation_role:
+  directories:
+    - path: "{{ hass_dir }}"
+    - path: "{{ hass_db_dir }}"

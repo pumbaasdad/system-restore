@@ -1,11 +1,3 @@
-- name: Create home assistant config dir
-  file:
-    path: "{{ item }}"
-    state: directory
-  with_items:
-    - "{{ hass_dir }}"
-    - "{{ hass_db_dir }}"
-
 # Should this trigger a handler to restart docker-compose?
 - name: Install home assistant configuration
   template:

@@ -1,4 +1,0 @@
-- name: Create media server directory
-  file:
-    path: "{{ media_server_dir }}"
-    state: directory

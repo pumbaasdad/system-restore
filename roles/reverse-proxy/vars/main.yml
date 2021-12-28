@@ -1,0 +1,4 @@
+reverse_proxy_role:
+  directories:
+    - path: "{{ private_reverse_proxy_dir }}"
+    - path: "{{ public_reverse_proxy_dir }}"

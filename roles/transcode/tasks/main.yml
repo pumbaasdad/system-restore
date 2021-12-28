@@ -1,4 +1,0 @@
-- name: Create transcode directory
-  file:
-    path: "{{ transcode_dir }}"
-    state: directory

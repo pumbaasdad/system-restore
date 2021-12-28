@@ -1,0 +1,3 @@
+unifi_role:
+  directories:
+    - path: "{{ unifi_dir }}"

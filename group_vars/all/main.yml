@@ -11,6 +11,7 @@ apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_
 packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='packages', start=[]) | list }}"
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
+directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
 
 lastpass_secrets_path: Infrastructure/Secrets
 

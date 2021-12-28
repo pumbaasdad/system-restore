@@ -8,3 +8,6 @@ media_rip_role:
       attrs:
         vendor: "{{ optical_vendor }}"
       symlink: "{{ media_rip_scsi_generic_device_symlink }}"
+  directories:
+    - path: "{{ media_rip_config_dir }}"
+    - path: "{{ media_rip_output_dir }}"

@@ -1,0 +1,3 @@
+dhcp_role:
+  directories:
+    - path: "{{ dhcp_dir }}"

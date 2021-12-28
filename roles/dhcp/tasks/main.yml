@@ -1,8 +1,3 @@
-- name: Create dhcp directory
-  file:
-    path: "{{ dhcp_dir }}"
-    state: directory
-
 - name: Install prerequsites
   local_action:
     module: pip 

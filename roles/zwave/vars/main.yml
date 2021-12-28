@@ -5,3 +5,5 @@ zwave_rip_role:
         idVendor: "{{ zwave_vendor }}"
         idProduct: "{{ zwave_product }}"
       symlink: "{{ zwave_usbstick_symlink }}"
+  directories:
+    - path: "{{ zwave_dir }}"
