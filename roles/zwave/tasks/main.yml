@@ -1,5 +1,0 @@
-- name: Install zwavejs2mqtt configuration
-  template:
-    src: settings.json.j2
-    dest: "{{ zwave_dir }}/settings.json"
-  register: zwave_configuration

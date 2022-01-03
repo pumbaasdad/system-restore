@@ -1,36 +1,5 @@
-# Should this trigger a handler to restart docker-compose?
 - name: Install home assistant configuration
   template:
     src: configuration.yaml.j2
     dest: "{{ hass_dir }}/configuration.yaml"
-  register: hass_configuration
-
-- name: Install home assistant log
-  copy:
-    src: home-assistant.log
-    dest: "{{ hass_dir }}/home-assistant.log"
-    force: no
-
-- name: Install private home assistant reverse proxy
-  template:
-    src: private-reverse-proxy.j2
-    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/hass-private"
-  register: hass_private_reverse_proxy
-
-- name: Install public home assistant reverse proxy
-  template:
-    src: public-reverse-proxy.j2
-    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/hass-public"
-  register: hass_public_reverse_proxy
-
-- name: Install fail2ban filter
-  template:
-    src: filter.local.j2
-    dest: "{{ fail2ban_dir }}/filter.d/ha.local"
-  register: fail2ban_hass_filter
-
-- name: Install fail2ban jail
-  template:
-    src: jail.conf.j2
-    dest: "{{ fail2ban_dir }}/jail.d/ha.conf"
-  register: fail2ban_hass_jail
+  register: hass_config

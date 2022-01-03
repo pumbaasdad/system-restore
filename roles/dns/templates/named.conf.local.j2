@@ -7,31 +7,38 @@ zone "{{ fwd_zone }}"
 {
     type master;
     notify no;
-    file "{{ '/var/cache/bind/db.' + fwd_zone }}";
-    allow-update { key {{ ddns_key_name }}; };
+    file "{{ '/etc/bind/db.' + fwd_zone }}";
 };
 
+{% set zone_octets = ((zone.ipv4_subnet | ipaddr('prefix')) / 8) | round(0, 'ceil') | int -%}
+{%- set reverse_zone = (zone.ipv4_subnet | ipaddr('network') | ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
+
+zone "{{ reverse_zone }}"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + reverse_zone[:-13] }}";
+};
+
+{% set reverse_zone = (zone.ipv4_subnet | ipaddr('network') | ipmath(256) | ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
+
+zone "{{ reverse_zone }}"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + reverse_zone[:-13] }}";
+};
 {% endfor %}
 zone "{{ network.domain }}.{{ network.suffix }}"
 {
     type master;
     notify no;
-    file "{{ '/var/cache/bind/db.' + network.domain + '.' + network.suffix }}";
-    allow-update { key {{ ddns_key_name }}; };
-};
-
-zone "{{ reverse_ipv4_zone }}.in-addr.arpa"
-{
-    type master;
-    notify no;
-    file "{{ '/var/cache/bind/db.' + reverse_ipv4_zone }}";
-    allow-update { key {{ ddns_key_name }}; };
+    file "{{ '/etc/bind/db.' + network.domain + '.' + network.suffix }}";
 };
 
 zone "{{ reverse_ipv6_zone }}.ip6.arpa"
 {
     type master;
     notify no;
-    file "{{ '/var/cache/bind/db.' + reverse_ipv6_zone }}";
-    allow-update { key {{ ddns_key_name }}; };
+    file "{{ '/etc/bind/db.' + reverse_ipv6_zone }}";
 };

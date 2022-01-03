@@ -10,9 +10,38 @@ deb_repos: "{{ role_vars | selectattr('deb_repo', 'defined') | map(attribute='de
 apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_key') | list }}"
 packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='packages', start=[]) | list }}"
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
-udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
+all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
 directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
-local_pip_modules: "{{ role_vars | selectattr('local_pip_modules', 'defined') | map(attribute='local_pip_modules') | flatten }}"
+local_pip_modules: "{{ role_vars | selectattr('local_pip_modules', 'defined') | map(attribute='local_pip_modules') | flatten | unique }}"
+files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
+files_changed_by_roles: "{{ role_vars | selectattr('files_changed_by_tasks', 'defined') | map(attribute='files_changed_by_tasks') | flatten }}"
+iptable_rules: "{{ role_vars | selectattr('iptable_rules', 'defined') | map(attribute='iptable_rules') | flatten }}"
+disabled_services: "{{ role_vars | selectattr('disabled_services', 'defined') | map(attribute='disabled_services') | flatten | unique }}"
+
+pip_modules: "{{ role_vars | selectattr('pip_modules', 'defined') | map(attribute='pip_modules') | flatten }}"
+virtual_environments: "{{ pip_modules | map(attribute='environment') | unique }}"
+
+user_groups: "{{ role_vars | selectattr('groups', 'defined') | map(attribute='groups') | flatten }}"
+user_group_names: "{{ user_groups | map(attribute='name') | unique }}"
+user_group_users: "{{ user_groups | subelements('users') }}"
+group_names_to_zip: "{{ user_group_users | map('first') | map(attribute='name') }}"
+user_names_to_zip: "{{ user_group_users | map('last') }}"
+unique_user_group_mappings: "{{ group_names_to_zip | zip(user_names_to_zip) | unique }}"
+
+intrusion_detection: "{{ role_vars | selectattr('intrusion_detection', 'defined') | map(attribute='intrusion_detection') }}"
+intrusion_jails: "{{ intrusion_detection | selectattr('jails', 'defined') | map(attribute='jails') | flatten }}"
+intrusion_filters: "{{ intrusion_detection | selectattr('filters', 'defined') | map(attribute='filters') | flatten }}"
+
+reverse_proxy_configs: "{{ role_vars | selectattr('reverse_proxy', 'defined') | map(attribute='reverse_proxy') }}"
+public_site_configs: "{{ reverse_proxy_configs | selectattr('public_site_configs', 'defined') | map(attribute='public_site_configs') | flatten }}"
+private_site_configs: "{{ reverse_proxy_configs | selectattr('private_site_configs', 'defined') | map(attribute='private_site_configs') | flatten }}"
+trusted_proxy_ips: "{{ reverse_proxy_configs | selectattr('trusted_ips', 'defined') | map(attribute='trusted_ips') | flatten }}"
+
+docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='docker') | flatten }}"
+docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"
+docker_services_with_config: "{{ docker_services | selectattr('config_dir', 'defined') | map(attribute='name') }}"
+
+all_changed_files: "{{ changed_files.results + files_changed_by_roles }}"
 
 lastpass_secrets_path: Infrastructure/Secrets
 

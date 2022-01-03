@@ -1,0 +1,10 @@
+$ORIGIN .
+$TTL	604800	; 1 week
+{{ zone_name }}	IN	SOA	{{ dns_hostname }}.	root.{{ dns_root_domain }}. (
+				{{ serial_number }}	; Serial
+				604800	; Refresh
+				86400	; Retry
+				2419200	; Expire
+				604800	; Negative Cache TTL
+				)
+				NS	{{ dns_hostname }}.

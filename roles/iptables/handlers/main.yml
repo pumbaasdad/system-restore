@@ -1,3 +1,8 @@
+- name: Reload systemd for netfilter-persistent
+  systemd:
+    daemon_reload: yes
+  loop: "{{ all_changed_files | selectattr('dest', 'match', '/etc/systemd/system/netfilter-persistent.service.d') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"
+
 - name: Restart netfilter-persistent
   service:
     name: netfilter-persistent

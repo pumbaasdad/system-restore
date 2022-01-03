@@ -1,4 +1,5 @@
-- name: Restart SSHD
+- name: Restart sshd
   service:
     name: sshd
     state: restarted
+  loop: "{{ all_changed_files | selectattr('dest', 'match', '/etc/udev/rules.d/ansible.rules') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"

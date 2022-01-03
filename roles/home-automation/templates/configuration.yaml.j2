@@ -25,8 +25,7 @@ config:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    - {{ reverse_proxy_private0_ipv4_address }}
-
+    {{ home_automation_trusted_proxies | to_nice_yaml | indent(4) }}
 # Discover some devices automatically
 discovery:
 

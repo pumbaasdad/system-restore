@@ -1,5 +1,13 @@
-- name: Install jail.local
+- name: Install jails
   template:
-    src: jail.local.j2
-    dest: "{{ fail2ban_dir }}/jail.local"
-  register: fail2ban_jail
+    src: jail.conf.j2
+    dest: "{{ fail2ban_dir }}/jail.d/{{ item.jail_name }}.conf"
+  register: fail2ban_installed_jails
+  loop: "{{ fail2ban_jails }}"
+
+- name: Install filters
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ fail2ban_dir }}/filter.d/{{ item.dest }}"
+  register: fail2ban_installed_filters
+  loop: "{{ fail2ban_filters }}"
