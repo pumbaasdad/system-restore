@@ -73,13 +73,6 @@
           apt:
             upgrade: "yes"
 
-        - name: Install python modules
-          pip:
-            name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
-            state: latest
-            virtualenv: "{{ item }}"
-          loop: "{{ virtual_environments }}"
-
         - name: Disable services
           service:
             name: "{{ item }}"
@@ -117,6 +110,13 @@
             name: iptables
           vars:
             iptables_rules: "{{ iptable_rules }}"
+
+    - name: Install python modules
+      pip:
+        name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
+        state: latest
+        virtualenv: "{{ item }}"
+      loop: "{{ virtual_environments }}"
 
     - name: Create directories
       file:

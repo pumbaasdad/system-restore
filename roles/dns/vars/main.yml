@@ -101,11 +101,6 @@ dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
     - path: "{{ dns_cache_dir }}"
-  local_pip_modules:
-    - dnspython
-    - netaddr
-    - jinja2
-    - jmespath
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"
@@ -114,3 +109,10 @@ dns_role:
     service:
       name: dns
       config_dir: "{{ dns_dir }}"
+
+local_dns_role:
+  pip_modules:
+    - dnspython
+    - netaddr
+    - jinja2
+    - jmespath

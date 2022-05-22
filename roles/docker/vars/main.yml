@@ -23,8 +23,6 @@ docker_role:
     modules:
     - docker
     - docker-compose
-  local_pip_modules:
-    - jmespath
   groups:
     - name: docker
       users:
@@ -55,3 +53,7 @@ docker_role:
       in_interface: public0
       cstate: [ESTABLISHED, RELATED]
       jump: ACCEPT
+
+local_docker_role:
+  pip_modules:
+    - jmespath

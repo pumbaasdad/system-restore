@@ -1,8 +1,6 @@
 dhcp_role:
   directories:
     - path: "{{ dhcp_dir }}"
-  local_pip_modules:
-    - netaddr
   files:
     - src: roles/dhcp/templates/dhcpd.conf.j2
       dest: "{{ dhcp_dir }}/dhcpd.conf"
@@ -10,3 +8,7 @@ dhcp_role:
     service:
       name: dhcp
       config_dir: "{{ dhcp_dir }}"
+
+local_dhcp_role:
+  pip_modules:
+    - netaddr
