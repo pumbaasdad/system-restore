@@ -1,5 +1,4 @@
 - hosts: all
-  become: true
   pre_tasks:
     - name: Include secrets
       include_vars: "{{ path }}"
@@ -15,22 +14,13 @@
         secrets: "{{ secrets_dictionary }}"
         network: "{{ secret_network.network }}"
 
+    - name: Set become password
+      set_fact:
+        ansible_become_password: "{{ network_hosts[inventory_hostname].become_password }}"
+
     - name: Load network configuration
       set_fact:
         network: "{{ secret_network.network }}"
-
-    - name: Create groups
-      group:
-        name: "{{ item }}"
-        state: present
-      loop: "{{ user_group_names }}"
-
-    - name: Add users to groups
-      user:
-        name: "{{ item.1 }}"
-        groups: "{{ item.0 }}"
-        append: yes
-      loop: "{{ unique_user_group_mappings }}"
 
     - name: Find local python interpreter
       local_action: command which python
@@ -45,31 +35,85 @@
         name: "{{ local_pip_modules }}"
         state: latest
 
-    - name: Add apt keys
-      apt_key:
-        url: "{{ item.url }}"
-      with_items: "{{ apt_keys }}"
+    - name: As root
+      become: yes
+      block:
+        - name: Create groups
+          group:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ user_group_names }}"
 
-    - name: Add PPAs
-      apt_repository:
-        repo: "ppa:{{ item.ppa }}"
-        codename: "{{ item.codename | default(ansible_distribution_release) }}"
-      with_items: "{{ apt_ppas }}"
+        - name: Add users to groups
+          user:
+            name: "{{ item.1 }}"
+            groups: "{{ item.0 }}"
+            append: yes
+          loop: "{{ unique_user_group_mappings }}"
 
-    - name: Add deb repos
-      apt_repository:
-        repo: "deb [arch=amd64] {{ item.url }} {{ item.codename | default(ansible_distribution_release) }} {{ item.channel | default('stable') }}"
-      with_items: "{{ deb_repos }}"
+        - name: Add apt keys
+          apt_key:
+            url: "{{ item.url }}"
+          with_items: "{{ apt_keys }}"
 
-    - name: Install packages
-      apt:
-        name: "{{ packages }}"
-        state: present
-        update_cache: true
+        - name: Add PPAs
+          apt_repository:
+            repo: "ppa:{{ item.ppa }}"
+            codename: "{{ item.codename | default(ansible_distribution_release) }}"
+          with_items: "{{ apt_ppas }}"
 
-    - name: Upgrade packages
-      apt:
-        upgrade: "yes"
+        - name: Add deb repos
+          apt_repository:
+            repo: "deb [arch=amd64] {{ item.url }} {{ item.codename | default(ansible_distribution_release) }} {{ item.channel | default('stable') }}"
+          with_items: "{{ deb_repos }}"
+
+        - name: Install packages
+          apt:
+            name: "{{ packages }}"
+            state: present
+            update_cache: true
+
+        - name: Upgrade packages
+          apt:
+            upgrade: "yes"
+
+        - name: Disable services
+          service:
+            name: "{{ item }}"
+            enabled: no
+          loop: "{{ disabled_services }}"
+
+        - name: Create root directories
+          file:
+            path: "{{ item.path }}"
+            state: directory
+            owner: "{{ item.owner | default(omit) }}"
+            group: "{{ item.group | default(omit) }}"
+          loop: "{{ root_directories }}"
+
+        - name: Install root configuration files
+          template:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            force: "{{ item.force | default(omit) }}"
+            owner: "{{ item.owner | default(omit) }}"
+            group: "{{ item.group | default(omit) }}"
+            mode: "{{ item.mode | default(omit) }}"
+          loop: "{{ root_files }}"
+          loop_control:
+            label: "{{ item.label | default(item) }}"
+          register: changed_root_files
+          notify: "{{ item.notify | default(omit) }}"
+
+        - import_role:
+            name: udev
+          vars:
+            udev_devices: "{{ all_udev_devices }}"
+
+        - import_role:
+            name: iptables
+          vars:
+            iptables_rules: "{{ iptable_rules }}"
 
     - name: Install python modules
       pip:
@@ -77,12 +121,6 @@
         state: latest
         virtualenv: "{{ item }}"
       loop: "{{ virtual_environments }}"
-
-    - name: Disable services
-      service:
-        name: "{{ item }}"
-        enabled: no
-      loop: "{{ disabled_services }}"
 
     - name: Create directories
       file:
@@ -119,16 +157,6 @@
         reverse_proxy_private_site_configs: "{{ private_site_configs }}"
 
     - import_role:
-        name: udev
-      vars:
-        udev_devices: "{{ all_udev_devices }}"
-
-    - import_role:
-        name: iptables
-      vars:
-        iptables_rules: "{{ iptable_rules }}"
-
-    - import_role:
         name: home-automation
       vars:
         home_automation_trusted_proxies: "{{ trusted_proxy_ips }}"
@@ -136,7 +164,6 @@
   roles:
     - security
     - shell
-    - system-config
     - backup
     - certificates
     - ddns
@@ -150,13 +177,16 @@
     - docker
 
   post_tasks:
-    - name: Start services on boot
-      service:
-        name: "{{ item }}"
-        enabled: true
-        state: started
-      with_items: "{{ services }}"
+    - name: As root
+      become: yes
+      block:
+        - name: Start services on boot
+          service:
+            name: "{{ item }}"
+            enabled: true
+            state: started
+          with_items: "{{ services }}"
 
-    - name: Remove unused packages
-      apt:
-        autoremove: yes
+        - name: Remove unused packages
+          apt:
+            autoremove: yes

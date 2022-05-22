@@ -1,4 +1,4 @@
-fish_config_root: /home/{{ ansible_env.SUDO_USER }}/.config/fish
+fish_config_root: "{{ ansible_env.HOME }}/.config/fish"
 
 shell_role:
   packages:
@@ -6,16 +6,10 @@ shell_role:
   files:
     - src: roles/shell/files/config.fish
       dest: "{{ fish_config_root }}/config.fish"
-      owner: "{{ ansible_env.SUDO_USER }}"
-      group: "{{ ansible_env.SUDO_USER }}"
       mode: "0664"
     - src: roles/shell/files/fish_prompt.fish
       dest: "{{ fish_config_root }}/functions/fish_prompt.fish"
-      owner: "{{ ansible_env.SUDO_USER }}"
-      group: "{{ ansible_env.SUDO_USER }}"
       mode: "0664"
     - src: roles/shell/files/fish_title.fish
       dest: "{{ fish_config_root }}/functions/fish_title.fish"
-      owner: "{{ ansible_env.SUDO_USER }}"
-      group: "{{ ansible_env.SUDO_USER }}"
       mode: "0664"

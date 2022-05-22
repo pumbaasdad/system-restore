@@ -1,5 +1,0 @@
-system-config_role:
-  apt_ppa:
-    ppa: ansible/ansible
-  packages:
-    - ansible

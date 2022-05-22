@@ -9,9 +9,6 @@ dns_host_result: "{{ dns_zone_result | json_query(dns_host_query) }}"
 dns_host_ip: "{{ dns_zone_result.ipv4_subnet | ansible.utils.ipaddr(dns_host_result.ipv4_offset) | ansible.utils.ipaddr('address') }}"
 dns_root_domain: "{{ network.domain }}.{{ network.suffix }}"
 
-dns_user: "100"
-dns_group: "101"
-
 reverse_ipv6_zone: "{{ ('fe80::' | ansible.utils.ipaddr('revdns'))[32:-10] }}"
 
 dns_zone_files: "{%- set temp_zone_files = [] -%}
@@ -20,8 +17,6 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                      'src': 'roles/dns/templates/db.zone.j2',
                      'dest': dns_config_dir + '/db.' + zone.name + '.' + dns_root_domain,
                      'zone_name': zone.name,
-                     'owner': dns_user,
-                     'group': dns_group,
                      'mode': '0644',
                      'notify': 'Update DNS zone serial numbers',
                      'label': zone.name
@@ -33,8 +28,6 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                      'dest': dns_config_dir + '/db.' + zone_name[:-13],
                      'zone_name': zone.name,
                      'reverse_zone_name': zone_name,
-                     'owner': dns_user,
-                     'group': dns_group,
                      'mode': '0644',
                      'notify': 'Update DNS zone serial numbers',
                      'label': zone_name
@@ -45,8 +38,6 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                      'dest': dns_config_dir + '/db.' + zone_name[:-13],
                      'zone_name': zone.name,
                      'reverse_zone_name': zone_name,
-                     'owner': dns_user,
-                     'group': dns_group,
                      'mode': '0644',
                      'notify': 'Update DNS zone serial numbers',
                      'label': zone_name
@@ -58,72 +49,48 @@ dns_files:
   - src: roles/dns/files/db.0
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/db.127
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/db.255
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/db.empty
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/db.local
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/db.root
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/named.conf
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/files/named.conf.default-zones
     dest: "{{ dns_config_dir }}"
     force: no
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/templates/named.conf.local.j2
     dest: "{{ dns_config_dir }}/named.conf.local"
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/templates/named.conf.options.j2
     dest: "{{ dns_config_dir }}/named.conf.options"
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     mode: "0644"
   - src: roles/dns/templates/db.root_zone.j2
     dest: "{{ dns_config_dir }}/db.{{ dns_root_domain }}"
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     zone_name: "{{ dns_root_domain }}"
     mode: "0644"
     notify: Update DNS zone serial numbers
   - src: roles/dns/templates/db.reverse_ipv6_link_local_zone.j2
     dest: "{{ dns_config_dir }}/db.{{ reverse_ipv6_zone }}"
-    owner: "{{ dns_user }}"
-    group: "{{ dns_group }}"
     zone_name: "{{ reverse_ipv6_zone }}"
     mode: "0644"
     notify: Update DNS zone serial numbers
@@ -134,13 +101,6 @@ dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
     - path: "{{ dns_cache_dir }}"
-      owner: "{{ dns_user }}"
-      group: "{{ dns_group }}"
-  local_pip_modules:
-    - dnspython
-    - netaddr
-    - jinja2
-    - jmespath
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"
@@ -149,3 +109,10 @@ dns_role:
     service:
       name: dns
       config_dir: "{{ dns_dir }}"
+
+local_dns_role:
+  pip_modules:
+    - dnspython
+    - netaddr
+    - jinja2
+    - jmespath

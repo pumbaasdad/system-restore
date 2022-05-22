@@ -1,4 +1,4 @@
 - name: Set as default shell
   user:
-    name: "{{ ansible_env.SUDO_USER }}"
+    name: "{{ ansible_env.USER }}"
     shell: /usr/bin/fish

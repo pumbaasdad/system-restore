@@ -1,9 +1,16 @@
-role_var_names: "{{ lookup('varnames', '_role$').split(',') }}"
+role_var_names: "{{ lookup('varnames', '^(?!local_).+_role$').split(',') }}"
 role_vars: "{%- set temp_role_vars = [] -%}
             {%- for role_var in role_var_names -%}
             {%- set _ = temp_role_vars.append(lookup('vars', role_var)) -%}
             {%- endfor -%}
             {{- temp_role_vars -}}"
+
+local_role_var_names: "{{ lookup('varnames', '^local_.+_role$').split(',') }}"
+local_role_vars: "{%- set temp_local_role_vars = [] -%}
+                  {%- for local_role_var in local_role_var_names -%}
+                  {%- set _ = temp_local_role_vars.append(lookup('vars', local_role_var)) -%}
+                  {%- endfor -%}
+                  {{- temp_local_role_vars -}}"
 
 apt_ppas: "{{ role_vars | selectattr('apt_ppa', 'defined') | map(attribute='apt_ppa') | list }}"
 deb_repos: "{{ role_vars | selectattr('deb_repo', 'defined') | map(attribute='deb_repo') | list }}"
@@ -12,14 +19,16 @@ packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='pac
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
 directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
-local_pip_modules: "{{ role_vars | selectattr('local_pip_modules', 'defined') | map(attribute='local_pip_modules') | flatten | unique }}"
+root_directories: "{{ role_vars | selectattr('root_directories', 'defined') | map(attribute='root_directories') | flatten }}"
+local_pip_modules: "{{ local_role_vars | selectattr('pip_modules', 'defined') | map(attribute='pip_modules') | flatten | unique }}"
 files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
+root_files: "{{ role_vars | selectattr('root_files', 'defined') | map(attribute='root_files') | flatten }}"
 files_changed_by_roles: "{{ role_vars | selectattr('files_changed_by_tasks', 'defined') | map(attribute='files_changed_by_tasks') | flatten }}"
 iptable_rules: "{{ role_vars | selectattr('iptable_rules', 'defined') | map(attribute='iptable_rules') | flatten }}"
 disabled_services: "{{ role_vars | selectattr('disabled_services', 'defined') | map(attribute='disabled_services') | flatten | unique }}"
 
 pip_modules: "{{ role_vars | selectattr('pip_modules', 'defined') | map(attribute='pip_modules') | flatten }}"
-virtual_environments: "{{ pip_modules | map(attribute='environment') | unique }}"
+virtual_environments: "{{ pip_modules | selectattr('environment', 'defined') | map(attribute='environment') | unique }}"
 
 user_groups: "{{ role_vars | selectattr('groups', 'defined') | map(attribute='groups') | flatten }}"
 user_group_names: "{{ user_groups | map(attribute='name') | unique }}"
@@ -41,7 +50,7 @@ docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='
 docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"
 docker_services_with_config: "{{ docker_services | selectattr('config_dir', 'defined') | map(attribute='name') }}"
 
-all_changed_files: "{{ changed_files.results + files_changed_by_roles }}"
+all_changed_files: "{{ changed_files.results + changed_root_files.results + files_changed_by_roles }}"
 
 lastpass_secrets_path: Infrastructure/Secrets
 
@@ -51,3 +60,12 @@ secrets_files:
 resolve_search: "{{ network.domain }}.{{ network.suffix }}"
 
 docker_compose_dir: "{{ secrets['docker_compose_dir'] }}"
+
+network_hosts: "{%- set temp_network_hosts = {} -%}
+                {%- for zone in network.zones -%}
+                {%- for host in zone.hosts -%}
+                {%- set host_name = [host.name, zone.name] | join('.') -%}
+                {%- set _ = temp_network_hosts.update({ host_name: host })  -%}
+                {%- endfor -%}
+                {%- endfor -%}
+                {{- temp_network_hosts -}}"

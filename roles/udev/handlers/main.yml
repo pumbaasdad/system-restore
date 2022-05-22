@@ -1,3 +1,4 @@
 - name: Reload udev rules
+  become: yes
   shell: "udevadm control --reload-rules && udevadm trigger"
   loop: "{{ all_changed_files | selectattr('dest', 'match', docker_compose_dir + '/docker-compose.yml') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"
