@@ -11,6 +11,7 @@ security_role:
     - path: "{{ ansible_env.HOME }}/.gnupg"
     - path: "{{ ansible_env.HOME }}/.ssh"
     - path: "{{ ansible_env.HOME }}/.yubico"
+  root_directories:
     - path: /etc/pam.d
     - path: /etc/ssh
   files:
@@ -20,12 +21,13 @@ security_role:
     - src: roles/security/templates/authorized_yubikeys.j2
       dest: "{{ ansible_env.HOME }}/.yubico/authorized_yubikeys"
       mode: "0600"
+    - src: roles/security/files/gpg-agent.conf
+      dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
+  root_files:
     - src: roles/security/templates/pam.sshd.j2
       dest: /etc/pam.d/sshd
     - src: roles/security/templates/pam.login.j2
       dest: /etc/pam.d/login
-    - src: roles/security/files/gpg-agent.conf
-      dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
     - src: roles/security/files/sshd_config
       dest: /etc/sshd_config
       notify: Restart sshd

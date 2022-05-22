@@ -12,8 +12,10 @@ packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='pac
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
 directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
+root_directories: "{{ role_vars | selectattr('root_directories', 'defined') | map(attribute='root_directories') | flatten }}"
 local_pip_modules: "{{ role_vars | selectattr('local_pip_modules', 'defined') | map(attribute='local_pip_modules') | flatten | unique }}"
 files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
+root_files: "{{ role_vars | selectattr('root_files', 'defined') | map(attribute='root_files') | flatten }}"
 files_changed_by_roles: "{{ role_vars | selectattr('files_changed_by_tasks', 'defined') | map(attribute='files_changed_by_tasks') | flatten }}"
 iptable_rules: "{{ role_vars | selectattr('iptable_rules', 'defined') | map(attribute='iptable_rules') | flatten }}"
 disabled_services: "{{ role_vars | selectattr('disabled_services', 'defined') | map(attribute='disabled_services') | flatten | unique }}"
@@ -41,7 +43,7 @@ docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='
 docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"
 docker_services_with_config: "{{ docker_services | selectattr('config_dir', 'defined') | map(attribute='name') }}"
 
-all_changed_files: "{{ changed_files.results + files_changed_by_roles }}"
+all_changed_files: "{{ changed_files.results + changed_root_files.results + files_changed_by_roles }}"
 
 lastpass_secrets_path: Infrastructure/Secrets
 

@@ -29,12 +29,13 @@ docker_role:
     - name: docker
       users:
         - "{{ ansible_env.USER }}"
-  files:
+  root_files:
     - src: roles/docker/templates/daemon.json.j2
       dest: /etc/docker/daemon.json
       notify:
         - Restart docker daemon
         - Stop docker containers
+  files:
     - src: roles/docker/templates/docker-compose.yml.j2
       dest: "{{ docker_compose_dir }}/docker-compose.yml"
   iptable_rules:
