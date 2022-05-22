@@ -60,3 +60,12 @@ secrets_files:
 resolve_search: "{{ network.domain }}.{{ network.suffix }}"
 
 docker_compose_dir: "{{ secrets['docker_compose_dir'] }}"
+
+network_hosts: "{%- set temp_network_hosts = {} -%}
+                {%- for zone in network.zones -%}
+                {%- for host in zone.hosts -%}
+                {%- set host_name = [host.name, zone.name] | join('.') -%}
+                {%- set _ = temp_network_hosts.update({ host_name: host })  -%}
+                {%- endfor -%}
+                {%- endfor -%}
+                {{- temp_network_hosts -}}"
