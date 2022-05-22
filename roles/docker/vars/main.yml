@@ -28,7 +28,7 @@ docker_role:
   groups:
     - name: docker
       users:
-        - "{{ ansible_env.SUDO_USER }}"
+        - "{{ ansible_env.USER }}"
   files:
     - src: roles/docker/templates/daemon.json.j2
       dest: /etc/docker/daemon.json
