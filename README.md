@@ -35,7 +35,7 @@ In its current state, this project will only run on the server being provision. 
 To run the playbook, execute the following command:
 
 ```shell script
-sudo ansible-playbook /path/to/playbook.yml -i localhost, -c local -e 'ansible_python_interpreter=/usr/bin/python3'
+ansible-playbook /path/to/playbook.yml -i localhost, -c local -K
 ```
 
 # Ansible
