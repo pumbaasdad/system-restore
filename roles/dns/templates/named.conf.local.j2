@@ -10,8 +10,8 @@ zone "{{ fwd_zone }}"
     file "{{ '/etc/bind/db.' + fwd_zone }}";
 };
 
-{% set zone_octets = ((zone.ipv4_subnet | ipaddr('prefix')) / 8) | round(0, 'ceil') | int -%}
-{%- set reverse_zone = (zone.ipv4_subnet | ipaddr('network') | ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
+{% set zone_octets = ((zone.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int -%}
+{%- set reverse_zone = (zone.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
 
 zone "{{ reverse_zone }}"
 {
@@ -20,7 +20,7 @@ zone "{{ reverse_zone }}"
     file "{{ '/etc/bind/db.' + reverse_zone[:-13] }}";
 };
 
-{% set reverse_zone = (zone.ipv4_subnet | ipaddr('network') | ipmath(256) | ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
+{% set reverse_zone = (zone.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
 
 zone "{{ reverse_zone }}"
 {

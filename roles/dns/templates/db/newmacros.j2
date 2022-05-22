@@ -1,16 +1,16 @@
 {%- macro append_records_for_host(records, zone, host, interface_type, offset, forward_origin, forward_host, reverse_ipv4_origin, link_local_ipv6_origin, dns_root_domain) -%}
-    {%- set ipv4_address = zone.ipv4_subnet | ipaddr(host.ipv4_offset + offset) | ipaddr('address') -%}
+    {%- set ipv4_address = zone.ipv4_subnet | ansible.utils.ipaddr(host.ipv4_offset + offset) | ansible.utils.ipaddr('address') -%}
     {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'A', 'target_host': ipv4_address, 'target_zone': ''}) -%}
 
     {%- if 'ipv6_interface' in host[interface_type] -%}
-        {%- set ipv6_address = ((zone.ipv6_prefix | ipaddr('network')) + host[interface_type].ipv6_interface) -%}
-        {%- if ipv6_address | ipaddr('address') -%}
+        {%- set ipv6_address = ((zone.ipv6_prefix | ansible.utils.ipaddr('network')) + host[interface_type].ipv6_interface) -%}
+        {%- if ipv6_address | ansible.utils.ipaddr('address') -%}
             {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'AAAA', 'target_host': ipv6_address, 'target_zone': ''}) -%}
         {%- endif -%}
     {%- else -%}
-        {%- set ipv6_address = 'fe80::' | slaac(host[interface_type].mac) -%}
+        {%- set ipv6_address = 'fe80::' | ansible.utils.slaac(host[interface_type].mac) -%}
         {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'AAAA', 'target_host': ipv6_address, 'target_zone': ''}) -%}
-        {%- set _ = records.append({'origin': link_local_ipv6_origin, 'host': (ipv6_address | ipaddr('revdns'))[:31], 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' + dns_root_domain + '.' + link_local_ipv6_origin + '.'}) -%}
+        {%- set _ = records.append({'origin': link_local_ipv6_origin, 'host': (ipv6_address | ansible.utils.ipaddr('revdns'))[:31], 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' + dns_root_domain + '.' + link_local_ipv6_origin + '.'}) -%}
     {%- endif -%}
 
     {%- set _ = records.append({'origin': reverse_ipv4_origin, 'host': host.ipv4_offset, 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' +  dns_root_domain + '.' + reverse_ipv4_origin + '.'}) -%}
@@ -47,14 +47,14 @@
 {%- endmacro -%}
 
 {%- macro append_records_for_zone(records, zone, dns_zone, dns_root_domain) -%}
-    {%- set link_local_ipv6_origin = ('fe80::' | ipaddr('revdns'))[32:72] -%}
+    {%- set link_local_ipv6_origin = ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] -%}
 
-    {%- set zone_octets = ((zone.ipv4_subnet | ipaddr('prefix')) / 8) | round(0, 'ceil') | int -%}
+    {%- set zone_octets = ((zone.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int -%}
 
-    {%- set reverse_ipv4_ethernet_origin_octets = (zone.ipv4_subnet | ipaddr('network')).split('.') -%}
+    {%- set reverse_ipv4_ethernet_origin_octets = (zone.ipv4_subnet | ansible.utils.ipaddr('network')).split('.') -%}
     {%- set reverse_ipv4_ethernet_origin = reverse_ipv4_ethernet_origin_octets[:zone_octets] | reverse | join('.') + '.in-addr.arpa' -%}
 
-    {%- set reverse_ipv4_wifi_origin_octets = (zone.ipv4_subnet | ipaddr(256) | ipaddr('address')).split('.') -%}
+    {%- set reverse_ipv4_wifi_origin_octets = (zone.ipv4_subnet | ansible.utils.ipaddr(256) | ansible.utils.ipaddr('address')).split('.') -%}
     {%- set reverse_ipv4_wifi_origin = reverse_ipv4_wifi_origin_octets[:zone_octets] | reverse | join('.') + '.in-addr.arpa' -%}
 
     {%- set hosts_with_ethernet_and_wifi = zone.hosts | selectattr('ethernet', 'defined') | selectattr('wifi', 'defined') -%}

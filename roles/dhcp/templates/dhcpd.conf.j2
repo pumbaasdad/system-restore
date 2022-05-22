@@ -1,9 +1,9 @@
 {% set suffix = [network.domain, network.suffix] | join('.') %}
 {% set suffixed_nameservers = network.nameservers | zip_longest([], fillvalue='.' + suffix) | map('join') | list %}
-{% set ip_nameservers = network.nameservers | map('ipaddr') | map('default', None, 'true') | list %}
+{% set ip_nameservers = network.nameservers | map('ansible.utils.ipaddr') | map('default', None, 'true') | list %}
 {% set nameservers = ip_nameservers | zip(suffixed_nameservers) | map('reject', 'none') | map('list') | map('first') | list %}
 {% set suffixed_routers = network.routers | zip_longest([], fillvalue='.' + suffix) | map('join') | list %}
-{% set ip_routers = network.routers | map('ipaddr') | map('default', None, 'true') | list %}
+{% set ip_routers = network.routers | map('ansible.utils.ipaddr') | map('default', None, 'true') | list %}
 {% set routers = ip_routers| zip(suffixed_routers) | map('reject', 'none') | map('list') | map('first') | list %}
 ddns-update-style none;
 
@@ -13,16 +13,16 @@ option domain-name-servers ns1.example.org, ns2.example.org;
 default-lease-time 172800;
 max-lease-time 345600;
 
-subnet {{ dhcp_docker_subnet | ipaddr('network') }} netmask {{ dhcp_docker_subnet | ipaddr('netmask') }} {
+subnet {{ dhcp_docker_subnet | ansible.utils.ipaddr('network') }} netmask {{ dhcp_docker_subnet | ansible.utils.ipaddr('netmask') }} {
 }
 
-subnet {{ network.ipv4_subnet | ipaddr('network') }} netmask {{ network.ipv4_subnet | ipaddr('netmask') }} {
+subnet {{ network.ipv4_subnet | ansible.utils.ipaddr('network') }} netmask {{ network.ipv4_subnet | ansible.utils.ipaddr('netmask') }} {
     authoritative;
-    range {{ network.dhcpv4_subnet | ipaddr(1) | ipaddr('address') }} {{ network.dhcpv4_subnet | ipaddr('-2') | ipaddr('address') }};
+    range {{ network.dhcpv4_subnet | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }} {{ network.dhcpv4_subnet | ansible.utils.ipaddr('-2') | ansible.utils.ipaddr('address') }};
     option domain-name-servers {{ nameservers | join(', ') }};
     option domain-name "{{ [network.domain, network.suffix] | join('.') }}";
     option routers {{ routers | join(', ') }};
-    option broadcast-address {{ network.ipv4_subnet | ipaddr('broadcast') }};
+    option broadcast-address {{ network.ipv4_subnet | ansible.utils.ipaddr('broadcast') }};
     use-host-decl-names on;
 {% set types = [
     { 'self': 'ethernet', 'other': 'wifi', 'offset': 0 },
