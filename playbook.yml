@@ -164,7 +164,6 @@
   roles:
     - security
     - shell
-    - system-config
     - backup
     - certificates
     - ddns
