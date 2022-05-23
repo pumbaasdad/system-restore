@@ -1,3 +1,6 @@
 transcode_role:
   directories:
     - path: "{{ transcode_dir }}"
+  nas_directories:
+    - path: "{{ transcode_nas_dir }}"
+      volume: transcode_destination

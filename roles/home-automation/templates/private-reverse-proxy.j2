@@ -1,6 +1,6 @@
 server {
 	listen 80; 
-        server_name home.{{ resolve_search }};
+        server_name home.{{ network.domain }}.{{ network.suffix }};
 	location / {
                 proxy_pass http://hass:8123;
                 proxy_set_header Host $host;

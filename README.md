@@ -92,6 +92,7 @@ of the following keys:
                provisioned.
    * `group` - The group that owns the directory.  Defaults to the group of the user that ansible uses to connect to the
                machine being provisioned.
+   * `volume` - Optional.  The name that should be assigned to this directory if it is to be used as a docker volume.
  * `files`
    * `dest` - A file that will be created by the user that ansible uses to connect to the machine being provisioned.
    * `src` - The source template to use to create the file.
@@ -102,6 +103,9 @@ of the following keys:
                machine being provisioned.
    * `mode` - The permissions that the file will have.  Defaults to the default `umask` on the machine being configured.
    * `notify` - Optional.  The name of an ansible handler to be run when this file is modified.
+ * `nas_directories`
+   * `path` - The path to the directory on the NAS.
+   * `volume` - Optional.  The name that should be assigned to this directory when being used as a docker volume.
  * `udev_devices`
    * `subsystem` - The subsystem to which an udev device belongs.
    * `attrs` - A dictionary of key value pairs that can be used to uniquely identify an udev device. 

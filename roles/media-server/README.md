@@ -28,3 +28,10 @@ server until it has been initially setup, therefore, initial setup must be done 
 | Variable         | Required | Description                                                                   | Default                           |
 |:-----------------|:---------|:------------------------------------------------------------------------------|:----------------------------------|
 | media_server_dir | No       | The path of the directory in which media server configuration will be stored. | "`{{ docker_compose_dir }}`/plex" | 
+
+# Docker Volumes
+
+ | Volume             | Description                                     |
+|:-------------------|:------------------------------------------------|
+ | media              | Directory where media served by plex is stored. |
+ | plex-configuration | Directory where plex configuration is stored.   |

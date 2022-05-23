@@ -1,3 +1,8 @@
 media_server_role:
   directories:
     - path: "{{ media_server_dir }}"
+      volume: plex_config
+  nas_directories:
+    - path: "{{ secrets['nas_media_dir'] }}"
+      volume: media
+

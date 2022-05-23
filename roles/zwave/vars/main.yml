@@ -7,6 +7,7 @@ zwave_rip_role:
       symlink: "{{ zwave_usbstick_symlink }}"
   directories:
     - path: "{{ zwave_dir }}"
+      volume: zwave-config
   files:
     - src: roles/zwave/templates/settings.json.j2
       dest: "{{ zwave_dir }}/settings.json"

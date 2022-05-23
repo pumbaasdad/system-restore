@@ -1,3 +1,6 @@
 unifi_role:
   directories:
     - path: "{{ unifi_dir }}"
+      volume: unifi
+    - path: "{{ unifi_dir }}/data/backup"
+      volume: unifi-backup

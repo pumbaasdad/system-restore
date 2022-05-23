@@ -23,3 +23,10 @@ This role provides a reverse proxy for accessing other services running on the s
  | reverse_proxy_private_site_configs |        | Reverse proxy configurations that can be accessed from inside the network.  |
 |                                    | name   | The name of the reverse proxy.                                              |
  |                                    | src    | The template that will be used to create the reverse proxy configuration.   |
+
+# Docker Volumes
+
+ | Volume              | Description                                                                                                                                                                    |
+|:--------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | public-nginx-config | Configuration for the `nginx` service that is exposed to the public internet.  It contains configurations required to access sites from the public internet and local network. |
+ | public-nginx-log    | The directory where logs from the `nginx` server that is exposed to the public internet are written.                                                                           |

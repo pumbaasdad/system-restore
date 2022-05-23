@@ -2,6 +2,10 @@ reverse_proxy_role:
   directories:
     - path: "{{ private_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}"
+    - path: "{{ public_reverse_proxy_dir }}/nginx"
+      volume: public-nginx-config
+    - path: "{{ public_reverse_proxy_dir }}/log/nginx"
+      volume: public-nginx-log
   files:
     - src: roles/reverse-proxy/templates/nginx.conf.j2
       dest: "{{ private_reverse_proxy_dir }}/nginx/nginx.conf"
