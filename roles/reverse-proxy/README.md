@@ -12,3 +12,14 @@ This role provides a reverse proxy for accessing other services running on the s
 | hass_google_assistant_api           | Yes      | The path that the reverse proxy will forward to the /api/google_assistant endpoint of home assistant. |                                          |
 | hass_auth_authorize                 | Yes      | The path that the reverse proxy will forward to the /auth/authorize endpoint of home assistant.       |                                          |
 | hass_auth_token                     | Yes      | The path that the reverse proxy will forward to the /auth/token endpoint of home assistant.           |                                          |
+
+# Parameters
+
+| Parameter                          | Member | Description                                                                 |
+|:-----------------------------------|:-------|:----------------------------------------------------------------------------|
+| reverse_proxy_public_site_configs  |        | Reverse proxy configurations that can be accessed from outside the network. |
+ |                                    | name   | The name of the reverse proxy.                                              |
+ |                                    | src    | The template that will be used to create the reverse proxy configuration.   |
+ | reverse_proxy_private_site_configs |        | Reverse proxy configurations that can be accessed from inside the network.  |
+|                                    | name   | The name of the reverse proxy.                                              |
+ |                                    | src    | The template that will be used to create the reverse proxy configuration.   |

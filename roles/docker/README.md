@@ -293,10 +293,6 @@ This directory stores the configuration for `handbrake`.
 
 This directory stores the configuration for the `bind9` DNS server.
 
-#### dns_cache_dir
-
-This directory stores the zone databases that `bind9` creates when DDNS records are added to the server.
-
 ## Containers
 
 The docker containers created by this role are documented in their own roles.  All containers will restart unless

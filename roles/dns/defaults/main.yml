@@ -1,6 +1,5 @@
 dns_dir: "{{ docker_compose_dir }}/dns"
 dns_config_dir: "{{ dns_dir }}/config"
-dns_cache_dir: "{{ dns_dir }}/cache"
 
 dns_forwarders:
   - 2606:4700:4700::1111

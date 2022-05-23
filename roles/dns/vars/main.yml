@@ -100,7 +100,6 @@ dns_files:
 dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
-    - path: "{{ dns_cache_dir }}"
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"
