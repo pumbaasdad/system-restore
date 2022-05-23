@@ -1,4 +1,6 @@
 backup_role:
   directories:
     - path: "{{ volumerize_dir }}/cache"
+      volume: volumerize-cache
     - path: "{{ volumerize_dir }}/credentials"
+      volume: volumerize-credentials

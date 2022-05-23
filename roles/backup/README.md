@@ -25,3 +25,10 @@ You must create a Google Cloud Platform project that will provide this service a
 | volumerize_passphrase       | Yes      | The passphrase that will be used to encrypt/decrypt backups.               |                                          |
 | volumerize_email            | Yes      | The e-mail address of the google account to which backups will be written. |                                          |
 | volumerize_google_drive_dir | Yes      | The name of the google drive directory where backups will be stored.       |                                          |
+
+# Docker Volumes
+
+ | Volume                 | Description                                                  |
+|:-----------------------|:-------------------------------------------------------------|
+ | volumerize-cache       | Directory used to created incremental backups.               |
+ | volumerize-credentials | Credentials used by volumerize to save backups to the cloud. |

@@ -19,3 +19,9 @@ transcoder output directory.
 | transcode_output_subdir           | No       | The subdirectory of `transcode_output_dir` where automatically transcoded files should be stored.                                                                                                                                                                                                | SAME_AS_SRC (uses the same subdirectory as the file was in within `transcode_input_dir`) |
 | transcode_input_stability_seconds | No       | How long, in seconds, the transcoder will wait before it begins transcoding a file found in `transcode_input_dir`.  If the file changes within this time, the time to wait will reset.  This allows the transcoder to ensure that the file has been completely written before transcoding begins | 30                                                                                       |
 | transcode_input_check_seconds     | No       | How often, in seconds, the transcoder checks `transcoder_input_dir`. for new files.                                                                                                                                                                                                              | 60                                                                                       |
+
+# Docker Volumes
+
+| Volume                | Description                                                                           |
+|:----------------------|:--------------------------------------------------------------------------------------|
+ | transcode_destination | Directory that is used to store files that are created by the `handbrake` transcoder. |

@@ -11,3 +11,4 @@ media_rip_role:
   directories:
     - path: "{{ media_rip_config_dir }}"
     - path: "{{ media_rip_output_dir }}"
+      volume: media_rip_destination

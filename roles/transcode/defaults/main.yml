@@ -1,5 +1,5 @@
 transcode_dir: "{{ docker_compose_dir }}/transcode"
-transcode_nas_dir: "{{ nas_media_dir }}/transcode"
+transcode_nas_dir: "{{ secrets['nas_media_dir'] }}/transcode"
 transcode_input_dir: "{{ transcode_nas_dir }}/raw"
 transcode_output_dir: "{{ transcode_nas_dir }}/output"
 transcode_keep_app_running: 1
@@ -8,5 +8,3 @@ transcode_keep_source_file: 0
 transcode_output_subdir: "SAME_AS_SRC"
 transcode_input_stability_seconds: 30
 transcode_input_check_seconds: 60
-
-nas_media_dir: "{{ secrets['nas_media_dir'] }}"

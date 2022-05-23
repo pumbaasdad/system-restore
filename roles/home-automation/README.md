@@ -23,3 +23,10 @@ variables in the `reverse-proxy` role.
 | Parameter                       | Member | Description                                                           |
 |:--------------------------------|:-------|:----------------------------------------------------------------------|
 | home_automation_trusted_proxies |        | IP addresses of proxy servers that will be trusted by home assistant. |
+
+# Docker Volumes
+
+ | Volume      | Description                                                            |
+|:------------|:-----------------------------------------------------------------------|
+ | hass-config | Used to store home assistant configuration.  This volume is backed up. |
+ | hass-db     | Used to store the home assistant database.                             |     

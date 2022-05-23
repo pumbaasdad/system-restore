@@ -20,3 +20,9 @@ You must have a Z-Wave USB stick plugged into the system being configured.
 | zwave_s2_unauthenticated_key | Yes      | The unauthenticated S2 security key used in your Z-Wave network.   |                                    |
 | zwave_s2_authenticated_key   | Yes      | The authenticated S2 security key used in your Z-Wave network.     |                                    |
 | zwave_s2_access_control_key  | Yes      | The S2 access control key used in your Z-Wave network.             |                                    |
+
+# Docker Volumes
+
+| Volume       | Description                                                |
+|:-------------|:-----------------------------------------------------------|
+ | zwave-config | Configuration for `zwave2mqtt`.  This volume is backed up. |

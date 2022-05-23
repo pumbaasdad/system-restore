@@ -20,6 +20,7 @@ services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='serv
 all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
 directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
 root_directories: "{{ role_vars | selectattr('root_directories', 'defined') | map(attribute='root_directories') | flatten }}"
+nas_directories: "{{ role_vars | selectattr('nas_directories', 'defined') | map(attribute='nas_directories') | flatten }}"
 local_pip_modules: "{{ local_role_vars | selectattr('pip_modules', 'defined') | map(attribute='pip_modules') | flatten | unique }}"
 files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
 root_files: "{{ role_vars | selectattr('root_files', 'defined') | map(attribute='root_files') | flatten }}"
@@ -47,8 +48,11 @@ private_site_configs: "{{ reverse_proxy_configs | selectattr('private_site_confi
 trusted_proxy_ips: "{{ reverse_proxy_configs | selectattr('trusted_ips', 'defined') | map(attribute='trusted_ips') | flatten }}"
 
 docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='docker') | flatten }}"
-docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"
-docker_services_with_config: "{{ docker_services | selectattr('config_dir', 'defined') | map(attribute='name') }}"
+all_docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"
+all_docker_services_with_config: "{{ docker_services | selectattr('config_dir', 'defined') | map(attribute='name') }}"
+
+local_docker_volumes: "{{ directories | selectattr('volume', 'defined') }}"
+nas_docker_volumes: "{{ nas_directories | selectattr('volume', 'defined') }}"
 
 all_changed_files: "{{ changed_files.results + changed_root_files.results + files_changed_by_roles }}"
 
@@ -56,8 +60,6 @@ lastpass_secrets_path: Infrastructure/Secrets
 
 secrets_files:
   - lastpass.yml
-
-resolve_search: "{{ network.domain }}.{{ network.suffix }}"
 
 docker_compose_dir: "{{ secrets['docker_compose_dir'] }}"
 

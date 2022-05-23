@@ -76,7 +76,6 @@
             - volumerize-credentials:/credentials
             - hass-config:/source/hass:ro
             - letsencrypt-etc:/source/letsencrypt/etc:ro
-            - secrets:/source/secrets:ro
             - unifi-backup:/source/unifi-backup
             - zwave-config:/source/zwave-config
             - /var/run/docker.sock:/var/run/docker.sock
@@ -207,6 +206,7 @@
             - "53:53/udp"
           volumes:
             - {{ dns_config_dir }}:/etc/bind
+            - {{ dns_cache_dir }}:/var/cache/bind
           networks:
             - docker1
           restart: unless-stopped
@@ -265,112 +265,20 @@
               - subnet: "{{ dhcp_docker_subnet }}"
 
       volumes:
-        hass-config:
+{% for directory in docker_local_volumes %}
+        {{ directory.volume }}:
           driver: local
           driver_opts:
-            device: {{ hass_dir }}
+            device: {{ directory.path }}
             o: bind
             type: none
-        hass-db:
+{% endfor %}
+{% for directory in docker_nas_volumes %}
+        {{ directory.volume }}:
           driver: local
           driver_opts:
-            device: {{ hass_db_dir }}
-            o: bind
-            type: none
-        letsencrypt-config:
-          driver: local
-          driver_opts:
-            device: {{ letsencrypt_dir }}
-            o: bind
-            type: none
-        letsencrypt-etc:
-          driver: local
-          driver_opts:
-            device: {{ letsencrypt_dir }}/etc
-            o: bind
-            type: none
-        fail2ban-jails:
-          driver: local
-          driver_opts:
-            device: {{ fail2ban_dir }}/jail.d
-            o: bind
-            type: none
-        public-nginx-config:
-          driver: local
-          driver_opts:
-            device: {{ public_reverse_proxy_dir }}/nginx
-            o: bind
-            type: none
-        public-nginx-log:
-          driver: local
-          driver_opts:
-            device: {{ public_reverse_proxy_dir }}/log/nginx
-            o: bind
-            type: none
-        volumerize-cache:
-          driver: local
-          driver_opts:
-            device: {{ volumerize_dir }}/cache
-            o: bind
-            type: none
-        volumerize-credentials:
-          driver: local
-          driver_opts:
-            device: {{ volumerize_dir }}/credentials
-            o: bind
-            type: none
-        secrets:
-          driver: local
-          driver_opts:
-            device: {{ secrets_dir }}
-            o: bind
-            type: none
-        unifi:
-          driver: local
-          driver_opts:
-            device: {{ unifi_dir }}
-            o: bind
-            type: none
-        unifi-backup:
-          driver: local
-          driver_opts:
-            device: {{ unifi_dir }}/data/backup
-            o: bind
-            type: none
-        media:
-          driver: local
-          driver_opts:
-            device: ":{{ nas_media_dir }}"
+            device: {{ directory.path }}
             o: addr={{ nas_address }},rw
-            type : nfs
-        plex_config:
-          driver: local
-          driver_opts:
-            device: {{ media_server_dir }}
-            o: bind
-            type: none
-        dhcp:
-          driver: local
-          driver_opts:
-            device: {{ dhcp_dir }}
-            o: bind
-            type: none
-        media_rip_destination:
-          driver: local
-          driver_opts:
-            device: {{ media_rip_output_dir }}
-            o: bind
-            type: none
-        transcode_destination:
-          driver: local
-          driver_opts:
-            device: ":{{ transcode_output_dir }}"
-            o: addr={{ nas_address }},rw
-            type : nfs
-        zwave-config:
-          driver: local
-          driver_opts:
-            device: {{ zwave_dir }}
-            o: bind
-            type: none
+            type: nfs
+{% endfor %}
 

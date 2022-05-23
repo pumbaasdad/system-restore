@@ -1,6 +1,7 @@
 dhcp_role:
   directories:
     - path: "{{ dhcp_dir }}"
+      volume: dhcp
   files:
     - src: roles/dhcp/templates/dhcpd.conf.j2
       dest: "{{ dhcp_dir }}/dhcpd.conf"
