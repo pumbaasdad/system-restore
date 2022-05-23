@@ -10,7 +10,3 @@ dns_forwarders:
   - 1.0.0.1
   - 8.8.8.8
   - 8.8.4.4
-
-dns_server: ns01
-dns_zone: infrastructure
-dns_hostname: "{{ dns_server }}.{{ dns_zone }}.{{ network.domain }}.{{ network.suffix }}"
