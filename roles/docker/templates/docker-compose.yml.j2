@@ -207,7 +207,6 @@
             - "53:53/udp"
           volumes:
             - {{ dns_config_dir }}:/etc/bind
-            - {{ dns_cache_dir }}:/var/cache/bind
           networks:
             - docker1
           restart: unless-stopped

@@ -45,6 +45,10 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                  {%- endfor -%}
                  {{- temp_zone_files -}}"
 
+dns_server: "{{ network_hosts[inventory_hostname].name }}"
+dns_zone: "{{ network_hosts[inventory_hostname].zone }}"
+dns_hostname: "{{ dns_server }}.{{ dns_zone }}.{{ network.domain }}.{{ network.suffix }}"
+
 dns_files:
   - src: roles/dns/files/db.0
     dest: "{{ dns_config_dir }}"
@@ -100,7 +104,6 @@ dns_files:
 dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
-    - path: "{{ dns_cache_dir }}"
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"

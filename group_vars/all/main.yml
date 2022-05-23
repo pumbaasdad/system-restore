@@ -65,7 +65,9 @@ network_hosts: "{%- set temp_network_hosts = {} -%}
                 {%- for zone in network.zones -%}
                 {%- for host in zone.hosts -%}
                 {%- set host_name = [host.name, zone.name] | join('.') -%}
-                {%- set _ = temp_network_hosts.update({ host_name: host })  -%}
+                {%- set host_with_zone = host -%}
+                {%- set _ = host_with_zone.update({ 'zone': zone.name }) -%}
+                {%- set _ = temp_network_hosts.update({ host_name: host_with_zone }) -%}
                 {%- endfor -%}
                 {%- endfor -%}
                 {{- temp_network_hosts -}}"

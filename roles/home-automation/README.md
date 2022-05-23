@@ -17,3 +17,9 @@ variables in the `reverse-proxy` role.
 | hass_db_dir                 | No       | The directory where the Home Assistant database will be stored.                                                  | `{{ docker_compose_dir }}/hass-db` |
 | google_assistant_project_id | Yes      | The ID of the Google Cloud Platform project that will be used to integrate Home Assistant with Google Assistant. |                                    |
 | google_assistant_api_key    | Yes      | The API key used to authorize Home Assistant with your Google Cloud Platform project.                            |                                    |
+
+# Parameters
+
+| Parameter                       | Member | Description                                                           |
+|:--------------------------------|:-------|:----------------------------------------------------------------------|
+| home_automation_trusted_proxies |        | IP addresses of proxy servers that will be trusted by home assistant. |

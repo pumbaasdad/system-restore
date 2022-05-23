@@ -1,3 +1,7 @@
+# Description
+
+This role configures a media server.  This service is provided by [Plex](http://www.plex.tv).
+
 # Initial Setup
 
 There does not appear to be any way to configure Plex using ansible, therefore, initial manual setup is required.
@@ -18,3 +22,9 @@ server until it has been initially setup, therefore, initial setup must be done 
 1. Access `<docker host>:32400`, if the Plex media server cannot be found, then, restart the docker container.
 1. Open the settings menu and configure as desired.
 1. Add media libraries.
+
+# Variables
+
+| Variable         | Required | Description                                                                   | Default                           |
+|:-----------------|:---------|:------------------------------------------------------------------------------|:----------------------------------|
+| media_server_dir | No       | The path of the directory in which media server configuration will be stored. | "`{{ docker_compose_dir }}`/plex" | 
