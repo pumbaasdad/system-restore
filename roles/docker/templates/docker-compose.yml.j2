@@ -234,35 +234,18 @@
           restart: unless-stopped
 
       networks:
-        docker1:
+{% for network in (docker_builtin_networks + docker_extra_networks) %}
+        {{ network.name }}:
           driver: bridge
           driver_opts:
-            com.docker.network.bridge.name: docker1
-        private0:
-          driver: bridge
-          driver_opts:
-            com.docker.network.bridge.name: private0
-          internal: true
+            com.docker.network.bridge.name: {{ network.name }}
+{% if 'subnet' in network %}
           ipam:
             driver: default
             config:
-              - subnet: "{{ docker_private0_subnet }}"
-        public0:
-          driver: bridge
-          driver_opts:
-            com.docker.network.bridge.name: public0
-        docker2:
-          driver: bridge
-          driver_opts:
-            com.docker.network.bridge.name: docker2
-        dhcp0:
-          driver: bridge
-          driver_opts:
-            com.docker.network.bridge.name: dhcp0
-          ipam:
-            driver: default
-            config:
-              - subnet: "{{ dhcp_docker_subnet }}"
+              - subnet: "{{ network.subnet }}"
+{% endif %}
+{% endfor %}
 
       volumes:
 {% for directory in docker_local_volumes %}
@@ -277,7 +260,7 @@
         {{ directory.volume }}:
           driver: local
           driver_opts:
-            device: {{ directory.path }}
+            device: ":{{ directory.path }}"
             o: addr={{ nas_address }},rw
             type: nfs
 {% endfor %}

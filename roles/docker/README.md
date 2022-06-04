@@ -1,111 +1,22 @@
 # Description
 
 This role uses `docker-compose` to run a number of services on the target machine.  It creates several docker networks
-in an attempt to isolate the blast radius should any container be compromised.  The resulting infrastructure looks like
-this:
+in an attempt to isolate the blast radius should any container be compromised.
 
 ## Networks
-
-```plantuml
-	
-@startuml
-
-cloud network as "home-network"
-cloud internet
-
-node router
-
-component host {
-    interface public as "public-ethernet"
-    
-    component docker {
-        cloud docker1
-        cloud docker2
-        cloud private0
-        cloud public0
-        cloud dhcp0
-        cloud HOST
-        
-        agent handbrake
-        agent makemkv
-        agent unifi
-        agent dns
-        agent volumerize
-        agent plex
-        agent duckdns
-        agent letsencrypt
-        agent homeassistant as "home-assistant"
-        agent publicnginx as "public-nginx"
-        agent dhcp
-        agent dhcprelay as "dhcp-relay"
-        agent zwave2mqtt
-        
-        handbrake -- docker1
-        makemkv -- docker1
-        unifi -- docker1
-        dns -- docker1
-        volumerize -- docker1
-        plex -- docker1
-        duckdns -- docker1
-        letsencrypt -- docker1
-        
-        letsencrypt -- private0
-        homeassistant -- private0
-        publicnginx -- private0
-        
-        publicnginx -- public0
-        
-        homeassistant -up- docker2
-        zwave2mqtt -up- docker2
-        
-        dhcp -- dhcp0
-        
-        dhcprelay -- HOST
-    }
-    
-    public -up- public0
-}
-
-network -up- public
-router -left- network
-router -right- internet
-
-@enduml
-
-```
-
-### public0
-
-This network is only accessible to the host interface that is exposed to the internet.  Its purpose is theoretically to
-make `nginx` the only service that is accessible to the internet.  `iptable` rules are configured to ensure that no
-connections can be initiated from within this network to any other systems on your network, or to the public internet.
-These `iptable` rules will allow responses to requests or new connections that are associated with existing connections.
 
 ### private0
 
 This is an internal docker network that the host system cannot access.  Its purpose is to allow nginx to proxy requests
-to home assistant and letsencrypt.  `private0` is a bad name and this will likely be renamed `internal0` in the future.
-
-### docker2
-
-This network was created because home assistant requires access to the home network and the internet to function
-properly.  As a result, it really defeats the purpose of the rules set up to protect the `public0` network.  If the
-public `nginx` container becomes compromised, an attacker could theoretically work their way through the private0 and
-docker2 networks to get access to the home network and public internet.  The correct solution to this issue is to set
-up a VLAN used by all smart home devices, and to include the `public0` network on that VLAN. The `iptable` rules
-preventing home assistant from accessing the network could be removed, and this network could be deleted. 
+to other services.  `private0` is a bad name and this will likely be renamed `internal0` in the future.
 
 ### docker1
 
 This network is supposed to be the general purpose network used by all docker containers that do not need to be accessed
-by the public internet.  It fails in that regard as `plex` needs to be publicly accessible.  Also, having `letsencrypt`
-on this network provides a bridge from the `private0` network to `docker1`.  It should be trivial to remove
-`letsencrypt` from this network.  `plex` can definitely be moved to the `docker2` network, but an ideal situation would
-be to put it on the `private0` network behind the `nginx` proxy.
-
-### dhcp0
-
-This network specifies the subnet that it will use and is needed so that subnet can be provided to `isc-dhcp-server`.
+by the public internet.  It fails in that regard as `plex` needs to be publicly accessible but is currently on this
+network.  Also, having `letsencrypt` on this network provides a bridge from the `private0` network to `docker1`.  It
+should be trivial to remove `letsencrypt` from this network.  `plex` can definitely be moved to the `docker2` network,
+but an ideal situation would be to put it on the `private0` network behind the `nginx` proxy.
 
 ### HOST
 
@@ -181,6 +92,9 @@ receives that traffic must be set in the `public_port` variable.
  | docker_nas_volumes          |            | NAS directories which will be available to docker containers as volumes.      |
  |                             | path       | The path to the directory on the NAS.                                         |
  |                             | volume     | The name of the volume.                                                       |
+ | docker_extra_networks       |            | Non-default networks that roles require.                                      |
+ |                             | name       | The name of the network.                                                      |
+ |                             | subnet     | Optional. The subnet that will be used by the network.                        | 
  | docker_services             |            | Docker services that will be created.                                         |
  |                             | config_dir | Optional.  The directory where configuration for the service will be created. |
  | docker_services_with_config |            | Names of docker services that have configuration directories                  |

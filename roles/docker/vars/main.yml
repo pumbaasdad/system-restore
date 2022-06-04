@@ -36,24 +36,12 @@ docker_role:
   files:
     - src: roles/docker/templates/docker-compose.yml.j2
       dest: "{{ docker_compose_dir }}/docker-compose.yml"
-  iptable_rules:
-    - chain: INPUT
-      in_interface: public0
-      cstate: []
-      jump: DROP
-    - chain: INPUT
-      in_interface: public0
-      cstate: [ESTABLISHED, RELATED]
-      jump: ACCEPT
-    - chain: DOCKER-USER
-      in_interface: public0
-      cstate: []
-      jump: DROP
-    - chain: DOCKER-USER
-      in_interface: public0
-      cstate: [ESTABLISHED, RELATED]
-      jump: ACCEPT
 
 local_docker_role:
   pip_modules:
     - jmespath
+
+docker_builtin_networks:
+  - name: docker1
+  - name: private0
+    subnet: "{{ docker_private0_subnet }}"
