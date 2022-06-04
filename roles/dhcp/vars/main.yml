@@ -9,6 +9,9 @@ dhcp_role:
     service:
       name: dhcp
       config_dir: "{{ dhcp_dir }}"
+    networks:
+      - name: dhcp0
+        subnet: "{{ dhcp_docker_subnet }}"
 
 local_dhcp_role:
   pip_modules:

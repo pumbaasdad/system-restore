@@ -41,3 +41,22 @@ reverse_proxy_role:
     service:
       name: public-nginx
       config_dir: "{{ public_reverse_proxy_dir }}"
+    networks:
+      - name: public0
+  iptable_rules:
+    - chain: INPUT
+      in_interface: public0
+      cstate: []
+      jump: DROP
+    - chain: INPUT
+      in_interface: public0
+      cstate: [ESTABLISHED, RELATED]
+      jump: ACCEPT
+    - chain: DOCKER-USER
+      in_interface: public0
+      cstate: []
+      jump: DROP
+    - chain: DOCKER-USER
+      in_interface: public0
+      cstate: [ESTABLISHED, RELATED]
+      jump: ACCEPT

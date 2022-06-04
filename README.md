@@ -134,6 +134,9 @@ of the following keys:
    * `service`
      * `name` - The name of the docker service to create.
      * `config_dir` - The directory where configuration for the service will be created.
+   * `networks`
+     * `name` - The name of the docker network to create.
+     * `subnet` - Optional.  The subnet that shoould be used by the network.
  * `files_changed_by_tasks` - A list of files that have been updated by tasks associated with the role.  This should
                               default to an empty list and use lazy evaluation to return a value if files are modified.
 

@@ -2,7 +2,7 @@
 
 This role provides services to run DHCP on the local network.
 
-Because DHCP is a multicast protocol, there is not way for a docker container running in bridge mode to reach a server
+Because DHCP is a multicast protocol, there is no way for a docker container running in bridge mode to reach a server
 running in a container with bridge networking.  This problem is solved by creating a DHCP relay container with host
 networking.  The DHCP server itself could use host networking, but, the long term plan is to have a network with
 multiple VLANs, which will necessitate a DHCP relay.  Because a relay is being used, subnet and IP information needs to
@@ -26,3 +26,9 @@ the DHCP server can be moved to the `docker1` network.
  | Volume             | Description                                   |
 |:-------------------|:----------------------------------------------|
  | dhcp               | Directory where DHCP configuration is stored. |
+
+# Docker Networks
+
+ | Network | Description                                                                                                                            |
+|:--------|:---------------------------------------------------------------------------------------------------------------------------------------|
+ | dhcp0   | The network in which `isc-dhcp-server` will run.  This network is required so the subnet can be specified in dhcp configuration files. |

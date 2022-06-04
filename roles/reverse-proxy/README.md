@@ -30,3 +30,15 @@ This role provides a reverse proxy for accessing other services running on the s
 |:--------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
  | public-nginx-config | Configuration for the `nginx` service that is exposed to the public internet.  It contains configurations required to access sites from the public internet and local network. |
  | public-nginx-log    | The directory where logs from the `nginx` server that is exposed to the public internet are written.                                                                           |
+
+# Docker Networks
+
+| Network | Description                                                                                                                                                                                                                 |
+|:--------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | public0 | This network is only accessible to the host interface that is exposed to the internet.  Its purpose is to make the reverse proxy the only service accessible from the internet.  This is accomplished with `iptable` rules. |
+
+# iptable Rules
+
+This module defines `iptable` rules to ensure that no external connections can be initiated from the `public0` docker
+network to any other system on this network, or the public internet.  The rules will allow responses to requests and
+connections that are associated with existing connections.
