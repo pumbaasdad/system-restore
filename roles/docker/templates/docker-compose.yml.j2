@@ -239,6 +239,7 @@
           driver: bridge
           driver_opts:
             com.docker.network.bridge.name: {{ network.name }}
+          internal: {{ network.internal | default(false) }}
 {% if 'subnet' in network %}
           ipam:
             driver: default

@@ -5,13 +5,6 @@ role_vars: "{%- set temp_role_vars = [] -%}
             {%- endfor -%}
             {{- temp_role_vars -}}"
 
-local_role_var_names: "{{ lookup('varnames', '^local_.+_role$').split(',') }}"
-local_role_vars: "{%- set temp_local_role_vars = [] -%}
-                  {%- for local_role_var in local_role_var_names -%}
-                  {%- set _ = temp_local_role_vars.append(lookup('vars', local_role_var)) -%}
-                  {%- endfor -%}
-                  {{- temp_local_role_vars -}}"
-
 apt_ppas: "{{ role_vars | selectattr('apt_ppa', 'defined') | map(attribute='apt_ppa') | list }}"
 deb_repos: "{{ role_vars | selectattr('deb_repo', 'defined') | map(attribute='deb_repo') | list }}"
 apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_key') | list }}"
@@ -21,7 +14,6 @@ all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(at
 directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
 root_directories: "{{ role_vars | selectattr('root_directories', 'defined') | map(attribute='root_directories') | flatten }}"
 nas_directories: "{{ role_vars | selectattr('nas_directories', 'defined') | map(attribute='nas_directories') | flatten }}"
-local_pip_modules: "{{ local_role_vars | selectattr('pip_modules', 'defined') | map(attribute='pip_modules') | flatten | unique }}"
 files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
 root_files: "{{ role_vars | selectattr('root_files', 'defined') | map(attribute='root_files') | flatten }}"
 files_changed_by_roles: "{{ role_vars | selectattr('files_changed_by_tasks', 'defined') | map(attribute='files_changed_by_tasks') | flatten }}"

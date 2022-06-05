@@ -27,4 +27,4 @@ home_automation_role:
       config_dir: "{{ hass_dir }}"
     networks:
       - name: docker2
-  files_changed_by_tasks: "{{ [hass_config] | default([]) }}"
+  files_changed_by_tasks: "{{ [hass_config | default(None)] | select() }}"

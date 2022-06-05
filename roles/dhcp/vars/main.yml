@@ -12,7 +12,3 @@ dhcp_role:
     networks:
       - name: dhcp0
         subnet: "{{ dhcp_docker_subnet }}"
-
-local_dhcp_role:
-  pip_modules:
-    - netaddr

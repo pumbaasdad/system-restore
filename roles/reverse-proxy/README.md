@@ -33,9 +33,9 @@ This role provides a reverse proxy for accessing other services running on the s
 
 # Docker Networks
 
-| Network | Description                                                                                                                                                                                                                 |
-|:--------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | public0 | This network is only accessible to the host interface that is exposed to the internet.  Its purpose is to make the reverse proxy the only service accessible from the internet.  This is accomplished with `iptable` rules. |
+| Network | Description                                                                                                                                                                                                                                       |
+|:--------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+ | public0 | This network is only accessible to the host interface that is exposed to the internet.  Its purpose is to prevent any requests to the local network or internet originating from the nginx container.  This is accomplished with `iptable` rules. |
 
 # iptable Rules
 
