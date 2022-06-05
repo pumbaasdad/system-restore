@@ -9,12 +9,9 @@ The system being configured must have two network interfaces, one of which may b
 
 ## Ansible
 
-`Ansible` must be on the PC that you wish to use to provision the server.  The included playbook runs and produces no
-warnings with `ansible core` version 2.12.5 and `python` 3.10.4.  Any local dependencies that are required to provision
-the server will be bootstrapped onto the system where the playbook is run.  If ansible is installed in a virtual
-environment, the prerequisites will be installed in that environment.
+The included playbook runs and produces no warnings with `python` 3.10.4 and the packages in requirements.txt.
 
-Instructions for installing `ansible` can be found [here](https://tinyurl.com/yyt73e8b).
+All local dependencies can be installed and updated by running `pip install -r requirements.txt`.
 
 Information about variables that must be available to ansible, as well as any manual setup steps can be found in the
 README files under the `roles` directory.
