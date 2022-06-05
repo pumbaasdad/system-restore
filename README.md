@@ -140,11 +140,6 @@ of the following keys:
  * `files_changed_by_tasks` - A list of files that have been updated by tasks associated with the role.  This should
                               default to an empty list and use lazy evaluation to return a value if files are modified.
 
-Roles can also define a variable named `local_<role name>_role` to configure the bootstrap of the machine on which
-ansible is being run.  This variable can include any of the following keys:
-
- * `pip_modules` - A list of python modules to be installed in the environment being used to run ansible.
-
 ## Defaults vs Variables
 
 The roles defined in this project define both defaults and variables.  The intention is that anything defined as a

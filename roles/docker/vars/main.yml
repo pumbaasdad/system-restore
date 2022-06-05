@@ -37,10 +37,6 @@ docker_role:
     - src: roles/docker/templates/docker-compose.yml.j2
       dest: "{{ docker_compose_dir }}/docker-compose.yml"
 
-local_docker_role:
-  pip_modules:
-    - jmespath
-
 docker_builtin_networks:
   - name: docker1
   - name: private0

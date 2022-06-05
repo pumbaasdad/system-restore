@@ -22,19 +22,6 @@
       set_fact:
         network: "{{ secret_network.network }}"
 
-    - name: Find local python interpreter
-      local_action: command which python
-      register: which_python
-      changed_when: false
-
-    - name: Install local python prerequisites
-      vars:
-        ansible_python_interpreter: "{{ which_python.stdout }}"
-      local_action:
-        module: pip
-        name: "{{ local_pip_modules }}"
-        state: latest
-
     - name: As root
       become: yes
       block:

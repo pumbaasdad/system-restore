@@ -110,10 +110,3 @@ dns_role:
     service:
       name: dns
       config_dir: "{{ dns_dir }}"
-
-local_dns_role:
-  pip_modules:
-    - dnspython
-    - netaddr
-    - jinja2
-    - jmespath
