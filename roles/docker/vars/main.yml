@@ -45,3 +45,4 @@ docker_builtin_networks:
   - name: docker1
   - name: private0
     subnet: "{{ docker_private0_subnet }}"
+    internal: true
