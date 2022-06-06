@@ -9,9 +9,10 @@ The system being configured must have two network interfaces, one of which may b
 
 ## Ansible
 
-The included playbook runs and produces no warnings with `python` 3.10.4 and the packages in requirements.txt.
+The included playbook runs and produces no warnings with `python` 3.10.4 and the packages in `poetry.toml`.
 
-All local dependencies can be installed and updated by running `pip install -r requirements.txt`.
+`poetry` can be installed by running `pip install poetry`.  After that, dependencies can be installed and updated by
+running `poetry install`.
 
 Information about variables that must be available to ansible, as well as any manual setup steps can be found in the
 README files under the `roles` directory.

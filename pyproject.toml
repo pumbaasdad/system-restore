@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "system-restore"
+version = "0.1.0"
+description = ""
+authors = ["Pumbaa's Dad <32616257+pumbaasdad@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+ansible = "^5.8.0"
+dnspython = "^2.2.1"
+jmespath = "^1.0.0"
+netaddr = "^0.8.0"
+
+[tool.poetry.dev-dependencies]
+poetry = "^1.1.13"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
