@@ -110,3 +110,11 @@ dns_role:
     service:
       name: dns
       config_dir: "{{ dns_dir }}"
+      image: resystit/bind9
+      container_name: bind9
+      ports:
+        - "53:53"
+        - "53:53/udp"
+      volumes:
+        - "{{ dns_config_dir }}:/etc/bind"
+        - "{{ dns_cache_dir }}:/var/cache/bind"

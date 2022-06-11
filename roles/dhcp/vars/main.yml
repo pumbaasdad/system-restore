@@ -9,6 +9,14 @@ dhcp_role:
     service:
       name: dhcp
       config_dir: "{{ dhcp_dir }}"
+      image: networkboot/dhcpd
+      volumes:
+        - dhcp:/data
+      networks:
+        default: false
+        extra:
+          dhcp0:
+            ipv4_address: "{{ dhcp_docker_ip }}"
     networks:
       - name: dhcp0
         subnet: "{{ dhcp_docker_subnet }}"

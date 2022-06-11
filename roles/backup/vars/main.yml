@@ -4,3 +4,25 @@ backup_role:
       volume: volumerize-cache
     - path: "{{ volumerize_dir }}/credentials"
       volume: volumerize-credentials
+  docker:
+    service:
+      name: volumerize
+      image: fekide/volumerize
+      volumes:
+        - volumerize-cache:/volumerize-cache
+        - volumerize-credentials:/credentials
+        - hass-config:/source/hass:ro
+        - letsencrypt-etc:/source/letsencrypt/etc:ro
+        - unifi-backup:/source/unifi-backup
+        - zwave-config:/source/zwave-config
+        - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+        - VOLUMERIZE_SOURCE=/source
+        - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
+        - VOLUMERIZE_EXCLUDE_1=**/*.log*
+        - PASSPHRASE={{ volumerize_passphrase }}
+        - VOLUMERIZE_JOBBER_TIME=0 30 0 * * 1
+        - VOLUMERIZE_CONTAINERS=zwavejs2mqtt hass letsencrypt unifi
+        - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
+        - REMOVE_ALL_BUT_N_FULL=4
+        - REMOVE_ALL_INC_BUT_N_FULL=1

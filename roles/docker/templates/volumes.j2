@@ -1,0 +1,40 @@
+{%- macro configure_volume(volume, device_prefix, o, type, volumes) -%}
+    {%- set driver_opts = {} %}
+    {%- set _ = driver_opts.update({'device': device_prefix + volume.path}) %}
+    {%- set _ = driver_opts.update({'o': o}) %}
+    {%- set _ = driver_opts.update({'type': type}) %}
+
+    {%- set volume_definition = {'driver': 'local', 'driver_opts': driver_opts} -%}
+
+    {%- set _ = volumes.update({volume.volume: volume_definition})-%}
+{%- endmacro -%}
+
+{%- macro configure_local_volume(volume, volumes) -%}
+    {{- configure_volume(volume, '', 'bind', 'none', volumes)  }}
+{%- endmacro -%}
+
+{%- macro configure_network_volume(volume, volumes, nas_address) -%}
+    {%- set o = 'addr=' + nas_address + ',rw' -%}
+    {{- configure_volume(volume, ':', o, 'nfs', volumes)  }}
+{%- endmacro -%}
+
+{%- macro configure_local_volumes(volumes, docker_volumes) -%}
+    {%- for volume in volumes -%}
+        {{- configure_local_volume(volume, docker_volumes) -}}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro configure_network_volumes(volumes, docker_volumes, nas_address) -%}
+    {%- for volume in volumes -%}
+        {{- configure_network_volume(volume, docker_volumes, nas_address) -}}
+    {%- endfor -%}
+{%- endmacro -%}
+
+{%- macro configure(local_volumes, network_volumes, nas_address, compose) -%}
+    {%- set docker_volumes = {} -%}
+
+    {{- configure_local_volumes(local_volumes, docker_volumes) -}}
+    {{- configure_network_volumes(network_volumes, docker_volumes, nas_address) -}}
+
+    {%- set _ = compose.update({'volumes': docker_volumes}) -%}
+{%- endmacro -%}

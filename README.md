@@ -131,10 +131,32 @@ of the following keys:
  * `docker`
    * `service`
      * `name` - The name of the docker service to create.
+     * `container_name` - Optional.  The name of the container used to run the service.  Defaults to the value of
+                          `name`.
      * `config_dir` - The directory where configuration for the service will be created.
+     * `image` - The image used to run the service
+     * `volumes` - A list of mappings of volume names to container paths
+     * `environment` - A list of environment variables that will be set in the container.
+     * `ports` - A mapping of host ports to container ports.
+     * `networks`
+       * `host` - Optional.  If the network runs in host mode.  If this value is true, all other options in the
+                  `networks` object are ignored.  Defaults to `false`.
+       * `default` - Optional.  If this service runs on the default docker network.  Defaults to true.
+       * `internal` - Optional.  If this service runs on the internal docker network.  Defaults to false.
+       * `extra` - Optional.  A list of non-standard docker networks that the service will run on.  Defaults to an empty
+                   list.
+         * `ipv4_address` - Optional.  The IPv4 address that will be assigned to the service.  Will be assigned randomly
+                            if not specified.
+     * `capabilities` - Optional.  A list of capabilities that will be given to the container.
+     * `command` - Optional.  The command that will be executed to start the container.  The command specified in the
+                   container's dockerfile.
+     * `devices` - Optional.  A list of mappings of host device paths to the container path where the device will be
+                   made available.  Defaults to an empty list.
+     * `tty` - Optional.  Whether a pseudo-tty will be allocated for this service.  Defaults to false.
+     * `stop_signal` - Optional.  A signal that will be used to stop the container.  Defaults to `SIGTERM`.
    * `networks`
      * `name` - The name of the docker network to create.
-     * `subnet` - Optional.  The subnet that shoould be used by the network.
+     * `subnet` - Optional.  The subnet that should be used by the network.
  * `files_changed_by_tasks` - A list of files that have been updated by tasks associated with the role.  This should
                               default to an empty list and use lazy evaluation to return a value if files are modified.
 

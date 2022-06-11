@@ -1,0 +1,8 @@
+ddns_role:
+  docker:
+    service:
+      name: duckdns
+      image: linuxserver/duckdns
+      environment:
+        - SUBDOMAINS={{ duckdns_subdomain }}
+        - TOKEN={{ duckdns_token }}

@@ -42,3 +42,8 @@ docker_builtin_networks:
   - name: private0
     subnet: "{{ docker_private0_subnet }}"
     internal: true
+
+docker_default_environment:
+  - TZ={{ TZ }}
+  - PUID=1000
+  - PGID=999
