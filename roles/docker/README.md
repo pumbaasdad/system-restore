@@ -18,26 +18,6 @@ by the public internet.  It fails in that regard as `plex` needs to be publicly 
 network.  `plex` can definitely be moved to the `docker2` network, but an ideal situation would be to put it on the
 `private0` network behind the `nginx` proxy.
 
-## Volumes
-
-The following directories are mounted, but are not named volumes.  They will be converted to volumes in the future:
-
-### media_rip_config_dir
-
-This directory stores the configuration for `makemkv`.
-
-### transcode_dir
-
-This directory stores the configuration for `handbrake`.
-
-### dns_config_dir
-
-This directory stores the configuration for the `bind9` DNS server.
-
-### dns_cache_dir
-
-This directory stores files cached by the `bind9` DNS server.
-
 # Initial Setup
 
 You must configure a port on your router that will forward traffic to the server being configured.  The port that

@@ -102,6 +102,9 @@ dns_files:
 dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
+      volume: dns_config
+    - path: "{{ dns_cache_dir }}"
+      volume: dns_cache
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"
@@ -116,5 +119,5 @@ dns_role:
         - "53:53"
         - "53:53/udp"
       volumes:
-        - "{{ dns_config_dir }}:/etc/bind"
-        - "{{ dns_cache_dir }}:/var/cache/bind"
+        - dns_config:/etc/bind
+        - dns_cache:/var/cache/bind
