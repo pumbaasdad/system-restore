@@ -1,6 +1,7 @@
 # Description
 
-This role provides a reverse proxy for accessing other services running on the server being configured.
+This role provides a reverse proxy for accessing other services running on the server being configured.  The service is
+assigned a specific IPv4 address so that other services can trust it as an allowed proxy.
 
 # Variables
 

@@ -1,7 +1,8 @@
 # Description
 
 This role provides support for generating certificates.  It provides this functionality using
-[Let's Encrypt](www.letsencrypt.org).
+[Let's Encrypt](www.letsencrypt.org).  This service runs with the `NET_ADMIN` capability to allow the embedded
+`fail2ban` service to add `iptable` rules when it identifies intrusions.
 
 # Initial Setup
 

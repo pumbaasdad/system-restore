@@ -38,29 +38,6 @@ This directory stores the configuration for the `bind9` DNS server.
 
 This directory stores files cached by the `bind9` DNS server.
 
-## Containers
-
-The docker containers created by this role are documented in their own roles.  All containers will restart unless
-explicitly stopped.  The following containers have interesting docker configuration that is worth noting:
-
-### letsencrypt
-
-This container is given the `NET_ADMIN` capacity to allow `fail2ban` to add `iptable` rules when it identifies malicious
-IP addresses.
-
-### public-nginx
-
-This container is assigned a specific IPv4 address as home assistant needs to know this address when it is behind a
-reverse proxy.
-
-### dhcp
-
-This container is given an explicit IP address because the DHCP server and the relay both need to know this IP address.
-
-### dhcp-relay
-
-This container is given the `NET_ADMIN` capacity to allow it to listen to multicast traffic.
-
 # Initial Setup
 
 You must configure a port on your router that will forward traffic to the server being configured.  The port that
