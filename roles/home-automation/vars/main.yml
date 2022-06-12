@@ -1,9 +1,12 @@
 home_automation_role:
   directories:
     - path: "{{ hass_dir }}"
-      volume: hass-config
+      volume:
+        name: hass-config
+        backup: true
     - path: "{{ hass_db_dir }}"
-      volume: hass-db
+      volume:
+        name: hass-db
   files:
     - src: roles/home-automation/files/home-assistant.log
       dest: "{{ hass_dir }}/home-assistant.log"
@@ -35,6 +38,7 @@ home_automation_role:
         extra:
           docker2:
       config_dir: "{{ hass_dir }}"
+      backup: true
     networks:
       - name: docker2
   files_changed_by_tasks: "{{ [hass_config | default(None)] | select() }}"

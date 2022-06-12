@@ -1,3 +1,4 @@
 dhcp_dir: "{{ docker_compose_dir }}/dhcp"
+dhcp_docker_network: dhcp0
 dhcp_docker_subnet: 172.31.0.0/16
 dhcp_docker_ip: 172.31.0.2

@@ -26,6 +26,15 @@ You must create a Google Cloud Platform project that will provide this service a
 | volumerize_email            | Yes      | The e-mail address of the google account to which backups will be written. |                                          |
 | volumerize_google_drive_dir | Yes      | The name of the google drive directory where backups will be stored.       |                                          |
 
+# Parameters
+
+| Parameter       | Member         | Description                                                                                         |
+|:----------------|:---------------|:----------------------------------------------------------------------------------------------------|
+| backup_services |                | A list of service that need to be backed up.                                                        |
+ |                 | name           | The name of the service.                                                                            |
+|                 | container_name | The name of the container in which the service runs.  Only required if it is different than `name`. | 
+| backup_volumes  |                | A list of volume names that need to be backed up.                                                   |
+
 # Docker Volumes
 
  | Volume                 | Description                                                  |

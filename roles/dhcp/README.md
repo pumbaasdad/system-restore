@@ -15,11 +15,12 @@ the DHCP server can be moved to the `docker1` network.
 
 # Variables
 
-| Variable           | Required | Description                                                         | Default                           |
-|:-------------------|:---------|:--------------------------------------------------------------------|:----------------------------------|
-| dhcp_dir           | No       | The directory where dhcp configuration will be stored.              | "`{{ docker_compose_dir }}`/dhcp" |
-| dhcp_docker_subnet | No       | The subnet that will be used by the `dhcp0` docker network.         | 172.31.0.0/16                     |
-| dhcp_docker_ip     | No       | The IP address of the DHCP docker container on the `dhcp0` network. | 127.31.0.2                        |
+| Variable            | Required | Description                                                           | Default                           |
+|:--------------------|:---------|:----------------------------------------------------------------------|:----------------------------------|
+| dhcp_dir            | No       | The directory where dhcp configuration will be stored.                | "`{{ docker_compose_dir }}`/dhcp" |
+| dhcp_docker_network | No       | The name of the docker network that will be used by the DHCP service. | dhcp0                             |
+| dhcp_docker_subnet  | No       | The subnet that will be used by the dhcp docker network.              | 172.31.0.0/16                     |
+| dhcp_docker_ip      | No       | The IP address of the DHCP docker container on the dhcp network.      | 127.31.0.2                        |
 
 # Docker Volumes
 

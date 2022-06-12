@@ -1,11 +1,17 @@
+external_zone: "{{ network | json_query('zones[?hosts[*].external] | [0]') }}"
+external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
+external_ip: "{{ external_zone.ipv4_subnet | ansible.utils.ipaddr(external_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
+
 reverse_proxy_role:
   directories:
     - path: "{{ private_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}/nginx"
-      volume: public-nginx-config
+      volume:
+        name: public-nginx-config
     - path: "{{ public_reverse_proxy_dir }}/log/nginx"
-      volume: public-nginx-log
+      volume:
+        name: public-nginx-log
   files:
     - src: roles/reverse-proxy/templates/nginx.conf.j2
       dest: "{{ private_reverse_proxy_dir }}/nginx/nginx.conf"
@@ -43,7 +49,7 @@ reverse_proxy_role:
       config_dir: "{{ public_reverse_proxy_dir }}"
       image: linuxserver/nginx
       volumes:
-        - letsencrypt-config:/config
+        - "{{ reverse_proxy_certificate_volume }}:/config"
         - public-nginx-config:/config/nginx
         - public-nginx-log:/config/log/nginx
       ports:

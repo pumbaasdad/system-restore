@@ -1,2 +1,4 @@
+letsencrypt_dir: "{{ docker_compose_dir }}/letsencrypt"
 letsencrypt_email: "{{ secrets['letsencrypt_email'] }}"
 letsencrypt_url: "{{ secrets['letsencrypt_url'] }}"
+letsencrypt_certificate_volume: letsencrypt-config

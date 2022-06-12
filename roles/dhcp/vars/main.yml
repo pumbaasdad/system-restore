@@ -1,7 +1,14 @@
+dhcp_ip_config:
+  ipv4_address: "{{ dhcp_docker_ip }}"
+dhcp_network_configuration: "{%- set temp_dhcp_network_configuration = {} -%}
+                             {%- set _ = temp_dhcp_network_configuration.update({dhcp_docker_network: dhcp_ip_config}) -%}
+                             {{- temp_dhcp_network_configuration -}}"
+
 dhcp_role:
   directories:
     - path: "{{ dhcp_dir }}"
-      volume: dhcp
+      volume:
+        name: dhcp
   files:
     - src: roles/dhcp/templates/dhcpd.conf.j2
       dest: "{{ dhcp_dir }}/dhcpd.conf"
@@ -14,9 +21,7 @@ dhcp_role:
         - dhcp:/data
       networks:
         default: false
-        extra:
-          dhcp0:
-            ipv4_address: "{{ dhcp_docker_ip }}"
+        extra: "{{ dhcp_network_configuration }}"
     networks:
-      - name: dhcp0
+      - name: "{{ dhcp_docker_network }}"
         subnet: "{{ dhcp_docker_subnet }}"

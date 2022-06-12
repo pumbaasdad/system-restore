@@ -90,7 +90,9 @@ of the following keys:
                provisioned.
    * `group` - The group that owns the directory.  Defaults to the group of the user that ansible uses to connect to the
                machine being provisioned.
-   * `volume` - Optional.  The name that should be assigned to this directory if it is to be used as a docker volume.
+   * `volume` - Optional.  Describes how the directory will be mounted to containers.  If no
+     * `name` - Required.  The name that should be assigned to this directory if it is to be used as a docker volume.
+     * `backup` - Optional.  If this directory needs to be backed up.
  * `files`
    * `dest` - A file that will be created by the user that ansible uses to connect to the machine being provisioned.
    * `src` - The source template to use to create the file.
@@ -154,11 +156,13 @@ of the following keys:
                    made available.  Defaults to an empty list.
      * `tty` - Optional.  Whether a pseudo-tty will be allocated for this service.  Defaults to false.
      * `stop_signal` - Optional.  A signal that will be used to stop the container.  Defaults to `SIGTERM`.
+     * `backup` - Optional.  Whether this service needs to be stopped to perform a backup.  Defaults to `false`.
    * `networks`
      * `name` - The name of the docker network to create.
      * `subnet` - Optional.  The subnet that should be used by the network.
  * `files_changed_by_tasks` - A list of files that have been updated by tasks associated with the role.  This should
                               default to an empty list and use lazy evaluation to return a value if files are modified.
+ * `provides` - Optional.  A dictionary of custom values owned by the role that should be available to other roles.
 
 ## Defaults vs Variables
 

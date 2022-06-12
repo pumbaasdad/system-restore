@@ -102,9 +102,11 @@ dns_files:
 dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
-      volume: dns_config
+      volume:
+        name: dns_config
     - path: "{{ dns_cache_dir }}"
-      volume: dns_cache
+      volume:
+        name: dns_cache
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"

@@ -117,6 +117,12 @@
         group: "{{ item.group | default(omit) }}"
       loop: "{{ directories }}"
 
+    - import_role:
+        name: backup
+      vars:
+        backup_services: "{{ backed_up_services }}"
+        backup_volumes: "{{ backed_up_volumes }}"
+
     - name: Install configuration files
       template:
         src: "{{ item.src }}"
@@ -142,6 +148,7 @@
       vars:
         reverse_proxy_public_site_configs: "{{ public_site_configs }}"
         reverse_proxy_private_site_configs: "{{ private_site_configs }}"
+        reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
 
     - import_role:
         name: home-automation
@@ -152,7 +159,9 @@
     - security
     - shell
     - backup
-    - certificates
+    - role: certificates
+      vars:
+        certificates_duckdns_token: "{{ ddns_role.provides.duckdns_token }}"
     - ddns
     - dhcp
     - dhcp-relay
@@ -162,7 +171,9 @@
         dns_zone: "{{ network_hosts[inventory_hostname].zone }}"
     - media-rip
     - media-server
-    - transcode
+    - role: transcode
+      vars:
+        transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
     - unifi
     - zwave
     - role: docker

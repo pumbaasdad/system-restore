@@ -1,28 +1,34 @@
+volumerize_standard_volumes:
+  - volumerize-cache:/volumerize-cache
+  - volumerize-credentials:/credentials
+  - /var/run/docker.sock:/var/run/docker.sock
+
+volumerize_lazy_containers_to_stop: "{%- set temp_volumerize_lazy_containers_to_stop = [] -%}
+                                     {%- for service in backup_services -%}
+                                     {%- set _ = temp_volumerize_lazy_containers_to_stop.append(service.container_name | default(service.name)) -%}
+                                     {%- endfor -%} 
+                                     {{- temp_volumerize_lazy_containers_to_stop -}}"
+
 backup_role:
   directories:
     - path: "{{ volumerize_dir }}/cache"
-      volume: volumerize-cache
+      volume:
+        name: volumerize-cache
     - path: "{{ volumerize_dir }}/credentials"
-      volume: volumerize-credentials
+      volume:
+        name: volumerize-credentials
   docker:
     service:
       name: volumerize
       image: fekide/volumerize
-      volumes:
-        - volumerize-cache:/volumerize-cache
-        - volumerize-credentials:/credentials
-        - hass-config:/source/hass:ro
-        - letsencrypt-etc:/source/letsencrypt/etc:ro
-        - unifi-backup:/source/unifi-backup
-        - zwave-config:/source/zwave-config
-        - /var/run/docker.sock:/var/run/docker.sock
+      volumes: "{{ volumerize_standard_volumes + (volumerize_custom_volumes | default([])) }}"
       environment:
         - VOLUMERIZE_SOURCE=/source
         - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
         - VOLUMERIZE_EXCLUDE_1=**/*.log*
         - PASSPHRASE={{ volumerize_passphrase }}
         - VOLUMERIZE_JOBBER_TIME=0 30 0 * * 1
-        - VOLUMERIZE_CONTAINERS=zwavejs2mqtt hass letsencrypt unifi
+        - VOLUMERIZE_CONTAINERS={{ volumerize_containers_to_stop | default('') }}
         - VOLUMERIZE_FULL_IF_OLDER_THAN=1M
         - REMOVE_ALL_BUT_N_FULL=4
         - REMOVE_ALL_INC_BUT_N_FULL=1

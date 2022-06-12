@@ -1,4 +1,3 @@
-letsencrypt_dir: "{{ docker_compose_dir }}/letsencrypt"
 fail2ban_dir: "{{ letsencrypt_dir }}/fail2ban"
 
 fail2ban_email: "{{ secrets['fail2ban_email'] }}"
