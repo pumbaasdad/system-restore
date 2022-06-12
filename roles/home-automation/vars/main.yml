@@ -24,6 +24,16 @@ home_automation_role:
   docker:
     service:
       name: homeassistant
+      container_name: hass
+      image: ghcr.io/home-assistant/home-assistant
+      volumes:
+        - hass-config:/config
+        - hass-db:/db
+      networks:
+        default: false
+        internal: true
+        extra:
+          docker2:
       config_dir: "{{ hass_dir }}"
     networks:
       - name: docker2

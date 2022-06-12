@@ -1,0 +1,88 @@
+{%- macro configure_container_name(service, service_definition) -%}
+    {%- set container_name = service.container_name | default(service.name) -%}
+    {%- set _ = service_definition.update({ 'container_name': container_name }) -%}
+{%- endmacro -%}
+
+{%- macro configure_value(name, service, service_definition) -%}
+    {%- if name in service -%}
+        {%- set _ = service_definition.update({ name: service[name] }) -%}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro configure_list(config_name, service, service_definition, compose_name) -%}
+    {%- set output_name = compose_name | default(config_name) -%}
+    {%- if config_name in service -%}
+        {%- set _ = service_definition.update({output_name: service[config_name] }) -%}
+    {%- endif %}
+{%- endmacro -%}
+
+{%- macro configure_networks(service, service_definition) -%}
+    {%- if 'networks' in service -%}
+        {%- set networks = service.networks.extra | default({}) -%}
+
+        {%- if service.networks.default | default(true) -%}
+            {%- set _ = networks.update({'docker1': {}}) -%}
+        {%- endif -%}
+
+        {%- set has_internal_ipv4_address = service.networks.internal_ipv4_address is defined -%}
+        {%- if service.networks.internal | default(has_internal_ipv4_address) | default(false) -%}
+            {%- if has_internal_ipv4_address -%}
+                {%- set internal_network = {'ipv4_address': service.networks.internal_ipv4_address} -%}
+            {%- endif -%}
+
+            {%- set _ = networks.update({'private0': internal_network | default({})}) -%}
+        {%- endif -%}
+    {%- else -%}
+        {%- set networks = {'docker1': {}} -%}
+    {%- endif -%}
+
+    {%- if networks | length > 0 -%}
+        {%- set _ = service_definition.update({'networks': networks }) -%}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro configure_networking(service, service_definition) -%}
+    {%- if service.networks.host | default(false) -%}
+        {%- set _ = service_definition.update({'network_mode': 'host'}) -%}
+    {%- else -%}
+        {{- configure_networks(service, service_definition) -}}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro configure_environment(service, service_definition, default_environment) -%}
+    {%- set service_environment = service.environment | default([]) -%}
+    {%- set environment = default_environment + service_environment -%}
+    {%- set _ = service_definition.update({ 'environment': environment }) -%}
+{%- endmacro -%}
+
+{%- macro configure_service(service, services, default_environment) -%}
+    {%- set service_definition = {} -%}
+
+    {{- configure_value('image', service, service_definition) -}}
+    {{- configure_value('command', service, service_definition) -}}
+    {{- configure_value('tty', service, service_definition) -}}
+    {{- configure_value('stop_signal', service, service_definition) -}}
+
+    {{- configure_list('volumes', service, service_definition) -}}
+    {{- configure_list('ports', service, service_definition) -}}
+    {{- configure_list('devices', service, service_definition) -}}
+    {{- configure_list('capabilities', service, service_definition, 'cap_add') -}}
+
+    {{- configure_container_name(service, service_definition) -}}
+    {{- configure_networking(service, service_definition) -}}
+
+    {{- configure_environment(service, service_definition, default_environment) -}}
+
+    {%- set _ = service_definition.update({ 'restart': 'unless-stopped' }) -%}
+
+    {%- set _ = services.update({ service.name: service_definition }) %}
+{%- endmacro -%}
+
+{%- macro configure(services, compose, default_environment) -%}
+    {%- set docker_services = {} -%}
+    {%- for service in services -%}
+        {{- configure_service(service, docker_services, default_environment) -}}
+    {%- endfor -%}
+
+    {%- set _ = compose.update({'services': docker_services}) -%}
+{%- endmacro -%}

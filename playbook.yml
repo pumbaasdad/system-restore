@@ -155,6 +155,7 @@
     - certificates
     - ddns
     - dhcp
+    - dhcp-relay
     - role: dns
       vars:
         dns_server: "{{ network_hosts[inventory_hostname].name }}"

@@ -1,0 +1,25 @@
+certificates_role:
+  docker:
+    service:
+      name: letsencrypt
+      config_dir: "{{ fail2ban_dir }}"
+      image: linuxserver/swag
+      volumes:
+        - letsencrypt-config:/config
+        - public-nginx-log:/config/log/nginx-public
+        - "{{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log"
+        - fail2ban-jails:/etc/fail2ban/jail.d
+      ports:
+        - "{{ internal_ip }}:80:80"
+      environment:
+        - EMAIL={{ letsencrypt_email }}
+        - SUBDOMAINS=wildcard
+        - URL={{ letsencrypt_url }}
+        - VALIDATION=duckdns
+        - DUCKDNSTOKEN={{ duckdns_token }}
+        - DHLEVEL=2048
+      networks:
+        default: false
+        internal: true
+      capabilities:
+        - NET_ADMIN

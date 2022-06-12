@@ -1,0 +1,10 @@
+dhcp_relay_role:
+  docker:
+    service:
+      name: dhcp-relay
+      image: pumbaasdad/dhcp-helper
+      networks:
+        host: true
+      capabilities:
+        - NET_ADMIN
+      command: -s {{ dhcp_docker_ip }}

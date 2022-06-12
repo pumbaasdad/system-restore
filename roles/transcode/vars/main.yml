@@ -4,3 +4,22 @@ transcode_role:
   nas_directories:
     - path: "{{ transcode_nas_dir }}"
       volume: transcode_destination
+  docker:
+    service:
+      name: handbrake
+      image: jlesage/handbrake
+      ports:
+        - 5800:5800
+      environment:
+        - USER_ID=1000
+        - GROUP_ID=999
+        - KEEP_APP_RUNNING={{ transcode_keep_app_running }}
+        - AUTOMATED_CONVERSION_PRESET={{ transcode_preset }}
+        - AUTOMATED_CONVERSION_KEEP_SOURCE={{ transcode_keep_source_file }}
+        - AUTOMATED_CONVERSION_OUTPUT_SUBDIR={{ transcode_output_subdir }}
+        - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME={{ transcode_input_stability_seconds }}
+        - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
+      volumes:
+        - "{{ transcode_dir }}:/config"
+        - media_rip_destination:/watch
+        - transcode_destination:/output

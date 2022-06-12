@@ -1,0 +1,29 @@
+{%- macro configure_subnet(network, network_definition) -%}
+    {%- if network.subnet is defined -%}
+        {%- set subnets = [{'subnet': network.subnet}] -%}
+        {%- set ipam = {'driver': 'default', 'config': subnets} -%}
+        {%- set _ = network_definition.update({'ipam': ipam})%}
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro configure_network(network, networks) -%}
+    {%- set network_definition = {} -%}
+
+    {%- set _ = network_definition.update({'driver': 'bridge'}) -%}
+    {%- set _ = network_definition.update({'driver_opts': {'com.docker.network.bridge.name': network.name}}) -%}
+    {%- set _ = network_definition.update({'internal': network.internal | default(false)}) -%}
+
+    {{- configure_subnet(network, network_definition) -}}
+
+    {%- set _ = networks.update({ network.name: network_definition }) -%}
+{%- endmacro -%}
+
+{%- macro configure(networks, compose) -%}
+    {%- set docker_networks = {} -%}
+
+    {%- for network in networks -%}
+        {{- configure_network(network, docker_networks) -}}
+    {%- endfor -%}
+
+    {%- set _ = compose.update({'networks': docker_networks}) -%}
+{%- endmacro -%}

@@ -1,4 +1,4 @@
-zwave_rip_role:
+zwave_role:
   udev_devices:
     - subsystem: tty
       attrs:
@@ -15,3 +15,23 @@ zwave_rip_role:
     service:
       name: zwavejs2mqtt
       config_dir: "{{ zwave_dir }}"
+      image: zwavejs/zwavejs2mqtt:latest
+      ports:
+        - "8091:8091"
+        - "3000:3000"
+      volumes:
+        - zwave-config:/usr/src/app/store
+      environment:
+        - SESSION_SECRET={{ zwave_session_secret }}
+        - KEY_S0_Legacy={{ zwave_s0_legacy_key }}
+        - KEY_S2_Unauthenticated={{ zwave_s2_unauthenticated_key }}
+        - KEY_S2_Authenticated={{ zwave_s2_authenticated_key }}
+        - KEY_S2_AccessControl={{ zwave_s2_access_control_key }}
+      networks:
+        default: false
+        extra:
+          docker2:
+      devices:
+        - /dev/{{ zwave_usbstick_symlink }}:/dev/zwave
+      tty: true
+      stop_signal: SIGINT

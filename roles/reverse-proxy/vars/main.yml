@@ -41,6 +41,21 @@ reverse_proxy_role:
     service:
       name: public-nginx
       config_dir: "{{ public_reverse_proxy_dir }}"
+      image: linuxserver/nginx
+      volumes:
+        - letsencrypt-config:/config
+        - public-nginx-config:/config/nginx
+        - public-nginx-log:/config/log/nginx
+      ports:
+        - "{{ external_ip }}:{{ public_port }}:443"
+        - "{{ external_ip }}:80:80"
+      environment:
+        - DHLEVEL=2048
+      networks:
+        default: false
+        internal_ipv4_address: "{{ reverse_proxy_private0_ipv4_address }}"
+        extra:
+          public0:
     networks:
       - name: public0
   iptable_rules:
