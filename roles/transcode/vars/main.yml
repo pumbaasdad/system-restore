@@ -1,6 +1,7 @@
 transcode_role:
   directories:
     - path: "{{ transcode_dir }}"
+      volume: transcode_config
   nas_directories:
     - path: "{{ transcode_nas_dir }}"
       volume: transcode_destination
@@ -20,6 +21,6 @@ transcode_role:
         - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME={{ transcode_input_stability_seconds }}
         - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
       volumes:
-        - "{{ transcode_dir }}:/config"
+        - transcode_config:/config
         - media_rip_destination:/watch
         - transcode_destination:/output

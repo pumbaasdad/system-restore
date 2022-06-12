@@ -10,6 +10,7 @@ media_rip_role:
       symlink: "{{ media_rip_scsi_generic_device_symlink }}"
   directories:
     - path: "{{ media_rip_config_dir }}"
+      volume: media_rip_config
     - path: "{{ media_rip_output_dir }}"
       volume: media_rip_destination
   docker:
@@ -25,7 +26,7 @@ media_rip_role:
         - AUTO_DISC_RIPPER=1
       volumes:
         - media_rip_destination:/output
-        - "{{ media_rip_config_dir }}:/config"
+        - media_rip_config:/config
       devices:
         - "{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}"
         - "{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}"
