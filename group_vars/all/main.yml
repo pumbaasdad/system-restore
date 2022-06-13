@@ -46,6 +46,9 @@ all_docker_services_with_config: "{{ docker_services | selectattr('config_dir', 
 local_docker_volumes: "{{ directories | selectattr('volume', 'defined') }}"
 nas_docker_volumes: "{{ nas_directories | selectattr('volume', 'defined') }}"
 
+backed_up_services: "{{ all_docker_services | selectattr('backup', 'defined') | selectattr('backup', 'equalto', true) }}"
+backed_up_volumes: "{{ local_docker_volumes | map(attribute='volume') | selectattr('backup', 'defined') | selectattr('backup', 'equalto', true) | map(attribute='name') }}"
+
 extra_docker_networks: "{{ docker_config | selectattr('networks', 'defined') | map(attribute='networks') | flatten }}"
 
 all_changed_files: "{{ changed_files.results + changed_root_files.results + files_changed_by_roles }}"

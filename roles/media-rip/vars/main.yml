@@ -10,9 +10,11 @@ media_rip_role:
       symlink: "{{ media_rip_scsi_generic_device_symlink }}"
   directories:
     - path: "{{ media_rip_config_dir }}"
-      volume: media_rip_config
+      volume:
+        name: media_rip_config
     - path: "{{ media_rip_output_dir }}"
-      volume: media_rip_destination
+      volume:
+        name: "{{ media_rip_output_volume }}"
   docker:
     service:
       name: makemkv
@@ -25,8 +27,10 @@ media_rip_role:
         - KEEP_APP_RUNNING={{ media_rip_keep_app_running }}
         - AUTO_DISC_RIPPER=1
       volumes:
-        - media_rip_destination:/output
+        - "{{ media_rip_output_volume }}:/output"
         - media_rip_config:/config
       devices:
         - "{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}"
         - "{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}"
+  provides:
+    output_volume: "{{ media_rip_output_volume }}"

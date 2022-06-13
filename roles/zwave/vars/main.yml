@@ -7,7 +7,9 @@ zwave_role:
       symlink: "{{ zwave_usbstick_symlink }}"
   directories:
     - path: "{{ zwave_dir }}"
-      volume: zwave-config
+      volume:
+        name: zwave-config
+        backup: true
   files:
     - src: roles/zwave/templates/settings.json.j2
       dest: "{{ zwave_dir }}/settings.json"
@@ -35,3 +37,4 @@ zwave_role:
         - /dev/{{ zwave_usbstick_symlink }}:/dev/zwave
       tty: true
       stop_signal: SIGINT
+      backup: true

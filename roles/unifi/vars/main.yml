@@ -1,9 +1,12 @@
 unifi_role:
   directories:
     - path: "{{ unifi_dir }}"
-      volume: unifi
+      volume:
+        name: unifi
     - path: "{{ unifi_dir }}/data/backup"
-      volume: unifi-backup
+      volume:
+        name: unifi-backup
+        backup: true
   docker:
     service:
       name: unifi
@@ -19,3 +22,4 @@ unifi_role:
         - 8843:8843
         - 8880:8880
         - 6789:6789
+      backup: true

@@ -6,7 +6,7 @@
 
     {%- set volume_definition = {'driver': 'local', 'driver_opts': driver_opts} -%}
 
-    {%- set _ = volumes.update({volume.volume: volume_definition})-%}
+    {%- set _ = volumes.update({volume.volume.name: volume_definition})-%}
 {%- endmacro -%}
 
 {%- macro configure_local_volume(volume, volumes) -%}

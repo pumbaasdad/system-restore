@@ -16,3 +16,9 @@ This role provides dynamic DNS functionality to the local network.  It provides 
 |:------------------|:---------|:--------------------------------------------------------------|:--------|
 | duckdns_subdomain | Yes      | The Duck DNS subdomain that you created during initial setup. |         |
 | duckdns_token     | Yes      | Your Duck DNS token that you noted during initial setup.      |         |
+
+# Outputs
+
+| Name          | Value                                                  |
+|:--------------|:-------------------------------------------------------|
+| duckdns_token | A token that can be used to authenticate with DuckDns. |

@@ -1,11 +1,23 @@
+internal_zone: "{{ network | json_query('zones[?hosts[*].internal] | [0]') }}"
+internal_host: "{{ internal_zone | json_query('hosts[?internal] | [0]') }}"
+internal_ip: "{{ internal_zone.ipv4_subnet | ansible.utils.ipaddr(internal_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
+
 certificates_role:
+  directories:
+    - path: "{{ letsencrypt_dir }}"
+      volume:
+        name: "{{ letsencrypt_certificate_volume }}"
+    - path: "{{ letsencrypt_dir }}/etc"
+      volume:
+        name: letsencrypt-etc
+        backup: true
   docker:
     service:
       name: letsencrypt
       config_dir: "{{ fail2ban_dir }}"
       image: linuxserver/swag
       volumes:
-        - letsencrypt-config:/config
+        - "{{ letsencrypt_certificate_volume }}:/config"
         - public-nginx-log:/config/log/nginx-public
         - "{{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log"
         - fail2ban-jails:/etc/fail2ban/jail.d
@@ -16,10 +28,13 @@ certificates_role:
         - SUBDOMAINS=wildcard
         - URL={{ letsencrypt_url }}
         - VALIDATION=duckdns
-        - DUCKDNSTOKEN={{ duckdns_token }}
+        - DUCKDNSTOKEN={{ certificates_duckdns_token }}
         - DHLEVEL=2048
       networks:
         default: false
         internal: true
       capabilities:
         - NET_ADMIN
+      backup: true
+  provides:
+    certificate_volume: "{{ letsencrypt_certificate_volume }}"

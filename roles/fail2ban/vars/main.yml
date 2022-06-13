@@ -1,11 +1,8 @@
 fail2ban_role:
   directories:
-    - path: "{{ letsencrypt_dir }}"
-      volume: letsencrypt-config
-    - path: "{{ letsencrypt_dir }}/etc"
-      volume: letsencrypt-etc
     - path: "{{ fail2ban_dir }}/jail.d"
-      volume: fail2ban-jails
+      volume:
+        name: fail2ban-jails
     - path: "{{ fail2ban_dir }}/filter.d"
   files:
     - src: "roles/fail2ban/templates/jail.local.j2"

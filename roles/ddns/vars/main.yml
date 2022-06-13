@@ -6,3 +6,5 @@ ddns_role:
       environment:
         - SUBDOMAINS={{ duckdns_subdomain }}
         - TOKEN={{ duckdns_token }}
+  provides:
+    duckdns_token: "{{ duckdns_token }}"

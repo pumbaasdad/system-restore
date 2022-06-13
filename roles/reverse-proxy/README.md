@@ -24,6 +24,7 @@ assigned a specific IPv4 address so that other services can trust it as an allow
  | reverse_proxy_private_site_configs |        | Reverse proxy configurations that can be accessed from inside the network.  |
 |                                    | name   | The name of the reverse proxy.                                              |
  |                                    | src    | The template that will be used to create the reverse proxy configuration.   |
+ | reverse_proxy_certificate_volume   |        | The name of the volume where SSL certificates are stored.                   |
 
 # Docker Volumes
 
