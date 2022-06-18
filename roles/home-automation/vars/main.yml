@@ -28,7 +28,7 @@ home_automation_role:
     service:
       name: homeassistant
       container_name: hass
-      image: ghcr.io/home-assistant/home-assistant
+      image: lscr.io/linuxserver/homeassistant:latest
       volumes:
         - hass-config:/config
         - hass-db:/db
