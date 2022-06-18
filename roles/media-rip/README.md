@@ -15,6 +15,9 @@ The container is configured to automatically rip any media inserted into the PC.
 | media_rip_keep_app_running            | No       | If the `MakeMKV` process should be restarted if it crashes.                                             | 1 (yes)                                             |
 | media_rip_block_device_symlink        | No       | The name of the symlink in /dev that points at the block optical device that will be used to rip media. | optical1                                            |
 | media_rip_scsi_generic_device_symlink | No       | The name of the symlink in /dev /that points at the scsi optical device that will be used to rip media. | `{{ media_rip_scsi_block_device_symling }}_generic` |
+| media_rip_service_name                | No       | The name of the docker-compose service that will be used to rip media.                                  | makemkv                                             |
+| media_rip_port                        | No       | The port on which the `MakeMKV` web UI will be available.                                               | 5801                                                |
+| media_rip_config_volume               | No       | The name of the volume into which ripped media will be stored.                                          | media_rip_config                                    |
 
 # Docker Volumes
 

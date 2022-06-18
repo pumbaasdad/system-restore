@@ -2,16 +2,19 @@ external_zone: "{{ network | json_query('zones[?hosts[*].external] | [0]') }}"
 external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
 external_ip: "{{ external_zone.ipv4_subnet | ansible.utils.ipaddr(external_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
 
+reverse_proxy_extra_networks: "{%- set temp_reverse_proxy_extra_networks = { reverse_proxy_public_network: {} } -%}
+                               {{- temp_reverse_proxy_extra_networks -}}"
+
 reverse_proxy_role:
   directories:
     - path: "{{ private_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}/nginx"
       volume:
-        name: public-nginx-config
+        name: "{{ reverse_proxy_config_volume }}"
     - path: "{{ public_reverse_proxy_dir }}/log/nginx"
       volume:
-        name: public-nginx-log
+        name: "{{ reverse_proxy_log_volume }}"
   files:
     - src: roles/reverse-proxy/templates/nginx.conf.j2
       dest: "{{ private_reverse_proxy_dir }}/nginx/nginx.conf"
@@ -45,13 +48,13 @@ reverse_proxy_role:
   files_changed_by_tasks: "{{ reverse_proxy_public_site_config_installation.results | default([]) }}"
   docker:
     service:
-      name: public-nginx
+      name: "{{ reverse_proxy_service_name }}"
       config_dir: "{{ public_reverse_proxy_dir }}"
       image: linuxserver/nginx
       volumes:
         - "{{ reverse_proxy_certificate_volume }}:/config"
-        - public-nginx-config:/config/nginx
-        - public-nginx-log:/config/log/nginx
+        - "{{ reverse_proxy_config_volume }}:/config/nginx"
+        - "{{ reverse_proxy_log_volume }}:/config/log/nginx"
       ports:
         - "{{ external_ip }}:{{ public_port }}:443"
         - "{{ external_ip }}:80:80"
@@ -60,24 +63,23 @@ reverse_proxy_role:
       networks:
         default: false
         internal_ipv4_address: "{{ reverse_proxy_private0_ipv4_address }}"
-        extra:
-          public0:
+        extra: "{{ reverse_proxy_extra_networks }}"
     networks:
-      - name: public0
+      - name: "{{ reverse_proxy_public_network }}"
   iptable_rules:
     - chain: INPUT
-      in_interface: public0
+      in_interface: "{{ reverse_proxy_public_network }}"
       cstate: []
       jump: DROP
     - chain: INPUT
-      in_interface: public0
+      in_interface: "{{ reverse_proxy_public_network }}"
       cstate: [ESTABLISHED, RELATED]
       jump: ACCEPT
     - chain: DOCKER-USER
-      in_interface: public0
+      in_interface: "{{ reverse_proxy_public_network }}"
       cstate: []
       jump: DROP
     - chain: DOCKER-USER
-      in_interface: public0
+      in_interface: "{{ reverse_proxy_public_network }}"
       cstate: [ESTABLISHED, RELATED]
       jump: ACCEPT

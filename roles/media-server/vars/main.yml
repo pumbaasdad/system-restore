@@ -2,20 +2,20 @@ media_server_role:
   directories:
     - path: "{{ media_server_dir }}"
       volume:
-        name: plex_config
+        name: "{{ media_server_config_volume }}"
   nas_directories:
     - path: "{{ secrets['nas_media_dir'] }}"
       volume:
-        name: media
+        name: "{{ media_server_media_volume }}"
   docker:
     service:
-      name: plex
+      name: "{{ media_server_service_name }}"
       image: linuxserver/plex
       environment:
         - VERSION=docker
       volumes:
-        - plex_config:/config
-        - media:/media
+        - "{{ media_server_config_volume }}:/config"
+        - "{{ media_server_media_volume}}:/media"
       ports:
         - 32400:32400
         - 32400:32400/udp

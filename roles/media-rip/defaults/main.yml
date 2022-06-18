@@ -8,3 +8,7 @@ media_rip_block_device_symlink: optical1
 media_rip_scsi_generic_device_symlink: "{{ media_rip_block_device_symlink }}_generic"
 
 optical_vendor: "{{ secrets['optical_vendor'] }}"
+
+media_rip_service_name: makemkv
+media_rip_port: 5801
+media_rip_config_volume: media_rip_config

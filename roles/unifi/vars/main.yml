@@ -2,23 +2,23 @@ unifi_role:
   directories:
     - path: "{{ unifi_dir }}"
       volume:
-        name: unifi
+        name: "{{ unifi_volume }}"
     - path: "{{ unifi_dir }}/data/backup"
       volume:
-        name: unifi-backup
+        name: "{{ unifi_backups_volume }}"
         backup: true
   docker:
     service:
-      name: unifi
+      name: "{{ unifi_service_name }}"
       image: linuxserver/unifi-controller
       volumes:
-        - unifi:/config
+        - "{{ unifi_volume }}:/config"
       ports:
         - 3478:3478/udp
         - 10001:10001/udp
         - 8080:8080
         - 8081:8081
-        - 8443:8443
+        - "{{ unifi_ui_port }}:8443"
         - 8843:8843
         - 8880:8880
         - 6789:6789

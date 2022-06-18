@@ -11,16 +11,16 @@ media_rip_role:
   directories:
     - path: "{{ media_rip_config_dir }}"
       volume:
-        name: media_rip_config
+        name: "{{ media_rip_config_volume }}"
     - path: "{{ media_rip_output_dir }}"
       volume:
         name: "{{ media_rip_output_volume }}"
   docker:
     service:
-      name: makemkv
+      name: "{{ media_rip_service_name }}"
       image: jlesage/makemkv
       ports:
-        - 5801:5800
+        - "{{ media_rip_port }}:5800"
       environment:
         - USER_ID=1000
         - GROUP_ID=999
@@ -28,7 +28,7 @@ media_rip_role:
         - AUTO_DISC_RIPPER=1
       volumes:
         - "{{ media_rip_output_volume }}:/output"
-        - media_rip_config:/config
+        - "{{ media_rip_config_volume }}:/config"
       devices:
         - "{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_block_device_symlink) | realpath }}"
         - "{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}:{{ ('/dev/' + media_rip_scsi_generic_device_symlink) | realpath }}"

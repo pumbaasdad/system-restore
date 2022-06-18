@@ -17,7 +17,7 @@ docker_role:
     - docker
     - docker-compose
   groups:
-    - name: docker
+    - name: "{{ docker_group_name }}"
       users:
         - "{{ ansible_env.USER }}"
   root_files:
@@ -31,8 +31,8 @@ docker_role:
       dest: "{{ docker_compose_dir }}/docker-compose.yml"
 
 docker_builtin_networks:
-  - name: docker1
-  - name: private0
+  - name: "{{ docker_primary_network }}"
+  - name: "{{ docker_internal_network }}"
     subnet: "{{ docker_private0_subnet }}"
     internal: true
 

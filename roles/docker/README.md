@@ -25,14 +25,17 @@ receives that traffic must be set in the `public_port` variable.
 
 # Variables
 
-| Variable                   | Required | Description                                                                                                        | Default          |
-|:---------------------------|:---------|:-------------------------------------------------------------------------------------------------------------------|:-----------------|
-| TZ                         | No       | The timezone in which the docker host is running.                                                                  | America/Toronto  |
-| docker_address_pool_size   | No       | The CIDR suffix specifying how many addresses a docker network will be given.                                      | 24               |
-| docker_address_pool_subnet | Yes      | The subnet from which docker networks will be allocated.                                                           |                  |
-| docker_private0_subnet     | Yes      | The subnet that will be used for the `private0` network.                                                           |                  |
-| public_port                | Yes      | The port that has been setup on your router to forward packets to the interface connected to the`public0` network. |                  |
-| nas_address                | Yes      | The IP of the NAS used by docker.                                                                                  |                  |
+| Variable                   | Required | Description                                                                                                        | Default         |
+|:---------------------------|:---------|:-------------------------------------------------------------------------------------------------------------------|:----------------|
+| TZ                         | No       | The timezone in which the docker host is running.                                                                  | America/Toronto |
+| docker_address_pool_size   | No       | The CIDR suffix specifying how many addresses a docker network will be given.                                      | 24              |
+| docker_group_name          | No       | The name of the unix group whose members can run docker.                                                           | docker          |
+| docker_primary_network     | No       | The name of the network that docker containers will use by default.                                                | docker1         |
+| docker_internal_network    | No       | The name of the default internal network that can be used for itra-container communication.                        | private0        |
+| docker_address_pool_subnet | Yes      | The subnet from which docker networks will be allocated.                                                           |                 |
+| docker_private0_subnet     | Yes      | The subnet that will be used for the `private0` network.                                                           |                 |
+| public_port                | Yes      | The port that has been setup on your router to forward packets to the interface connected to the`public0` network. |                 |
+| nas_address                | Yes      | The IP of the NAS used by docker.                                                                                  |                 |
 
 # Parameters
 

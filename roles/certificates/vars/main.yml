@@ -9,11 +9,11 @@ certificates_role:
         name: "{{ letsencrypt_certificate_volume }}"
     - path: "{{ letsencrypt_dir }}/etc"
       volume:
-        name: letsencrypt-etc
+        name: "{{ letsencrypt_etc_volume }}"
         backup: true
   docker:
     service:
-      name: letsencrypt
+      name: "{{ letsencrypt_service_name }}"
       config_dir: "{{ fail2ban_dir }}"
       image: linuxserver/swag
       volumes:

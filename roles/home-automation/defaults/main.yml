@@ -9,3 +9,10 @@ hass_auth_authorize: "{{ secrets['hass_auth_authorize'] }}"
 hass_auth_token: "{{ secrets['hass_auth_token'] }}"
 
 home_automation_wemo_server_port: 8989
+
+hass_config_volume: hass-config
+hass_db_volume: hass-db
+
+home_automation_service_name: homeassistant
+home_automation_container_name: hass
+home_automation_network: docker2

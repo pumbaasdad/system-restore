@@ -9,3 +9,8 @@ zwave_s2_authenticated_key: "{{ secrets['zwave_s2_authenticated_key'] }}"
 zwave_s2_access_control_key: "{{ secrets['zwave_s2_access_control_key'] }}"
 
 zwave_usbstick_symlink: zwaveusbstick
+
+zwave_config_volume: zwave-config
+zwave_service_name: zwavejs2mqtt
+zwave_http_port: 8091
+zwave_websocket_port: 3000
