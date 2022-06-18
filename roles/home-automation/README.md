@@ -11,12 +11,13 @@ variables in the `reverse-proxy` role.
 
 # Variables
 
-| Variable                    | Required | Description                                                                                                      | Default                            |
-|:----------------------------|:---------|:-----------------------------------------------------------------------------------------------------------------|:-----------------------------------|
-| hass_dir                    | No       | The directory where Home Assistant configuration will be stored.                                                 | `{{ docker_compose_dir }}/hass`    |
-| hass_db_dir                 | No       | The directory where the Home Assistant database will be stored.                                                  | `{{ docker_compose_dir }}/hass-db` |
-| google_assistant_project_id | Yes      | The ID of the Google Cloud Platform project that will be used to integrate Home Assistant with Google Assistant. |                                    |
-| google_assistant_api_key    | Yes      | The API key used to authorize Home Assistant with your Google Cloud Platform project.                            |                                    |
+| Variable                        | Required | Description                                                                                                      | Default                            |
+|:--------------------------------|:---------|:-----------------------------------------------------------------------------------------------------------------|:-----------------------------------|
+| hass_dir                        | No       | The directory where Home Assistant configuration will be stored.                                                 | `{{ docker_compose_dir }}/hass`    |
+| hass_db_dir                     | No       | The directory where the Home Assistant database will be stored.                                                  | `{{ docker_compose_dir }}/hass-db` |
+| home_assistant_wemo_server_port | No       | The port that will be used in the home assistant container to listed for wemo callbacks.                         | 8989                               |
+| google_assistant_project_id     | Yes      | The ID of the Google Cloud Platform project that will be used to integrate Home Assistant with Google Assistant. |                                    |
+| google_assistant_api_key        | Yes      | The API key used to authorize Home Assistant with your Google Cloud Platform project.                            |                                    |
 
 # Parameters
 

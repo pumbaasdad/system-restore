@@ -1,3 +1,7 @@
+home_automation_internal_zone: "{{ network | json_query('zones[?hosts[*].internal] | [0]') }}"
+home_automation_internal_host: "{{ internal_zone | json_query('hosts[?internal] | [0]') }}"
+home_automation_internal_ip: "{{ internal_zone.ipv4_subnet | ansible.utils.ipaddr(internal_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
+
 home_automation_role:
   directories:
     - path: "{{ hass_dir }}"
@@ -32,6 +36,11 @@ home_automation_role:
       volumes:
         - hass-config:/config
         - hass-db:/db
+      ports:
+        - "{{ home_automation_wemo_server_port }}:{{ home_automation_wemo_server_port }}"
+      environment:
+        - PYWEMO_HTTP_SERVER_PORT={{ home_automation_wemo_server_port }}
+        - PYWEMO_CALLBACK_ADDRESS={{ home_automation_internal_ip }}:{{ home_automation_wemo_server_port }}
       networks:
         default: false
         internal: true
