@@ -24,10 +24,8 @@ security_role:
     - src: roles/security/files/gpg-agent.conf
       dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
   root_files:
-    - src: roles/security/templates/pam.sshd.j2
-      dest: /etc/pam.d/sshd
     - src: roles/security/templates/pam.login.j2
       dest: /etc/pam.d/login
     - src: roles/security/files/sshd_config
-      dest: /etc/sshd_config
+      dest: /etc/ssh/sshd_config
       notify: Restart sshd
