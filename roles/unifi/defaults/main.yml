@@ -1,1 +1,5 @@
 unifi_dir: "{{ docker_compose_dir }}/unifi"
+unifi_volume: unifi
+unifi_backups_volume: unifi-backup
+unifi_service_name: unifi
+unifi_ui_port: 8443

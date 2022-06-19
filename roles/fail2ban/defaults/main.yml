@@ -1,3 +1,5 @@
 fail2ban_dir: "{{ letsencrypt_dir }}/fail2ban"
 
 fail2ban_email: "{{ secrets['fail2ban_email'] }}"
+
+fail2ban_jails_volume: fail2ban-jails

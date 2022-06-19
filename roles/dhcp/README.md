@@ -21,6 +21,8 @@ the DHCP server can be moved to the `docker1` network.
 | dhcp_docker_network | No       | The name of the docker network that will be used by the DHCP service. | dhcp0                             |
 | dhcp_docker_subnet  | No       | The subnet that will be used by the dhcp docker network.              | 172.31.0.0/16                     |
 | dhcp_docker_ip      | No       | The IP address of the DHCP docker container on the dhcp network.      | 127.31.0.2                        |
+ | dhcp_volume         | No       | The name assigned to the volume storing DCHP configuration.           | dhcp                              |
+ | dhcp_service_name   | No       | The name of the docker-compose service providing DHCP services.       | dhcp                              |                 
 
 # Docker Volumes
 
@@ -33,3 +35,9 @@ the DHCP server can be moved to the `docker1` network.
  | Network | Description                                                                                                                            |
 |:--------|:---------------------------------------------------------------------------------------------------------------------------------------|
  | dhcp0   | The network in which `isc-dhcp-server` will run.  This network is required so the subnet can be specified in dhcp configuration files. |
+
+# Outputs
+
+| Name           | Value                                                            |
+|:---------------|:-----------------------------------------------------------------|
+| dhcp_server_ip | The IP address of the docker container running the DHCP service. |

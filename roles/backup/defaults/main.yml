@@ -3,3 +3,13 @@ volumerize_dir: "{{ docker_compose_dir }}/volumerize"
 volumerize_passphrase: "{{ secrets['volumerize_passphrase'] }}"
 volumerize_email: "{{ secrets['volumerize_email'] }}"
 volumerize_google_drive_dir: "{{ secrets['volumerize_google_drive_dir'] }}"
+
+volumerize_cache_volume: volumerize-cache
+volumerize_credentials_volume: volumerize-credentials
+
+volumerize_schedule: "0 30 0 * * 1"
+volumerize_full_if_older_than: 1M
+volumerize_remove_all_but_n_full: 4
+volumerize_all_inc_but_n_full: 1
+
+volumerize_service_name: volumerize

@@ -164,7 +164,9 @@
         certificates_duckdns_token: "{{ ddns_role.provides.duckdns_token }}"
     - ddns
     - dhcp
-    - dhcp-relay
+    - role: dhcp-relay
+      vars:
+        dhcp_relay_dhcp_server_ip: "{{dhcp_role.provides.dhcp_server_ip }}"
     - role: dns
       vars:
         dns_server: "{{ network_hosts[inventory_hostname].name }}"

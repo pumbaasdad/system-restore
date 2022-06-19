@@ -103,23 +103,23 @@ dns_role:
   directories:
     - path: "{{ dns_config_dir }}"
       volume:
-        name: dns_config
+        name: "{{ dns_config_volume }}"
     - path: "{{ dns_cache_dir }}"
       volume:
-        name: dns_cache
+        name: "{{ dns_cache_volume }}"
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"
 
   docker:
     service:
-      name: dns
+      name: "{{ dns_service_name }}"
       config_dir: "{{ dns_dir }}"
       image: resystit/bind9
-      container_name: bind9
+      container_name: "{{ dns_container_name }}"
       ports:
         - "53:53"
         - "53:53/udp"
       volumes:
-        - dns_config:/etc/bind
-        - dns_cache:/var/cache/bind
+        - "{{ dns_config_volume }}:/etc/bind"
+        - "{{ dns_cache_volume }}:/var/cache/bind"

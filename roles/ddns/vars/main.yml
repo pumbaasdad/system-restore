@@ -1,7 +1,7 @@
 ddns_role:
   docker:
     service:
-      name: duckdns
+      name: "{{ duckdns_service_name}}"
       image: linuxserver/duckdns
       environment:
         - SUBDOMAINS={{ duckdns_subdomain }}

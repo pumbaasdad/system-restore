@@ -2,7 +2,7 @@ fail2ban_role:
   directories:
     - path: "{{ fail2ban_dir }}/jail.d"
       volume:
-        name: fail2ban-jails
+        name: "{{ fail2ban_jails_volume }}"
     - path: "{{ fail2ban_dir }}/filter.d"
   files:
     - src: "roles/fail2ban/templates/jail.local.j2"

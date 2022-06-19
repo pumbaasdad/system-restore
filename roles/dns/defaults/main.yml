@@ -11,3 +11,8 @@ dns_forwarders:
   - 1.0.0.1
   - 8.8.8.8
   - 8.8.4.4
+
+dns_config_volume: dns_config
+dns_cache_volume: dns_cache
+dns_service_name: dns
+dns_container_name: bind9

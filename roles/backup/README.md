@@ -1,16 +1,8 @@
 # Description
 
-This role provides services to back up configuration that is too sensitive to be stored in GitHub.  The following will
-be backed up:
+This role provides services to back up configuration that is too sensitive to be stored in GitHub.
 
- * Home Assistant configuration
- * Let's Encrypt certificates
- * Unifi Controller configuration
- * zwave2mqtt configuration
-
-All backups are encrypted and currently, they can only be stored in Google Drive.  Incremental backups will occur every
-Monday at 12:30 AM, with a new full backup being created monthly.  4 full backups will be stored, and incremental
-backups will only be stored for the most recent full backup.
+All backups are encrypted and currently, they can only be stored in Google Drive.
 
 # Initial Setup
 
@@ -19,12 +11,19 @@ You must create a Google Cloud Platform project that will provide this service a
 
 # Variables
 
-| Variable                    | Required | Description                                                                | Default                                  |
-|:----------------------------|:---------|:---------------------------------------------------------------------------|:-----------------------------------------|
-| volumerize_dir              | No       | The directory in which duplicity configuration will be stored.             | `"{{ docker_compose_dir }}/volumerize"`  |
-| volumerize_passphrase       | Yes      | The passphrase that will be used to encrypt/decrypt backups.               |                                          |
-| volumerize_email            | Yes      | The e-mail address of the google account to which backups will be written. |                                          |
-| volumerize_google_drive_dir | Yes      | The name of the google drive directory where backups will be stored.       |                                          |
+| Variable                         | Required | Description                                                                | Default                                 |
+|:---------------------------------|:---------|:---------------------------------------------------------------------------|:----------------------------------------|
+| volumerize_dir                   | No       | The directory in which duplicity configuration will be stored.             | `"{{ docker_compose_dir }}/volumerize"` |
+| volumerize_schedule              | No       | The jobber schedule that specifies when backups should occur.              | 0 30 0 * * 1                            |
+| volumerize_service_name          | No       | The name given to the docker-compose service that creates backups.         | volumerize                              | 
+| volumerize_cache_volume          | No       | The name given to the volumerize cache docker volume.                      | volumerize-cache                        |
+| volumerize_credentials_volume    | No       | The name given to the volumerize credentials docker volume.                | volumerize-credentials                  |
+| volumerize_full_if_older_than    | No       | How often a full backup should be taken.                                   | 1M                                      |
+| volumerize_remove_all_but_n_full | No       | How many full backups should be saved.                                     | 4                                       |
+| volumerize_all_inc_but_n_full    | No       | The number of full backups that should have incremantal backups saved.     | 1                                       |
+| volumerize_passphrase            | Yes      | The passphrase that will be used to encrypt/decrypt backups.               |                                         |
+| volumerize_email                 | Yes      | The e-mail address of the google account to which backups will be written. |                                         |
+| volumerize_google_drive_dir      | Yes      | The name of the google drive directory where backups will be stored.       |                                         |
 
 # Parameters
 

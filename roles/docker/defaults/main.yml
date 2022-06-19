@@ -8,3 +8,7 @@ public_port: "{{ secrets['public_port'] }}"
 nas_address: "{{ secrets['nas_address'] }}"
 
 docker_virtual_env: "{{ docker_compose_dir }}/.venv/docker"
+
+docker_group_name: docker
+docker_primary_network: docker1
+docker_internal_network: private0

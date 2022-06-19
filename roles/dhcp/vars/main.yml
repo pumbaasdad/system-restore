@@ -8,20 +8,22 @@ dhcp_role:
   directories:
     - path: "{{ dhcp_dir }}"
       volume:
-        name: dhcp
+        name: "{{ dhcp_volume }}"
   files:
     - src: roles/dhcp/templates/dhcpd.conf.j2
       dest: "{{ dhcp_dir }}/dhcpd.conf"
   docker:
     service:
-      name: dhcp
+      name: "{{ dhcp_service_name }}"
       config_dir: "{{ dhcp_dir }}"
       image: networkboot/dhcpd
       volumes:
-        - dhcp:/data
+        - "{{ dhcp_volume }}:/data"
       networks:
         default: false
         extra: "{{ dhcp_network_configuration }}"
     networks:
       - name: "{{ dhcp_docker_network }}"
         subnet: "{{ dhcp_docker_subnet }}"
+  provides:
+    dhcp_server_ip: "{{ dhcp_docker_ip }}"

@@ -8,21 +8,21 @@ zwave_role:
   directories:
     - path: "{{ zwave_dir }}"
       volume:
-        name: zwave-config
+        name: "{{ zwave_config_volume }}"
         backup: true
   files:
     - src: roles/zwave/templates/settings.json.j2
       dest: "{{ zwave_dir }}/settings.json"
   docker:
     service:
-      name: zwavejs2mqtt
+      name: "{{ zwave_service_name }}"
       config_dir: "{{ zwave_dir }}"
       image: zwavejs/zwavejs2mqtt:latest
       ports:
-        - "8091:8091"
-        - "3000:3000"
+        - "{{ zwave_http_port }}:8091"
+        - "{{ zwave_websocket_port }}:3000"
       volumes:
-        - zwave-config:/usr/src/app/store
+        - "{{ zwave_config_volume }}:/usr/src/app/store"
       environment:
         - SESSION_SECRET={{ zwave_session_secret }}
         - KEY_S0_Legacy={{ zwave_s0_legacy_key }}
