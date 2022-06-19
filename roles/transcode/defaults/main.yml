@@ -1,5 +1,5 @@
 transcode_dir: "{{ docker_compose_dir }}/transcode"
-transcode_nas_dir: "{{ secrets['nas_media_dir'] }}/transcode"
+transcode_nas_dir: "{{ transcode_media_mountpoint }}/transcode"
 transcode_input_dir: "{{ transcode_nas_dir }}/raw"
 transcode_output_dir: "{{ transcode_nas_dir }}/output"
 transcode_keep_app_running: 1

@@ -6,6 +6,6 @@
 
 {{- services.configure(docker_services, compose, docker_default_environment) -}}
 {{- networks.configure(docker_builtin_networks + docker_extra_networks, compose) -}}
-{{- volumes.configure(docker_local_volumes, docker_nas_volumes, nas_address, compose) -}}
+{{- volumes.configure(docker_local_volumes, docker_nas_volumes, docker_nas_ip, compose) -}}
 
 {{ compose | to_nice_yaml }}

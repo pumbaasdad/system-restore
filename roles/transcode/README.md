@@ -22,13 +22,13 @@ transcoder output directory.
 | transcode_destination_volume      | No       | The name of the volume in which transcoded media will be stored.                                                                                                                                                                                                                                 | transcode_destination                                                                    |
 | transcode_service_name            | No       | The name of the docker-compose service running the transcoder.                                                                                                                                                                                                                                   | handbrake                                                                                |
 | transcode_port                    | No       | The port on which the transcoder's web UI will be available.                                                                                                                                                                                                                                     | 5800                                                                                     |
-| nas_media_dir                     | Yes      | The name of the NFS directory on the NAS that contains media.                                                                                                                                                                                                                                    |                                                                                          |
 
 # Parameters
 
-| Parameter            | Member | Description                                              |
-|:---------------------|:-------|:---------------------------------------------------------|
-| transcode_src_volume |        | The volume that the transcoder will watch for new media. |
+| Parameter                  | Member | Description                                              |
+|:---------------------------|:-------|:---------------------------------------------------------|
+| transcode_src_volume       |        | The volume that the transcoder will watch for new media. |
+| transcode_media_mountpoint |        | The NAS mountpoint where media files are stored. |
 
 # Docker Volumes
 

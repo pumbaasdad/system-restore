@@ -72,3 +72,10 @@ network_hosts: "{%- set temp_network_hosts = {} -%}
                 {{- temp_network_hosts -}}"
 
 wemo_hosts: "{{ network_hosts | dict2items | json_query('[?value.wemo]') | map(attribute='value') }}"
+
+nas_host: "{{ network_hosts | dict2items | json_query('[?value.nas]') | map(attribute='value') | first }}"
+nas_zone: "{{ network.zones | selectattr('name', 'equalto', nas_host.zone) | first }}"
+nas_ip: "{{ nas_zone.ipv4_subnet | ansible.utils.ipaddr(nas_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
+
+media_mountpoint: "{{ (network_hosts | dict2items | json_query('[?value.nas.mountpoints.media]') | first).value.nas.mountpoints.media }}"
+

@@ -4,7 +4,7 @@ media_server_role:
       volume:
         name: "{{ media_server_config_volume }}"
   nas_directories:
-    - path: "{{ secrets['nas_media_dir'] }}"
+    - path: "{{ media_server_media_mountpoint }}"
       volume:
         name: "{{ media_server_media_volume }}"
   docker:

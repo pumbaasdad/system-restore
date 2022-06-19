@@ -173,16 +173,20 @@
         dns_server: "{{ network_hosts[inventory_hostname].name }}"
         dns_zone: "{{ network_hosts[inventory_hostname].zone }}"
     - media-rip
-    - media-server
+    - role: media-server
+      vars:
+        media_server_media_mountpoint: "{{ media_mountpoint }}"
     - role: transcode
       vars:
         transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
+        transcode_media_mountpoint: "{{ media_mountpoint }}"
     - unifi
     - zwave
     - role: docker
       vars:
         docker_local_volumes: "{{ local_docker_volumes }}"
         docker_nas_volumes: "{{ nas_docker_volumes }}"
+        docker_nas_ip: "{{ nas_ip }}"
         docker_extra_networks: "{{ extra_docker_networks }}"
         docker_services: "{{ all_docker_services }}"
         docker_services_with_config: "{{ all_docker_services_with_config }}"

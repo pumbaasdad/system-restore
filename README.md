@@ -239,7 +239,8 @@ internal: An optional boolean that should only be set to true on the host being 
           that this is the interface of the host that is not exposed to the public internet.  If unspecified, false is
           assumed (i.e. this is not the internal interface of the host being configured).
 become_password: The password used by ansible to elevate privileges while provisioning this host.
-wemo: If this is a wemo device that will be controlled by home-automation services.
+wemo: If this is a wemo device that will be controlled by home-automation services.  If unspeciid, false is assumed.
+nas: Optional details about a NAS host.  Only one device may have this configuration.
 ```
 
 If both `ethernet` and `wifi` are specified, two FQDNs will be generated one prefixed with `ethernet` and the other with
@@ -257,4 +258,12 @@ ipv6_interface: Optional value that can be used to specify the interface portion
                 value `unknown` can be used to indicate that the interface supports IPv6, but it's unknown how the
                 interface portion is assigned.  If this value is not specified, the it's assumed that the interface
                 uses a link local IPv6 address.
+```
+
+`nas` details are defined as follows:
+
+```yaml
+mountpoints: A dictionary of mountpoints provided by this NAS device.  The key is the name of the mountpoint and the
+             value is the path that can be mounted.  Currently the only supported key is `media`, which is the mount
+             point used to store media files.
 ```

@@ -35,7 +35,6 @@ receives that traffic must be set in the `public_port` variable.
 | docker_address_pool_subnet | No       | Yes    | The subnet from which docker networks will be allocated.                                                           | 172.32.0.0/12   |
 | docker_private0_subnet     | No       | Yes    | The subnet that will be used for the `private0` network.                                                           | 172.32.128.0/24 |
 | public_port                | Yes      | Yes    | The port that has been setup on your router to forward packets to the interface connected to the`public0` network. |                 |
-| nas_address                | Yes      | Yes    | The IP of the NAS used by docker.                                                                                  |                 |
 
 # Parameters
 
@@ -53,6 +52,7 @@ receives that traffic must be set in the `public_port` variable.
  | docker_services             |            | Docker services that will be created.  See details below.                     |
  |                             | config_dir | Optional.  The directory where configuration for the service will be created. |
  | docker_services_with_config |            | Names of docker services that have configuration directories                  |
+| nas_ip                      |            | The IP address of the NAS from which volumes will be mounted.                 |
 
 ## docker_services
 
