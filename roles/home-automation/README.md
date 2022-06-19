@@ -20,7 +20,7 @@ variables in the `reverse-proxy` role.
 | home_automation_service_name    | No       | The name of the docker-compose service running Home Assistant.                                                   | homeassistant                      |
 | home_automation_container_name  | No       | The name of the docker container running Home Assistant.                                                         | hass                               |
 | home_automation_network         | No       | The name of the non-internal docker network that will be used by Home Assistant.                                 | docker2                            |
-| home_assistant_wemo_server_port | No       | The port that will be used in the home assistant container to listed for wemo callbacks.                         | 8989                               |
+| home_assistant_wemo_server_port | No       | The port that will be used in the home assistant container to listed for wemo callbacks.                         | 8990                               |
 | google_assistant_project_id     | Yes      | The ID of the Google Cloud Platform project that will be used to integrate Home Assistant with Google Assistant. |                                    |
 | google_assistant_api_key        | Yes      | The API key used to authorize Home Assistant with your Google Cloud Platform project.                            |                                    |
 | hass_google_assistant_api       | Yes      | The path that the reverse proxy will forward to the /api/google_assistant endpoint of home assistant.            |                                    |
