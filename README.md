@@ -239,6 +239,7 @@ internal: An optional boolean that should only be set to true on the host being 
           that this is the interface of the host that is not exposed to the public internet.  If unspecified, false is
           assumed (i.e. this is not the internal interface of the host being configured).
 become_password: The password used by ansible to elevate privileges while provisioning this host.
+wemo: If this is a wemo device that will be controlled by home-automation services.
 ```
 
 If both `ethernet` and `wifi` are specified, two FQDNs will be generated one prefixed with `ethernet` and the other with

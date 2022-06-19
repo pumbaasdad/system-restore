@@ -154,6 +154,7 @@
         name: home-automation
       vars:
         home_automation_trusted_proxies: "{{ trusted_proxy_ips }}"
+        home_automation_wemo_hosts: "{{ wemo_hosts }}"
 
   roles:
     - security

@@ -70,3 +70,5 @@ network_hosts: "{%- set temp_network_hosts = {} -%}
                 {%- endfor -%}
                 {%- endfor -%}
                 {{- temp_network_hosts -}}"
+
+wemo_hosts: "{{ network_hosts | dict2items | json_query('[?value.wemo]') | map(attribute='value') }}"

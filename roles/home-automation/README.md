@@ -29,9 +29,12 @@ variables in the `reverse-proxy` role.
 
 # Parameters
 
-| Parameter                       | Member | Description                                                           |
-|:--------------------------------|:-------|:----------------------------------------------------------------------|
-| home_automation_trusted_proxies |        | IP addresses of proxy servers that will be trusted by home assistant. |
+| Parameter                       | Member      | Description                                                                   |
+|:--------------------------------|:------------|:------------------------------------------------------------------------------|
+| home_automation_trusted_proxies |             | IP addresses of proxy servers that will be trusted by home assistant.         |
+| home_automation_wemo_hosts      |             | A list of wemo devices to be controlled.                                      |
+|                                 | zone        | The name of the DNS zone to which the device belongs.                         |
+ |                                 | ipv4_offset | The offset of the devices IP address from the start of the DNS zone's subnet. |
 
 # Docker Volumes
 
