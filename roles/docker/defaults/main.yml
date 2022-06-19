@@ -1,10 +1,10 @@
 TZ: America/Toronto
 docker_address_pool_size: 24
 
-docker_address_pool_subnet: "{{ secrets['docker_address_pool_subnet'] }}"
-docker_private0_subnet: "{{ secrets['docker_private0_subnet'] }}"
+docker_address_pool_subnet: "{{ secrets['docker_address_pool_subnet'] | default('172.32.0.0/12') }}"
+docker_private0_subnet: "{{ secrets['docker_private0_subnet'] | default('172.32.128.0/24') }}"
 
-public_port: "{{ secrets['public_port'] }}"
+public_port: "{{ secrets['public_port'] | default(12345) }}"
 nas_address: "{{ secrets['nas_address'] }}"
 
 docker_virtual_env: "{{ docker_compose_dir }}/.venv/docker"

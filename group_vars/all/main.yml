@@ -58,7 +58,7 @@ lastpass_secrets_path: Infrastructure/Secrets
 secrets_files:
   - lastpass.yml
 
-docker_compose_dir: "{{ secrets['docker_compose_dir'] }}"
+docker_compose_dir: "{{ secrets['docker_compose_dir'] | default('~/docker') }}"
 
 network_hosts: "{%- set temp_network_hosts = {} -%}
                 {%- for zone in network.zones -%}

@@ -5,15 +5,16 @@ assigned a specific IPv4 address so that other services can trust it as an allow
 
 # Variables
 
-| Variable                            | Required | Description                                                                            | Default                                  |
-|:------------------------------------|:---------|:---------------------------------------------------------------------------------------|:-----------------------------------------|
-| private_reverse_proxy_dir           | No       | Deprecated and will be removed in a future version.                                    | `{{ docker_compose_dir }}/nginx-private` |
-| public_reverse_proxy_dir            | No       | The directory in which nginx configuration will be stored.                             | `{{ docker_compose_dir }}/nginx-public`  |
-| reverse_proxy_config_volume         | No       | The name of the volume used to store reverse proxy configuration.                      | public-nginx-config                      |
-| reverse_proxy_log_volume            | No       | The name of the volume used to store reverse proxy logs.                               | public-nginx-log                         |
-| reverse_proxy_service_name          | No       | The name of the docker-compose service that runs the reverse proxy.                    | public-nginx                             |
-| reverse_proxy_public_network        | No       | The name of the docker network that is exposed to the public internet.                 | public0                                  |
-| reverse_proxy_private0_ipv4_address | Yes      | The IP address within `docker_private0_subnet` that will be used by the reverse proxy. |                                          |
+| Variable                            | Required | Secret | Description                                                                            | Default                                  |
+|:------------------------------------|:---------|:-------|:---------------------------------------------------------------------------------------|:-----------------------------------------|
+| private_reverse_proxy_dir           | No       | No     | Deprecated and will be removed in a future version.                                    | `{{ docker_compose_dir }}/nginx-private` |
+| public_reverse_proxy_dir            | No       | No     | The directory in which nginx configuration will be stored.                             | `{{ docker_compose_dir }}/nginx-public`  |
+| reverse_proxy_config_volume         | No       | No     | The name of the volume used to store reverse proxy configuration.                      | public-nginx-config                      |
+| reverse_proxy_log_volume            | No       | No     | The name of the volume used to store reverse proxy logs.                               | public-nginx-log                         |
+| reverse_proxy_service_name          | No       | No     | The name of the docker-compose service that runs the reverse proxy.                    | public-nginx                             |
+| reverse_proxy_public_network        | No       | No     | The name of the docker network that is exposed to the public internet.                 | public0                                  |
+| reverse_proxy_private0_ipv4_address | Yes      | Yes    | The IP address within `docker_private0_subnet` that will be used by the reverse proxy. | 172.32.128.20                            |
+ | reverse_proxy_public_domain         | Yes      | Yes    | The public domain that the reverse proxy is serving.                                   |                                          |
 
 # Parameters
 

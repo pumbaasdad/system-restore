@@ -11,19 +11,19 @@ You must create a Google Cloud Platform project that will provide this service a
 
 # Variables
 
-| Variable                         | Required | Description                                                                | Default                                 |
-|:---------------------------------|:---------|:---------------------------------------------------------------------------|:----------------------------------------|
-| volumerize_dir                   | No       | The directory in which duplicity configuration will be stored.             | `"{{ docker_compose_dir }}/volumerize"` |
-| volumerize_schedule              | No       | The jobber schedule that specifies when backups should occur.              | 0 30 0 * * 1                            |
-| volumerize_service_name          | No       | The name given to the docker-compose service that creates backups.         | volumerize                              | 
-| volumerize_cache_volume          | No       | The name given to the volumerize cache docker volume.                      | volumerize-cache                        |
-| volumerize_credentials_volume    | No       | The name given to the volumerize credentials docker volume.                | volumerize-credentials                  |
-| volumerize_full_if_older_than    | No       | How often a full backup should be taken.                                   | 1M                                      |
-| volumerize_remove_all_but_n_full | No       | How many full backups should be saved.                                     | 4                                       |
-| volumerize_all_inc_but_n_full    | No       | The number of full backups that should have incremantal backups saved.     | 1                                       |
-| volumerize_passphrase            | Yes      | The passphrase that will be used to encrypt/decrypt backups.               |                                         |
-| volumerize_email                 | Yes      | The e-mail address of the google account to which backups will be written. |                                         |
-| volumerize_google_drive_dir      | Yes      | The name of the google drive directory where backups will be stored.       |                                         |
+| Variable                         | Required | Secret | Description                                                                | Default                                 |
+|:---------------------------------|:---------|:-------|:---------------------------------------------------------------------------|:----------------------------------------|
+| volumerize_dir                   | No       | No     | The directory in which duplicity configuration will be stored.             | `"{{ docker_compose_dir }}/volumerize"` |
+| volumerize_schedule              | No       | No     | The jobber schedule that specifies when backups should occur.              | 0 30 0 * * 1                            |
+| volumerize_service_name          | No       | No     | The name given to the docker-compose service that creates backups.         | volumerize                              | 
+| volumerize_cache_volume          | No       | No     | The name given to the volumerize cache docker volume.                      | volumerize-cache                        |
+| volumerize_credentials_volume    | No       | No     | The name given to the volumerize credentials docker volume.                | volumerize-credentials                  |
+| volumerize_full_if_older_than    | No       | No     | How often a full backup should be taken.                                   | 1M                                      |
+| volumerize_remove_all_but_n_full | No       | No     | How many full backups should be saved.                                     | 4                                       |
+| volumerize_all_inc_but_n_full    | No       | No     | The number of full backups that should have incremantal backups saved.     | 1                                       |
+| volumerize_google_drive_dir      | No       | Yes    | The name of the google drive directory where backups will be stored.       | backups                                 |
+| volumerize_passphrase            | Yes      | Yes    | The passphrase that will be used to encrypt/decrypt backups.               |                                         |
+| volumerize_email                 | Yes      | Yes    | The e-mail address of the google account to which backups will be written. |                                         |
 
 # Parameters
 
