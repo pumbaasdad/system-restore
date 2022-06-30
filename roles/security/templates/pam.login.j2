@@ -2,7 +2,7 @@
 # The PAM configuration file for the Shadow `login' service
 #
 
-auth required pam_yubico.so id={{ yubico_api_client_id }} key={{ yubico_api_secret_key }}
+auth required pam_u2f.so
 
 # Enforce a minimal delay in case of failure (in microseconds).
 # (Replaces the `FAIL_DELAY' setting from login.defs)

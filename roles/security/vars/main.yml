@@ -2,24 +2,20 @@ security_role:
   apt_ppa:
     ppa: yubico/stable
   packages:
-    - libpam-yubico
+    - libpam-u2f
     - openssh-server
     - scdaemon
-    - yubikey-manager
   service: sshd
   directories:
     - path: "{{ ansible_env.HOME }}/.gnupg"
     - path: "{{ ansible_env.HOME }}/.ssh"
-    - path: "{{ ansible_env.HOME }}/.yubico"
+    - path: "{{ ansible_env.HOME }}/.config/Yubico"
   root_directories:
     - path: /etc/pam.d
     - path: /etc/ssh
   files:
     - src: roles/security/templates/authorized_keys.j2
       dest: "{{ ansible_env.HOME }}/.ssh/authorized_keys"
-      mode: "0600"
-    - src: roles/security/templates/authorized_yubikeys.j2
-      dest: "{{ ansible_env.HOME }}/.yubico/authorized_yubikeys"
       mode: "0600"
     - src: roles/security/files/gpg-agent.conf
       dest: "{{ ansible_env.HOME }}/.gnupg/gpg-agent.conf"
