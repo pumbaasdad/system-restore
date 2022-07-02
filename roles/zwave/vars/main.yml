@@ -29,10 +29,6 @@ zwave_role:
         - KEY_S2_Unauthenticated={{ zwave_s2_unauthenticated_key }}
         - KEY_S2_Authenticated={{ zwave_s2_authenticated_key }}
         - KEY_S2_AccessControl={{ zwave_s2_access_control_key }}
-      networks:
-        default: false
-        extra:
-          docker2:
       devices:
         - /dev/{{ zwave_usbstick_symlink }}:/dev/zwave
       tty: true

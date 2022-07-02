@@ -16,24 +16,15 @@
     {%- endif %}
 {%- endmacro -%}
 
-{%- macro configure_networks(service, service_definition) -%}
+{%- macro configure_networks(service, service_definition, primary_network_name) -%}
     {%- if 'networks' in service -%}
         {%- set networks = service.networks.extra | default({}) -%}
 
         {%- if service.networks.default | default(true) -%}
-            {%- set _ = networks.update({'docker1': {}}) -%}
-        {%- endif -%}
-
-        {%- set has_internal_ipv4_address = service.networks.internal_ipv4_address is defined -%}
-        {%- if service.networks.internal | default(has_internal_ipv4_address) | default(false) -%}
-            {%- if has_internal_ipv4_address -%}
-                {%- set internal_network = {'ipv4_address': service.networks.internal_ipv4_address} -%}
-            {%- endif -%}
-
-            {%- set _ = networks.update({'private0': internal_network | default({})}) -%}
+            {%- set _ = networks.update({primary_network_name: {}}) -%}
         {%- endif -%}
     {%- else -%}
-        {%- set networks = {'docker1': {}} -%}
+        {%- set networks = {primary_network_name: {}} -%}
     {%- endif -%}
 
     {%- if networks | length > 0 -%}
@@ -41,11 +32,11 @@
     {%- endif -%}
 {%- endmacro -%}
 
-{%- macro configure_networking(service, service_definition) -%}
+{%- macro configure_networking(service, service_definition, primary_network_name) -%}
     {%- if service.networks.host | default(false) -%}
         {%- set _ = service_definition.update({'network_mode': 'host'}) -%}
     {%- else -%}
-        {{- configure_networks(service, service_definition) -}}
+        {{- configure_networks(service, service_definition, primary_network_name) -}}
     {%- endif -%}
 {%- endmacro -%}
 
@@ -55,7 +46,7 @@
     {%- set _ = service_definition.update({ 'environment': environment }) -%}
 {%- endmacro -%}
 
-{%- macro configure_service(service, services, default_environment) -%}
+{%- macro configure_service(service, services, default_environment, primary_network_name) -%}
     {%- set service_definition = {} -%}
 
     {{- configure_value('image', service, service_definition) -}}
@@ -69,7 +60,7 @@
     {{- configure_list('capabilities', service, service_definition, 'cap_add') -}}
 
     {{- configure_container_name(service, service_definition) -}}
-    {{- configure_networking(service, service_definition) -}}
+    {{- configure_networking(service, service_definition, primary_network_name) -}}
 
     {{- configure_environment(service, service_definition, default_environment) -}}
 
@@ -78,10 +69,10 @@
     {%- set _ = services.update({ service.name: service_definition }) %}
 {%- endmacro -%}
 
-{%- macro configure(services, compose, default_environment) -%}
+{%- macro configure(services, compose, default_environment, primary_network_name) -%}
     {%- set docker_services = {} -%}
     {%- for service in services -%}
-        {{- configure_service(service, docker_services, default_environment) -}}
+        {{- configure_service(service, docker_services, default_environment, primary_network_name) -}}
     {%- endfor -%}
 
     {%- set _ = compose.update({'services': docker_services}) -%}

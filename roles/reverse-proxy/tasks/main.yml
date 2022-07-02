@@ -1,3 +1,7 @@
+- name: Load reverse proxy networks
+  set_fact:
+    reverse_proxy_internal_networks: "{{ reverse_proxy_networks }}"
+
 - name: Install public site configs
   vars:
     domain: "{{ reverse_proxy_public_domain }}"
@@ -6,9 +10,3 @@
     dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}"
   with_items: "{{ reverse_proxy_public_site_configs }}"
   register: reverse_proxy_public_site_config_installation
-
-- name: Install private site configs
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ private_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}"
-  with_items: "{{ reverse_proxy_private_site_configs }}"

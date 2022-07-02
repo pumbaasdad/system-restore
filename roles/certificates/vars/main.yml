@@ -21,8 +21,6 @@ certificates_role:
         - public-nginx-log:/config/log/nginx-public
         - "{{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log"
         - fail2ban-jails:/etc/fail2ban/jail.d
-      ports:
-        - "{{ internal_ip }}:80:80"
       environment:
         - EMAIL={{ letsencrypt_email }}
         - SUBDOMAINS=wildcard
@@ -30,9 +28,6 @@ certificates_role:
         - VALIDATION=duckdns
         - DUCKDNSTOKEN={{ certificates_duckdns_token }}
         - DHLEVEL=2048
-      networks:
-        default: false
-        internal: true
       capabilities:
         - NET_ADMIN
       backup: true
