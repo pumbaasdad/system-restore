@@ -7,6 +7,10 @@ machine up to date with the latest version of those services.
 
 The system being configured must have two network interfaces, one of which may be virtual.
 
+## Host System
+
+The host system must have `libgpgme-dev` and `swig` installed.  They can be installed with `apt`.
+
 ## Ansible
 
 The included playbook runs and produces no warnings with `python` 3.10.4 and the packages in `poetry.toml`.
