@@ -3,7 +3,10 @@
     action: insert
     chain: "{{ item.chain }}"
     in_interface: "{{ item.in_interface }}"
-    ctstate: "{{ item.cstate }}"
+    ctstate: "{{ item.cstate | default(omit) }}"
+    destination_port: "{{ item.destination_port | default(omit) }}"
+    protocol: "{{ item.protocol | default(omit) }}"
+    match: "{{ item.protocol | default(omit) }}"
     jump: "{{ item.jump }}"
   loop: "{{ iptables_rules }}"
-  notify: restart netfilter-persistent
+  notify: Restart netfilter-persistent

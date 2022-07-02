@@ -2,6 +2,12 @@ home_automation_internal_zone: "{{ network | json_query('zones[?hosts[*].interna
 home_automation_internal_host: "{{ internal_zone | json_query('hosts[?internal] | [0]') }}"
 home_automation_internal_ip: "{{ internal_zone.ipv4_subnet | ansible.utils.ipaddr(internal_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
 
+home_automation_reverse_proxy_ip_config:
+  ipv4_address: "{{ home_automation_reverse_proxy_ip }}"
+
+home_automation_reverse_proxy_network_config:  "{%- set temp_home_automation_reverse_proxy_network_config = { home_automation_network: home_automation_reverse_proxy_ip_config } -%}
+                                                {{- temp_home_automation_reverse_proxy_network_config -}}"
+
 home_automation_extra_networks: "{%- set temp_home_automation_extra_networks = { home_automation_network: {} } -%}
                                  {{- temp_home_automation_extra_networks -}}"
 
@@ -33,6 +39,8 @@ home_automation_role:
         name: hass-private
       - src: roles/home-automation/templates/public-reverse-proxy.j2
         name: hass-public
+    networks:
+      - "{{ home_automation_reverse_proxy_network_config }}"
   docker:
     service:
       name: "{{ home_automation_service_name }}"
@@ -47,11 +55,36 @@ home_automation_role:
         - PYWEMO_HTTP_SERVER_PORT={{ home_automation_wemo_server_port }}
         - PYWEMO_CALLBACK_ADDRESS={{ home_automation_internal_ip }}:{{ home_automation_wemo_server_port }}
       networks:
-        default: false
-        internal: true
         extra: "{{ home_automation_extra_networks }}"
       config_dir: "{{ hass_dir }}"
       backup: true
     networks:
       - name: "{{ home_automation_network }}"
+        subnet: "{{ home_automation_subnet }}"
+        internal: true
   files_changed_by_tasks: "{{ [hass_config | default(None)] | select() }}"
+  iptable_rules:
+    - chain: INPUT
+      in_interface: "{{ home_automation_network }}"
+      jump: DROP
+    - chain: INPUT
+      in_interface: "{{ home_automation_network }}"
+      destination_port: 8123
+      protocol: tcp
+      jump: ACCEPT
+    - chain: INPUT
+      in_interface: "{{ home_automation_network }}"
+      cstate: [ ESTABLISHED, RELATED ]
+      jump: ACCEPT
+    - chain: DOCKER-USER
+      in_interface: "{{ home_automation_network }}"
+      jump: DROP
+    - chain: DOCKER-USER
+      in_interface: "{{ home_automation_network }}"
+      destination_port: 8123
+      protocol: tcp
+      jump: ACCEPT
+    - chain: DOCKER-USER
+      in_interface: "{{ home_automation_network }}"
+      cstate: [ ESTABLISHED, RELATED ]
+      jump: ACCEPT

@@ -113,8 +113,10 @@ of the following keys:
  * `iptable_rules`
    * `chain` - The chain to which the rule will be added.
    * `in_interface` - The input interface to which the rule will apply.
-   * `cstate` - A list of connection states to which the rule will apply.
    * `jump` - What to do if the rule matches.
+   * `cstate` - Optional.  A list of connection states to which the rule will apply.  Defaults to all states.
+   * `protocl` - Optional.  The protocol to which the rule will apply.  Defaults to all states.
+   * `destination_port` - Optional.  The destination port to which the rule will apply.  Defaults to all states.
  * `intrusion_detection`
    * `jails`
      * `jail_name`: The name of an intrusion detection jail to create.
@@ -126,10 +128,9 @@ of the following keys:
    * `public_site_configs`
      * `name` - The name of an external reverse proxy configuration to create.
      * `src` - The template that will be used to create the configuration.
-   * `private_site_configs`
-     * `name` - The name of an internal reverse proxy configuration to create.
-     * `src` - The template that will be used to create the configuration.
-   * `trusted_ips` - A list of reverse proxy IP addresses that should be trusted by internal services.
+   * `networks` - A list of dictionaries that maps networks to which the reverse proxy container will connect to the
+                  properties of the network.
+     * `ipv4_address` - The IPv4 address of the reverse proxy on the network.
  * `docker`
    * `service`
      * `name` - The name of the docker service to create.

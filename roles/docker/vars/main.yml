@@ -32,9 +32,6 @@ docker_role:
 
 docker_builtin_networks:
   - name: "{{ docker_primary_network }}"
-  - name: "{{ docker_internal_network }}"
-    subnet: "{{ docker_private0_subnet }}"
-    internal: true
 
 docker_default_environment:
   - TZ={{ TZ }}

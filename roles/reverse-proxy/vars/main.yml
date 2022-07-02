@@ -3,11 +3,13 @@ external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
 external_ip: "{{ external_zone.ipv4_subnet | ansible.utils.ipaddr(external_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
 
 reverse_proxy_extra_networks: "{%- set temp_reverse_proxy_extra_networks = { reverse_proxy_public_network: {} } -%}
+                               {%- for network in (reverse_proxy_internal_networks | default([])) -%}
+                               {%- set _ = temp_reverse_proxy_extra_networks.update(network) -%}
+                               {%- endfor -%}
                                {{- temp_reverse_proxy_extra_networks -}}"
 
 reverse_proxy_role:
   directories:
-    - path: "{{ private_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}"
     - path: "{{ public_reverse_proxy_dir }}/nginx"
       volume:
@@ -16,8 +18,6 @@ reverse_proxy_role:
       volume:
         name: "{{ reverse_proxy_log_volume }}"
   files:
-    - src: roles/reverse-proxy/templates/nginx.conf.j2
-      dest: "{{ private_reverse_proxy_dir }}/nginx/nginx.conf"
     - src: roles/reverse-proxy/templates/nginx.conf.j2
       dest: "{{ public_reverse_proxy_dir }}/nginx/nginx.conf"
   intrusion_detection:
@@ -43,8 +43,6 @@ reverse_proxy_role:
       - src: roles/reverse-proxy/templates/default.j2
         name: default
         nginx_port: 443
-    trusted_ips:
-      - "{{ reverse_proxy_private0_ipv4_address }}"
   files_changed_by_tasks: "{{ reverse_proxy_public_site_config_installation.results | default([]) }}"
   docker:
     service:
@@ -62,7 +60,6 @@ reverse_proxy_role:
         - DHLEVEL=2048
       networks:
         default: false
-        internal_ipv4_address: "{{ reverse_proxy_private0_ipv4_address }}"
         extra: "{{ reverse_proxy_extra_networks }}"
     networks:
       - name: "{{ reverse_proxy_public_network }}"

@@ -6,17 +6,11 @@ radius should any container be compromised.
 
 ## Networks
 
-### private0
-
-This is an internal docker network that the host system cannot access.  Its purpose is to allow nginx to proxy requests
-to other services.  `private0` is a bad name and this will likely be renamed `internal0` in the future.
-
 ### docker1
 
 This network is supposed to be the general purpose network used by all docker containers that do not need to be accessed
 by the public internet.  It fails in that regard as `plex` needs to be publicly accessible but is currently on this
-network.  `plex` can definitely be moved to the `docker2` network, but an ideal situation would be to put it on the
-`private0` network behind the `nginx` proxy.
+network.  `plex` should be moved to an internal network behind the reverse proxy.
 
 # Initial Setup
 
@@ -31,9 +25,7 @@ receives that traffic must be set in the `public_port` variable.
 | docker_address_pool_size   | No       | No     | The CIDR suffix specifying how many addresses a docker network will be given.                                      | 24              |
 | docker_group_name          | No       | No     | The name of the unix group whose members can run docker.                                                           | docker          |
 | docker_primary_network     | No       | No     | The name of the network that docker containers will use by default.                                                | docker1         |
-| docker_internal_network    | No       | No     | The name of the default internal network that can be used for itra-container communication.                        | private0        |
 | docker_address_pool_subnet | No       | Yes    | The subnet from which docker networks will be allocated.                                                           | 172.32.0.0/12   |
-| docker_private0_subnet     | No       | Yes    | The subnet that will be used for the `private0` network.                                                           | 172.32.128.0/24 |
 | public_port                | Yes      | Yes    | The port that has been setup on your router to forward packets to the interface connected to the`public0` network. |                 |
 
 # Parameters

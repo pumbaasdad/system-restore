@@ -36,8 +36,7 @@ intrusion_filters: "{{ intrusion_detection | selectattr('filters', 'defined') | 
 
 reverse_proxy_configs: "{{ role_vars | selectattr('reverse_proxy', 'defined') | map(attribute='reverse_proxy') }}"
 public_site_configs: "{{ reverse_proxy_configs | selectattr('public_site_configs', 'defined') | map(attribute='public_site_configs') | flatten }}"
-private_site_configs: "{{ reverse_proxy_configs | selectattr('private_site_configs', 'defined') | map(attribute='private_site_configs') | flatten }}"
-trusted_proxy_ips: "{{ reverse_proxy_configs | selectattr('trusted_ips', 'defined') | map(attribute='trusted_ips') | flatten }}"
+all_reverse_proxy_networks: "{{ reverse_proxy_configs | selectattr('networks', 'defined') | map(attribute='networks') | flatten }}"
 
 docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='docker') | flatten }}"
 all_docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"

@@ -123,6 +123,13 @@
         backup_services: "{{ backed_up_services }}"
         backup_volumes: "{{ backed_up_volumes }}"
 
+    - import_role:
+        name: reverse-proxy
+      vars:
+        reverse_proxy_public_site_configs: "{{ public_site_configs }}"
+        reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
+        reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"
+
     - name: Install configuration files
       template:
         src: "{{ item.src }}"
@@ -144,16 +151,8 @@
         fail2ban_filters: "{{ intrusion_filters }}"
 
     - import_role:
-        name: reverse-proxy
-      vars:
-        reverse_proxy_public_site_configs: "{{ public_site_configs }}"
-        reverse_proxy_private_site_configs: "{{ private_site_configs }}"
-        reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
-
-    - import_role:
         name: home-automation
       vars:
-        home_automation_trusted_proxies: "{{ trusted_proxy_ips }}"
         home_automation_wemo_hosts: "{{ wemo_hosts }}"
 
   roles:

@@ -15,4 +15,8 @@ hass_db_volume: hass-db
 
 home_automation_service_name: homeassistant
 home_automation_container_name: hass
-home_automation_network: docker2
+
+home_automation_network: ha-proxy0
+
+home_automation_subnet: "{{ secrets['docker_private0_subnet'] | default('172.32.128.0/24') }}"
+home_automation_reverse_proxy_ip: "{{ secrets['reverse_proxy_private0_ipv4_address'] | default('172.32.128.20') }}"
