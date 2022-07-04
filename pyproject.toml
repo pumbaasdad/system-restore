@@ -13,6 +13,7 @@ netaddr = "^0.8.0"
 gpg = "^1.10.0"
 lastpass-python = "^0.3.2"
 ansible-runner = "^2.2.1"
+jinja2schema = "^0.1.4"
 
 [tool.poetry.dev-dependencies]
 poetry = "^1.1.13"

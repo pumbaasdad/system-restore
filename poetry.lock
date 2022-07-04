@@ -271,6 +271,17 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "jinja2schema"
+version = "0.1.4"
+description = "Type inference for Jinja2 templates."
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+Jinja2 = ">=2.2"
+
+[[package]]
 name = "jmespath"
 version = "1.0.1"
 description = "JSON Matching Expressions"
@@ -634,7 +645,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "759801d3a2549036a99cc80019d028f6108fbb6bb422ef8a6046a2ef15044b52"
+content-hash = "6b5c518a817405252f37afed1a098bc55260ba1fb178bd66105466cdafcd09c0"
 
 [metadata.files]
 ansible = [
@@ -789,6 +800,9 @@ jeepney = [
 jinja2 = [
     {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
     {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+]
+jinja2schema = [
+    {file = "jinja2schema-0.1.4.tar.gz", hash = "sha256:236e4ee6612a0ab5a5664c453c954a2c7e42b6be986c12f7b31f34f9082043bc"},
 ]
 jmespath = [
     {file = "jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
