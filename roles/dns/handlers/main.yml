@@ -2,8 +2,6 @@
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
-    owner: "{{ item.owner }}"
-    group: "{{ item.group }}"
     mode: "{{ item.mode }}"
   vars:
     serial_number_increment: 1
