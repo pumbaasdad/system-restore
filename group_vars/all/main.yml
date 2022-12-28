@@ -11,7 +11,7 @@ apt_keys: "{{ role_vars | selectattr('apt_key', 'defined') | map(attribute='apt_
 packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='packages', start=[]) | list }}"
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
-directories: "{{ role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten }}"
+directories: "{{ (role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten) + [{ 'path': dockerfile_dir}] }}"
 root_directories: "{{ role_vars | selectattr('root_directories', 'defined') | map(attribute='root_directories') | flatten }}"
 nas_directories: "{{ role_vars | selectattr('nas_directories', 'defined') | map(attribute='nas_directories') | flatten }}"
 files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
@@ -58,6 +58,7 @@ secrets_files:
   - lastpass.yml
 
 docker_compose_dir: "{{ secrets['docker_compose_dir'] | default('~/docker') }}"
+dockerfile_dir: "{{ docker_compose_dir }}/dockerfiles"
 
 network_hosts: "{%- set temp_network_hosts = {} -%}
                 {%- for zone in network.zones -%}

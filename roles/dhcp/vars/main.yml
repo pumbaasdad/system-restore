@@ -12,6 +12,8 @@ dhcp_role:
   files:
     - src: roles/dhcp/templates/dhcpd.conf.j2
       dest: "{{ dhcp_dir }}/dhcpd.conf"
+    - src: roles/dhcp/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ dhcp_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ dhcp_service_name }}"

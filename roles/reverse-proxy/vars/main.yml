@@ -20,6 +20,8 @@ reverse_proxy_role:
   files:
     - src: roles/reverse-proxy/templates/nginx.conf.j2
       dest: "{{ public_reverse_proxy_dir }}/nginx/nginx.conf"
+    - src: roles/reverse-proxy/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ reverse_proxy_service_name }}.Dockerfile"
   intrusion_detection:
     jails:
       - jail_name: nginx-http-auth

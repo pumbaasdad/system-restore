@@ -4,7 +4,7 @@
   block:
     - name: Create docker containers
       docker_compose:
-        pull: yes
+        build: yes
         project_src: "{{ docker_compose_dir }}"
         restarted: "{{ force_docker_compose_restart | default(false) }}"
         debug: true

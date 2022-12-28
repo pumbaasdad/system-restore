@@ -11,6 +11,9 @@ certificates_role:
       volume:
         name: "{{ letsencrypt_etc_volume }}"
         backup: true
+  files:
+    - src: roles/certificates/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ letsencrypt_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ letsencrypt_service_name }}"

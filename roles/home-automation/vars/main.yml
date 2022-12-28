@@ -26,6 +26,8 @@ home_automation_role:
       force: no
     - src: roles/home-automation/templates/wemo.yaml.j2
       dest: "{{ hass_dir }}/wemo.yaml"
+    - src: roles/home-automation/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ home_automation_service_name }}.Dockerfile"
   intrusion_detection:
     jails:
       - jail_name: ha

@@ -1,0 +1,1 @@
+FROM linuxserver/swag:1.32.0

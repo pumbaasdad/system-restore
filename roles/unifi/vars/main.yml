@@ -7,6 +7,9 @@ unifi_role:
       volume:
         name: "{{ unifi_backups_volume }}"
         backup: true
+  files:
+    - src: roles/unifi/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ unifi_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ unifi_service_name }}"

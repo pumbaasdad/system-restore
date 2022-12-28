@@ -13,6 +13,8 @@ zwave_role:
   files:
     - src: roles/zwave/templates/settings.json.j2
       dest: "{{ zwave_dir }}/settings.json"
+    - src: roles/zwave/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ zwave_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ zwave_service_name }}"

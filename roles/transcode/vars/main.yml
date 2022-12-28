@@ -3,6 +3,9 @@ transcode_role:
     - path: "{{ transcode_dir }}"
       volume:
         name: "{{ transcode_config_volume }}"
+  files:
+    - src: roles/transcode/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ transcode_service_name }}.Dockerfile"
   nas_directories:
     - path: "{{ transcode_nas_dir }}"
       volume:

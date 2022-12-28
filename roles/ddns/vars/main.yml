@@ -8,3 +8,6 @@ ddns_role:
         - TOKEN={{ duckdns_token }}
   provides:
     duckdns_token: "{{ duckdns_token }}"
+  files:
+    - src: roles/ddns/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ duckdns_service_name }}.Dockerfile"
