@@ -17,6 +17,9 @@ backup_role:
     - path: "{{ volumerize_dir }}/credentials"
       volume:
         name: "{{ volumerize_credentials_volume }}"
+  files:
+    - src: roles/backup/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ volumerize_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ volumerize_service_name }}"

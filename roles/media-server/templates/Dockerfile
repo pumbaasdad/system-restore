@@ -1,0 +1,1 @@
+FROM linuxserver/plex:1.30.0

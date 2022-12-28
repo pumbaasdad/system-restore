@@ -133,7 +133,9 @@ of the following keys:
      * `ipv4_address` - The IPv4 address of the reverse proxy on the network.
  * `docker`
    * `service`
-     * `name` - The name of the docker service to create.
+     * `name` - The name of the docker service to create.  The role must create a dockerfile located in
+                `<dockerfile_dir>` named `<name>.Dockerfile`.  This file will be built to run the
+                service
      * `container_name` - Optional.  The name of the container used to run the service.  Defaults to the value of
                           `name`.
      * `config_dir` - The directory where configuration for the service will be created.

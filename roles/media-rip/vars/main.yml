@@ -15,6 +15,9 @@ media_rip_role:
     - path: "{{ media_rip_output_dir }}"
       volume:
         name: "{{ media_rip_output_volume }}"
+  files:
+    - src: roles/media-rip/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ media_rip_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ media_rip_service_name }}"

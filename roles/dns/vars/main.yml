@@ -98,6 +98,8 @@ dns_files:
     notify: Update DNS zone serial numbers
   - src: roles/dns/templates/resolv.conf.j2
     dest: /etc/resolv.conf
+  - src: roles/dns/templates/Dockerfile
+    dest: "{{ dockerfile_dir }}/{{ dns_service_name }}.Dockerfile"
 
 dns_role:
   directories:

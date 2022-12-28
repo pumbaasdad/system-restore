@@ -8,3 +8,6 @@ dhcp_relay_role:
       capabilities:
         - NET_ADMIN
       command: -s {{ dhcp_relay_dhcp_server_ip }}
+  files:
+    - src: roles/dhcp-relay/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ dhcp_relay_service_name }}.Dockerfile"

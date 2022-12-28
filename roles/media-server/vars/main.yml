@@ -7,6 +7,9 @@ media_server_role:
     - path: "{{ media_server_media_mountpoint }}"
       volume:
         name: "{{ media_server_media_volume }}"
+  files:
+    - src: roles/media-server/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ media_server_service_name }}.Dockerfile"
   docker:
     service:
       name: "{{ media_server_service_name }}"
