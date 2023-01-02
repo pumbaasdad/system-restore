@@ -7,6 +7,6 @@
     domain: "{{ reverse_proxy_public_domain }}"
   template:
     src: "{{ item.src }}"
-    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}"
+    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}.conf"
   with_items: "{{ reverse_proxy_public_site_configs }}"
   register: reverse_proxy_public_site_config_installation
