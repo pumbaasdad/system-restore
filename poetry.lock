@@ -2,29 +2,29 @@
 
 [[package]]
 name = "ansible"
-version = "7.2.0"
+version = "7.4.0"
 description = "Radically simple IT automation"
 category = "main"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "ansible-7.2.0-py3-none-any.whl", hash = "sha256:756a6d8fec6c19ccd7a00ad0f0cb18859f4ab77e0c5063f73a115f3fb75284aa"},
-    {file = "ansible-7.2.0.tar.gz", hash = "sha256:60e2c1a58f1ceb34a190b7c380f7b3386d1e7369061954b1f8b8ca3df76063cc"},
+    {file = "ansible-7.4.0-py3-none-any.whl", hash = "sha256:c9b5cae2ff8168b3dc859fff12275338cd7c84ef37f62889076f82846bb4beb5"},
+    {file = "ansible-7.4.0.tar.gz", hash = "sha256:0964d6ec7b363d2d559f245c39b01798c720a85b207672ec2c9d83cf61564b90"},
 ]
 
 [package.dependencies]
-ansible-core = ">=2.14.2,<2.15.0"
+ansible-core = ">=2.14.4,<2.15.0"
 
 [[package]]
 name = "ansible-core"
-version = "2.14.2"
+version = "2.14.4"
 description = "Radically simple IT automation"
 category = "main"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "ansible-core-2.14.2.tar.gz", hash = "sha256:47f0d4b4125b58edba6435a47f37cbe6a18da54594d18f812958bb0cb58d4e65"},
-    {file = "ansible_core-2.14.2-py3-none-any.whl", hash = "sha256:d1d44aab18fb5436d94ba77081bcfebece2a87015665e2444aadc16ece230886"},
+    {file = "ansible-core-2.14.4.tar.gz", hash = "sha256:90b260bc264901d35fb1f0753f2b650813f54cfe6476540afbc6b25ef541ef14"},
+    {file = "ansible_core-2.14.4-py3-none-any.whl", hash = "sha256:3915ef89f74ffd6277e534b4f14843d2425a3e7bb6ffae26eecd4cc571d020cc"},
 ]
 
 [package.dependencies]
@@ -1323,4 +1323,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "5ae98b615875e95da77a0360b7bfbdd80ed66c14f1ae9bb9107584ffdf63af26"
+content-hash = "da6dc1c55efff3fdc092b6da3ae40c001d52959f30492d8915e541d13a2eecd6"
