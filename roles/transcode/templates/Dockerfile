@@ -1,1 +1,1 @@
-FROM jlesage/handbrake:v23.03.2
+FROM jlesage/handbrake:v23.04.1
