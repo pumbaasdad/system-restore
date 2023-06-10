@@ -1,1 +1,1 @@
-FROM jlesage/makemkv:v23.04.2
+FROM jlesage/makemkv:v23.06.1
