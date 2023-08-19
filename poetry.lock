@@ -2,27 +2,27 @@
 
 [[package]]
 name = "ansible"
-version = "7.7.0"
+version = "8.3.0"
 description = "Radically simple IT automation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "ansible-7.7.0-py3-none-any.whl", hash = "sha256:4f8d346db1b6cec0f30b77935b3dce5633d76881186da839b58b34b48a089b92"},
-    {file = "ansible-7.7.0.tar.gz", hash = "sha256:9c206ba515f13a0cc9c919d496218ba26df581755bdc39be85b074066c699a02"},
+    {file = "ansible-8.3.0-py3-none-any.whl", hash = "sha256:f36b6f809743a4bca4c969178c7f4e0a960b2922c6c93ae12c08846e3acddc5a"},
+    {file = "ansible-8.3.0.tar.gz", hash = "sha256:5e58001d7d6dc33e5d156ca343883b613ec988f69364b0a43f7124fe4b5be2f2"},
 ]
 
 [package.dependencies]
-ansible-core = ">=2.14.7,<2.15.0"
+ansible-core = ">=2.15.3,<2.16.0"
 
 [[package]]
 name = "ansible-core"
-version = "2.14.8"
+version = "2.15.3"
 description = "Radically simple IT automation"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "ansible-core-2.14.8.tar.gz", hash = "sha256:637f62c9547023fb4704cd5de1329dc7c02ef9e583cea1c3be2ce6c2fde7739c"},
-    {file = "ansible_core-2.14.8-py3-none-any.whl", hash = "sha256:7830a988112ca148390bfb7db25193f51a95ef6f8b9e0e54e67f65957db8f60d"},
+    {file = "ansible-core-2.15.3.tar.gz", hash = "sha256:261bc01a15274fc5a6950d5b92b9aa1b7d7c6e8f7543c914505e5bfd9744793a"},
+    {file = "ansible_core-2.15.3-py3-none-any.whl", hash = "sha256:bc2f5ab74e1c81609aaa9bc8f7f92d939d8e1c847923290301231bdf4dadc812"},
 ]
 
 [package.dependencies]
@@ -30,7 +30,7 @@ cryptography = "*"
 jinja2 = ">=3.0.0"
 packaging = "*"
 PyYAML = ">=5.1"
-resolvelib = ">=0.5.3,<0.9.0"
+resolvelib = ">=0.5.3,<1.1.0"
 
 [[package]]
 name = "attrs"
@@ -1322,4 +1322,4 @@ testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "88e391731056ba894026eb29ce722a3ed4c5517ecd413700db873e727e139a8c"
+content-hash = "e6a65ec2d58973548128648c3fe694d096c72d0c1642b7bdcbce4f89bafd9a59"
