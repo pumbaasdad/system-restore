@@ -1,1 +1,1 @@
-FROM linuxserver/duckdns@sha256:6800f6e9f3df887246205c7994ede5015cfa2bbfba5339a4c828bbc5af80d75e
+FROM linuxserver/duckdns@sha256:4379f5ed32e7e27662fdb6ab29e8d78324de78b3ba53bb29240af3b75c06db3c
