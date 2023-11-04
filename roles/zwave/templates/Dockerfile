@@ -1,1 +1,1 @@
-FROM zwavejs/zwavejs2mqtt@sha256:3356909742821bdbe5d2d84b54e93e69eede551da838a5e4e91c8236b28c9618
+FROM zwavejs/zwavejs2mqtt@sha256:bf91b3d2aa4ca051a2f71ec04fc5deac492ee6b1077a81a1d6fe45b4fb3d7c2f
