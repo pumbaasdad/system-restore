@@ -9,7 +9,7 @@ python = "^3.10"
 ansible = "^7.7.0"
 dnspython = "^2.4.1"
 jmespath = "^1.0.1"
-netaddr = "^0.8.0"
+netaddr = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 poetry = "^1.5.1"
