@@ -35,3 +35,6 @@ backup_role:
         - VOLUMERIZE_FULL_IF_OLDER_THAN={{ volumerize_full_if_older_than }}
         - REMOVE_ALL_BUT_N_FULL={{ volumerize_remove_all_but_n_full }}
         - REMOVE_ALL_INC_BUT_N_FULL={{ volumerize_all_inc_but_n_full }}
+
+backup_services: "{{ backed_up_services }}"
+backup_volumes: "{{ backed_up_volumes }}"

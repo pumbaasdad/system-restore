@@ -20,13 +20,6 @@ Because certificate generation is tied to [Duck DNS](www.duckdns.org), you must 
 | letsencrypt_email              | Yes      | The email address associated with generated certificates.         |                                        |
 | letsencrypt_url                | Yes      | The public URL for which certificates will be generated.          |                                        |
 
-
-# Parameters
-
-| Parameter                  | Member | Description                                                                            |
-|:---------------------------|:-------|:---------------------------------------------------------------------------------------|
-| certificates_duckdns_token |        | The token that can be used to authenticate with DuckDNS to respond to ACME challenges. |
-
 # Docker Volumes
 
  | Volume             | Description                                                                                                               |
