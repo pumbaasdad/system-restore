@@ -6,7 +6,7 @@
 
 - name: Stop docker containers
   vars:
-    ansible_python_interpreter: "{{ docker_virtual_env }}/bin/python3"
+    ansible_python_interpreter: "{{ docker_compose_virtual_env }}/bin/python3"
   docker_compose:
     project_src: "{{ docker_compose_dir }}"
     stopped: yes

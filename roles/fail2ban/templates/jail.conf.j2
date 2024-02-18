@@ -1,11 +1,11 @@
-[{{ item.jail_name }}]
+[{{ file_vars['jail_name'] }}]
 
 enabled  = true
-{% if 'port' in item %}
-port     = {{ item.port }}
+{% if 'port' in file_vars %}
+port     = {{ file_vars['port'] }}
 {% endif %}
-filter   = {{ item.jail_name }}
-logpath  = /config/log/{{ item.file }}
-{% if 'max_retries' in item %}
-maxretry = {{ item.max_retries }}
+filter   = {{ file_vars['jail_name'] }}
+logpath  = /config/log/{{ file_vars['file'] }}
+{% if 'max_retries' in file_vars %}
+maxretry = {{ file_vars['max_retries'] }}
 {% endif %}

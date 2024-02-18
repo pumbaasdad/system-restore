@@ -1,0 +1,3 @@
+- name: Load DHCP Relay Configuration
+  set_fact:
+    __dhcp_relay_dhcp_server_ip: "{{ dhcp_relay_dhcp_server_ip }}"

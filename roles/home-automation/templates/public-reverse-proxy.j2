@@ -1,6 +1,6 @@
 server {
         listen 443;
-        server_name home.{{ domain }};
+        server_name home.{{ file_vars['domain'] }};
         include /config/nginx/ssl.conf;
         client_max_body_size 0;
 	location {{ hass_google_assistant_api }} {

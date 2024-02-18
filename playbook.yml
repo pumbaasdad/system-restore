@@ -1,5 +1,5 @@
 - hosts: all
-  pre_tasks:
+  tasks:
     - name: Include secrets
       include_vars: "{{ path }}"
       vars:
@@ -21,6 +21,86 @@
     - name: Load network configuration
       set_fact:
         network: "{{ secret_network.network }}"
+
+    - name: Load roles without tasks
+      block:
+        - import_role:
+            name: ddns
+
+        - import_role:
+            name: certificates
+          vars:
+            certificates_duckdns_token: "{{ ddns_role.provides.duckdns_token }}"
+
+        - import_role:
+            name: dhcp
+
+        - import_role:
+            name: dhcp-relay
+          vars:
+            dhcp_relay_dhcp_server_ip: "{{dhcp_role.provides.dhcp_server_ip }}"
+
+        - import_role:
+            name: dns
+          vars:
+            dns_server: "{{ network_hosts[inventory_hostname].name }}"
+            dns_zone: "{{ network_hosts[inventory_hostname].zone }}"
+
+        - import_role:
+            name: home-automation
+          vars:
+            home_automation_wemo_hosts: "{{ wemo_hosts }}"
+
+        - import_role:
+            name: media-rip
+
+        - import_role:
+            name: media-server
+          vars:
+            media_server_media_mountpoint: "{{ media_mountpoint }}"
+
+        - import_role:
+            name: security
+
+        - import_role:
+            name: transcode
+          vars:
+            transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
+            transcode_media_mountpoint: "{{ media_mountpoint }}"
+
+        - import_role:
+            name: unifi
+
+        - import_role:
+            name: zwave
+
+        - import_role:
+            name: reverse-proxy
+          vars:
+            reverse_proxy_public_site_configs: "{{ public_site_configs }}"
+            reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
+            reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"
+
+        - import_role:
+            name: fail2ban
+          vars:
+            fail2ban_jails: "{{ intrusion_jails }}"
+            fail2ban_filters: "{{ intrusion_filters }}"
+
+        - import_role:
+            name: backup
+          vars:
+            backup_services: "{{ backed_up_services }}"
+            backup_volumes: "{{ backed_up_volumes }}"
+
+        - import_role:
+            name: docker
+          vars:
+            docker_services: "{{ all_docker_services }}"
+            docker_local_volumes: "{{ local_docker_volumes }}"
+            docker_nas_volumes: "{{ nas_docker_volumes }}"
+            docker_nas_ip: "{{ nas_ip }}"
+            docker_extra_networks: "{{ extra_docker_networks }}"
 
     - name: As root
       become: yes
@@ -117,20 +197,9 @@
         group: "{{ item.group | default(omit) }}"
       loop: "{{ directories }}"
 
-    - import_role:
-        name: backup
-      vars:
-        backup_services: "{{ backed_up_services }}"
-        backup_volumes: "{{ backed_up_volumes }}"
-
-    - import_role:
-        name: reverse-proxy
-      vars:
-        reverse_proxy_public_site_configs: "{{ public_site_configs }}"
-        reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
-        reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"
-
     - name: Install configuration files
+      vars:
+        file_vars: "{{ item.vars | default(omit) }}"
       template:
         src: "{{ item.src }}"
         dest: "{{ item.dest }}"
@@ -145,52 +214,14 @@
       notify: "{{ item.notify | default(omit) }}"
 
     - import_role:
-        name: fail2ban
-      vars:
-        fail2ban_jails: "{{ intrusion_jails }}"
-        fail2ban_filters: "{{ intrusion_filters }}"
+        name: shell
 
     - import_role:
-        name: home-automation
+        name: docker-compose
       vars:
-        home_automation_wemo_hosts: "{{ wemo_hosts }}"
-
-  roles:
-    - security
-    - shell
-    - backup
-    - role: certificates
-      vars:
-        certificates_duckdns_token: "{{ ddns_role.provides.duckdns_token }}"
-    - ddns
-    - dhcp
-    - role: dhcp-relay
-      vars:
-        dhcp_relay_dhcp_server_ip: "{{dhcp_role.provides.dhcp_server_ip }}"
-    - role: dns
-      vars:
-        dns_server: "{{ network_hosts[inventory_hostname].name }}"
-        dns_zone: "{{ network_hosts[inventory_hostname].zone }}"
-    - media-rip
-    - role: media-server
-      vars:
-        media_server_media_mountpoint: "{{ media_mountpoint }}"
-    - role: transcode
-      vars:
-        transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
-        transcode_media_mountpoint: "{{ media_mountpoint }}"
-    - unifi
-    - zwave
-    - role: docker
-      vars:
-        docker_local_volumes: "{{ local_docker_volumes }}"
-        docker_nas_volumes: "{{ nas_docker_volumes }}"
-        docker_nas_ip: "{{ nas_ip }}"
-        docker_extra_networks: "{{ extra_docker_networks }}"
         docker_services: "{{ all_docker_services }}"
         docker_services_with_config: "{{ all_docker_services_with_config }}"
 
-  post_tasks:
     - name: As root
       become: yes
       block:

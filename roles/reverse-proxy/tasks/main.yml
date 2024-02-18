@@ -1,12 +1,8 @@
-- name: Load reverse proxy networks
+- name: Load reverse proxy certificates
   set_fact:
-    reverse_proxy_internal_networks: "{{ reverse_proxy_networks }}"
+    __reverse_proxy_certificate_volume: "{{ reverse_proxy_certificate_volume }}"
 
-- name: Install public site configs
-  vars:
-    domain: "{{ reverse_proxy_public_domain }}"
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ public_reverse_proxy_dir }}/nginx/site-confs/{{ item.name }}.conf"
-  with_items: "{{ reverse_proxy_public_site_configs }}"
-  register: reverse_proxy_public_site_config_installation
+- name: Load reverse proxy configuration
+  set_fact:
+    __reverse_proxy_internal_networks: "{{ reverse_proxy_networks }}"
+    __reverse_proxy_public_site_configs: "{{ reverse_proxy_public_site_configs }}"

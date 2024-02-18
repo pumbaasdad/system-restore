@@ -4,8 +4,8 @@
 
 {%- set compose = {'version': '3.8'} -%}
 
-{{- services.configure(docker_services, compose, docker_default_environment, docker_primary_network, dockerfile_dir) -}}
-{{- networks.configure(docker_builtin_networks + docker_extra_networks, compose) -}}
-{{- volumes.configure(docker_local_volumes, docker_nas_volumes, docker_nas_ip, compose) -}}
+{{- services.configure(__docker_services, compose, docker_default_environment, docker_primary_network, dockerfile_dir) -}}
+{{- networks.configure(docker_builtin_networks + __docker_extra_networks, compose) -}}
+{{- volumes.configure(__docker_local_volumes, __docker_nas_volumes, __docker_nas_ip, compose) -}}
 
 {{ compose | to_nice_yaml }}

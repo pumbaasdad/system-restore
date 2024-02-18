@@ -1,8 +1,8 @@
 # Description
 
-This role uses `docker-compose` to run a number of services on the target machine.  All containers will be configured to
-restart unless they are explicitly stopped.  Multiple docker networks will be created in an attempt to isolate the blast
-radius should any container be compromised.
+This role configured `docker-compose` to run a number of services on the target machine.  All containers will be
+configured to restart unless they are explicitly stopped.  Multiple docker networks will be created in an attempt to
+isolate the blast radius should any container be compromised.
 
 ## Networks
 
@@ -33,17 +33,16 @@ receives that traffic must be set in the `public_port` variable.
 | Parameter                   | Member     | Description                                                                   |
 |:----------------------------|:-----------|:------------------------------------------------------------------------------|
 | docker_local_volumes        |            | Local directories which will be available to docker containers as volumes.    |
- |                             | path       | The path to the directory.                                                    |
- |                             | volume     | The name of the volume.                                                       |
- | docker_nas_volumes          |            | NAS directories which will be available to docker containers as volumes.      |
- |                             | path       | The path to the directory on the NAS.                                         |
- |                             | volume     | The name of the volume.                                                       |
- | docker_extra_networks       |            | Non-default networks that roles require.                                      |
- |                             | name       | The name of the network.                                                      |
- |                             | subnet     | Optional. The subnet that will be used by the network.                        | 
- | docker_services             |            | Docker services that will be created.  See details below.                     |
- |                             | config_dir | Optional.  The directory where configuration for the service will be created. |
- | docker_services_with_config |            | Names of docker services that have configuration directories                  |
+|                             | path       | The path to the directory.                                                    |
+|                             | volume     | The name of the volume.                                                       |
+| docker_nas_volumes          |            | NAS directories which will be available to docker containers as volumes.      |
+|                             | path       | The path to the directory on the NAS.                                         |
+|                             | volume     | The name of the volume.                                                       |
+| docker_extra_networks       |            | Non-default networks that roles require.                                      |
+|                             | name       | The name of the network.                                                      |
+|                             | subnet     | Optional. The subnet that will be used by the network.                        | 
+| docker_services             |            | Docker services that will be created.  See details below.                     |
+|                             | config_dir | Optional.  The directory where configuration for the service will be created. |
 | nas_ip                      |            | The IP address of the NAS from which volumes will be mounted.                 |
 
 ## docker_services

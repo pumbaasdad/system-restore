@@ -103,6 +103,8 @@ of the following keys:
                machine being provisioned.
    * `mode` - The permissions that the file will have.  Defaults to the default `umask` on the machine being configured.
    * `notify` - Optional.  The name of an ansible handler to be run when this file is modified.
+   * `vars` - Optional.  A dictionary of variables that should be passed to the template task used to create the file.
+              If provided, the variables wile be available in a variable named `file_vars`
  * `nas_directories`
    * `path` - The path to the directory on the NAS.
    * `volume` - Optional.  The name that should be assigned to this directory when being used as a docker volume.
@@ -163,8 +165,6 @@ of the following keys:
    * `networks`
      * `name` - The name of the docker network to create.
      * `subnet` - Optional.  The subnet that should be used by the network.
- * `files_changed_by_tasks` - A list of files that have been updated by tasks associated with the role.  This should
-                              default to an empty list and use lazy evaluation to return a value if files are modified.
  * `provides` - Optional.  A dictionary of custom values owned by the role that should be available to other roles.
 
 ## Defaults vs Variables

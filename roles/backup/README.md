@@ -30,7 +30,7 @@ You must create a Google Cloud Platform project that will provide this service a
 | Parameter       | Member         | Description                                                                                         |
 |:----------------|:---------------|:----------------------------------------------------------------------------------------------------|
 | backup_services |                | A list of service that need to be backed up.                                                        |
- |                 | name           | The name of the service.                                                                            |
+|                 | name           | The name of the service.                                                                            |
 |                 | container_name | The name of the container in which the service runs.  Only required if it is different than `name`. | 
 | backup_volumes  |                | A list of volume names that need to be backed up.                                                   |
 

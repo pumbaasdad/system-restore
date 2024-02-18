@@ -33,17 +33,17 @@ variables in the `reverse-proxy` role.
 |:--------------------------------|:------------|:------------------------------------------------------------------------------|
 | home_automation_wemo_hosts      |             | A list of wemo devices to be controlled.                                      |
 |                                 | zone        | The name of the DNS zone to which the device belongs.                         |
- |                                 | ipv4_offset | The offset of the devices IP address from the start of the DNS zone's subnet. |
+|                                 | ipv4_offset | The offset of the devices IP address from the start of the DNS zone's subnet. |
 
 # Docker Volumes
 
- | Volume      | Description                                                            |
+| Volume      | Description                                                            |
 |:------------|:-----------------------------------------------------------------------|
- | hass-config | Used to store home assistant configuration.  This volume is backed up. |
- | hass-db     | Used to store the home assistant database.                             |     
+| hass-config | Used to store home assistant configuration.  This volume is backed up. |
+| hass-db     | Used to store the home assistant database.                             |     
 
 # Docker Networks
 
 | Network   | Description                                                                                                                                                          |
 |:----------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | ha-proxy0 | The network used to forward traffic from the reverse proxy to the home automation service.  `iptables` rules limits traffic to port 8123 or established connections. |
+| ha-proxy0 | The network used to forward traffic from the reverse proxy to the home automation service.  `iptables` rules limits traffic to port 8123 or established connections. |
