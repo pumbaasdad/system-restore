@@ -90,3 +90,5 @@ home_automation_role:
       in_interface: "{{ home_automation_network }}"
       cstate: [ ESTABLISHED, RELATED ]
       jump: ACCEPT
+
+home_automation_wemo_hosts: "{{ wemo_hosts }}"

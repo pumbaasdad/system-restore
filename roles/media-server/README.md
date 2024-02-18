@@ -38,9 +38,3 @@ server until it has been initially setup, therefore, initial setup must be done 
 |:-------------------|:------------------------------------------------|
  | media              | Directory where media served by plex is stored. |
  | plex-configuration | Directory where plex configuration is stored.   |
-
-# Parameters
-
-| Parameter                     | Member     | Description                                      |
-|:------------------------------|:-----------|:-------------------------------------------------|
-| media_server_media_mountpoint |            | The NAS mountpoint where media files are stored. |

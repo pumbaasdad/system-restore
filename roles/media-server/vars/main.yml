@@ -32,3 +32,5 @@ media_server_role:
         - 32412:32412/udp
         - 32413:32413/udp
         - 32414:32414/udp
+
+media_server_media_mountpoint: "{{ media_mountpoint }}"
