@@ -8,6 +8,3 @@ fail2ban_role:
     - src: "roles/fail2ban/templates/jail.local.j2"
       dest: "{{ fail2ban_dir }}/jail.local"
   files_changed_by_tasks: "{{ fail2ban_installed_jails.results | default([]) + fail2ban_installed_filters.results | default([]) }}"
-
-fail2ban_jails: "{{ intrusion_jails }}"
-fail2ban_filters: "{{ intrusion_filters }}"

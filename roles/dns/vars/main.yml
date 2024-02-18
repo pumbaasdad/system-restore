@@ -125,6 +125,3 @@ dns_role:
       volumes:
         - "{{ dns_config_volume }}:/etc/bind"
         - "{{ dns_cache_volume }}:/var/cache/bind"
-
-dns_server: "{{ network_hosts[inventory_hostname].name }}"
-dns_zone: "{{ network_hosts[inventory_hostname].zone }}"

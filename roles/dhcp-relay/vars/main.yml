@@ -11,5 +11,3 @@ dhcp_relay_role:
   files:
     - src: roles/dhcp-relay/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ dhcp_relay_service_name }}.Dockerfile"
-
-dhcp_relay_dhcp_server_ip: "{{dhcp_role.provides.dhcp_server_ip }}"

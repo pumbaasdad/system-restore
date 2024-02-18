@@ -14,6 +14,17 @@ assigned a specific IPv4 address so that other services can trust it as an allow
 | reverse_proxy_public_network        | No       | No     | The name of the docker network that is exposed to the public internet.                 | public0                                  |
  | reverse_proxy_public_domain         | Yes      | Yes    | The public domain that the reverse proxy is serving.                                   |                                          |
 
+# Parameters
+
+| Parameter                         | Member       | Description                                                                                                                   |
+|:----------------------------------|:-------------|:------------------------------------------------------------------------------------------------------------------------------|
+| reverse_proxy_public_site_configs |              | Reverse proxy configurations that can be accessed from outside the network.                                                   |
+ |                                   | name         | The name of the reverse proxy.                                                                                                |
+ |                                   | src          | The template that will be used to create the reverse proxy configuration.                                                     |
+ | reverse_proxy_certificate_volume  |              | The name of the volume where SSL certificates are stored.                                                                     |
+ | reverse_proxy_networks            |              | A list of dictionaries that maps networks to which the reverse proxy container will connect to the properties of the network. |
+ |                                   | ipv4_address | The IPv4 address of the reverse proxy container on the network.                                                               |
+
 # Docker Volumes
 
  | Volume              | Description                                                                                                                                                                    |

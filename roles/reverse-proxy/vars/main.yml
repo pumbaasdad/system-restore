@@ -82,7 +82,3 @@ reverse_proxy_role:
       in_interface: "{{ reverse_proxy_public_network }}"
       cstate: [ESTABLISHED, RELATED]
       jump: ACCEPT
-
-reverse_proxy_public_site_configs: "{{ public_site_configs }}"
-reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
-reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"

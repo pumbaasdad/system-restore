@@ -27,6 +27,14 @@ variables in the `reverse-proxy` role.
 | hass_auth_authorize             | Yes      | The path that the reverse proxy will forward to the /auth/authorize endpoint of home assistant.                  |                                    |
 | hass_auth_token                 | Yes      | The path that the reverse proxy will forward to the /auth/token endpoint of home assistant.                      |                                    |
 
+# Parameters
+
+| Parameter                       | Member      | Description                                                                   |
+|:--------------------------------|:------------|:------------------------------------------------------------------------------|
+| home_automation_wemo_hosts      |             | A list of wemo devices to be controlled.                                      |
+|                                 | zone        | The name of the DNS zone to which the device belongs.                         |
+ |                                 | ipv4_offset | The offset of the devices IP address from the start of the DNS zone's subnet. |
+
 # Docker Volumes
 
  | Volume      | Description                                                            |
