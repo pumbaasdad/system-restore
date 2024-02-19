@@ -1,0 +1,45 @@
+- name: Using docker virtual environment
+  vars:
+    ansible_python_interpreter: "{{ docker_compose_virtual_env }}/bin/python3"
+  block:
+    - name: Create docker containers
+      docker_compose:
+        build: yes
+        project_src: "{{ docker_compose_dir }}"
+        restarted: "{{ force_docker_compose_restart | default(false) }}"
+        debug: true
+      register: compose
+
+    - name: Restart docker containers
+      vars:
+        created_services: "{{ compose.actions | selectattr('create', 'defined') | map(attribute='service') }}"
+        started_services: "{{ compose.actions | selectattr('start', 'defined') | map(attribute='service') }}"
+        config_dir: "{{ docker_services | selectattr('name', 'equalto', item) | map(attribute='config_dir') | first }}"
+        config_changed: "{{ (all_changed_files | selectattr('dest', 'match', config_dir) | map(attribute='changed')) is any }}"
+      docker_compose:
+        project_src: "{{ docker_compose_dir }}"
+        restarted: "{{ config_changed }}"
+        services:
+          - "{{ item }}"
+      loop: "{{ docker_services_with_config | difference(created_services) | difference(started_services) }}"
+
+    - name: Prune docker containers
+      community.docker.docker_prune:
+        containers: yes
+        timeout: 300
+
+    - name: Prune docker images 
+      community.docker.docker_prune:
+        images: yes
+        timeout: 300
+
+    - name: Prune docker networks 
+      community.docker.docker_prune:
+        networks: yes
+        timeout: 300
+
+    - name: Prune docker volumes 
+      community.docker.docker_prune:
+        volumes: yes
+        timeout: 300
+

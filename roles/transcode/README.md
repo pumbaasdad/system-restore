@@ -23,6 +23,13 @@ transcoder output directory.
 | transcode_service_name            | No       | The name of the docker-compose service running the transcoder.                                                                                                                                                                                                                                   | handbrake                                                                                |
 | transcode_port                    | No       | The port on which the transcoder's web UI will be available.                                                                                                                                                                                                                                     | 5800                                                                                     |
 
+# Parameters
+
+| Parameter                  | Member | Description                                              |
+|:---------------------------|:-------|:---------------------------------------------------------|
+| transcode_src_volume       |        | The volume that the transcoder will watch for new media. |
+| transcode_media_mountpoint |        | The NAS mountpoint where media files are stored. |
+
 # Docker Volumes
 
 | Volume                | Description                                                                           |

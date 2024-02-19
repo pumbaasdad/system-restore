@@ -1,0 +1,5 @@
+- name: Load DNS Configuration
+  set_fact:
+    __dns_server: "{{ dns_server }}"
+    __dns_zone: "{{ dns_zone }}"
+    __dns_hostname: "{{ dns_server }}.{{ dns_zone }}.{{ network.domain }}.{{ network.suffix }}"

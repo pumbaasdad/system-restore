@@ -1,0 +1,3 @@
+- name: Load Certificate Configuration
+  set_fact:
+    __certificates_duckdns_token: "{{ certificates_duckdns_token }}"

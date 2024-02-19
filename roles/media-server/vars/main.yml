@@ -4,7 +4,7 @@ media_server_role:
       volume:
         name: "{{ media_server_config_volume }}"
   nas_directories:
-    - path: "{{ media_server_media_mountpoint }}"
+    - path: "{{ __media_server_media_mountpoint }}"
       volume:
         name: "{{ media_server_media_volume }}"
   files:
@@ -32,5 +32,3 @@ media_server_role:
         - 32412:32412/udp
         - 32413:32413/udp
         - 32414:32414/udp
-
-media_server_media_mountpoint: "{{ media_mountpoint }}"

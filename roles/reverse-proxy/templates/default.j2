@@ -1,6 +1,6 @@
 server {
-        listen 80{{ ' default_server' if item.nginx_port == 80 else '' }};
-{% if item.nginx_port == 443 %}
+        listen 80{{ ' default_server' if file_vars['nginx_port'] == 80 else '' }};
+{% if file_vars['nginx_port'] == 443 %}
         listen 443 ssl default_server;
         ssl_certificate /config/keys/cert.crt;
         ssl_certificate_key /config/keys/cert.key;

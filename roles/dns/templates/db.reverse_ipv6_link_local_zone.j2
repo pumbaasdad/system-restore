@@ -1,8 +1,8 @@
 {%- import 'db/macros.j2' as macros -%}
 {%- set records = [] -%}
 {%- for zone in network.zones -%}
-    {{- macros.append_records_for_zone(records, zone, dns_zone, dns_root_domain) }}
+    {{- macros.append_records_for_zone(records, zone, __dns_zone, dns_root_domain) }}
 {%- endfor -%}
 {%- set zone_name = ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] -%}
 {%- set record_selector = { 'field': 'origin', 'test': 'equalto', 'value': zone_name } -%}
-{{ macros.print_file(zone_name, dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0)) }}
+{{ macros.print_file(zone_name, __dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0)) }}

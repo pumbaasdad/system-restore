@@ -28,6 +28,8 @@ home_automation_role:
       dest: "{{ hass_dir }}/wemo.yaml"
     - src: roles/home-automation/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ home_automation_service_name }}.Dockerfile"
+    - src: roles/home-automation/templates/configuration.yaml.j2
+      dest: "{{ hass_dir }}/configuration.yaml"
   intrusion_detection:
     jails:
       - jail_name: ha
@@ -64,7 +66,6 @@ home_automation_role:
       - name: "{{ home_automation_network }}"
         subnet: "{{ home_automation_subnet }}"
         internal: true
-  files_changed_by_tasks: "{{ [hass_config | default(None)] | select() }}"
   iptable_rules:
     - chain: INPUT
       in_interface: "{{ home_automation_network }}"
@@ -90,5 +91,3 @@ home_automation_role:
       in_interface: "{{ home_automation_network }}"
       cstate: [ ESTABLISHED, RELATED ]
       jump: ACCEPT
-
-home_automation_wemo_hosts: "{{ wemo_hosts }}"

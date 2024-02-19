@@ -9,5 +9,3 @@ iptables_role:
       dest: /etc/systemd/system/netfilter-persistent.service.d/override.conf
       notify: Reload systemd for netfilter-persistent
   service: netfilter-persistent
-
-iptables_rules: "{{ iptable_rules }}"

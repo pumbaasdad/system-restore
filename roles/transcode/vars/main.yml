@@ -27,8 +27,5 @@ transcode_role:
         - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
       volumes:
         - "{{ transcode_config_volume }}:/config"
-        - "{{ transcode_src_volume }}:/watch"
+        - "{{ __transcode_src_volume }}:/watch"
         - "{{ transcode_destination_volume }}:/output"
-
-transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
-transcode_media_mountpoint: "{{ media_mountpoint }}"

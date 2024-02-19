@@ -1,14 +1,14 @@
 {%- import 'db/macros.j2' as macros -%}
 {%- set records = [] -%}
 {%- for zone in network.zones -%}
-    {{- macros.append_records_for_zone(records, zone, dns_zone, dns_root_domain) }}
+    {{- macros.append_records_for_zone(records, zone, __dns_zone, dns_root_domain) }}
 {%- endfor -%}
-{%- set dns_server_name = dns_server + '.' + dns_zone -%}
+{%- set dns_server_name = __dns_server + '.' + __dns_zone -%}
 {%- set record_selector = { 'field': 'type', 'test': 'equalto', 'value': 'CNAME' } -%}
 {%- set hostnames = (records | selectattr(record_selector.field, record_selector.test, record_selector.value) | map(attribute='host') | map('string')) + [dns_server_name] -%}
 {%- set max_pad = macros.get_max_padding(hostnames) | int -%}
 {%- set ns_record = {'host': dns_server_name, 'type': 'A', 'target_host': dns_host_ip, 'target_zone': ''}  -%}
-{{ macros.print_file(dns_root_domain, dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0), '', max_pad)  }}
+{{ macros.print_file(dns_root_domain, __dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0), '', max_pad)  }}
 {{- macros.print_origin(dns_root_domain) }}
 {{ macros.print_ttl(1, 'week') }}
 {{ macros.print_record(ns_record, max_pad) }}

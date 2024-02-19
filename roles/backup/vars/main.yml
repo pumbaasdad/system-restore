@@ -24,17 +24,14 @@ backup_role:
     service:
       name: "{{ volumerize_service_name }}"
       image: fekide/volumerize
-      volumes: "{{ volumerize_standard_volumes + (volumerize_custom_volumes | default([])) }}"
+      volumes: "{{ volumerize_standard_volumes + (__volumerize_custom_volumes | default([])) }}"
       environment:
         - VOLUMERIZE_SOURCE=/source
         - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
         - VOLUMERIZE_EXCLUDE_1=**/*.log*
         - PASSPHRASE={{ volumerize_passphrase }}
         - VOLUMERIZE_JOBBER_TIME={{ volumerize_schedule }}
-        - VOLUMERIZE_CONTAINERS={{ volumerize_containers_to_stop | default('') }}
+        - VOLUMERIZE_CONTAINERS={{ __volumerize_containers_to_stop | default('') }}
         - VOLUMERIZE_FULL_IF_OLDER_THAN={{ volumerize_full_if_older_than }}
         - REMOVE_ALL_BUT_N_FULL={{ volumerize_remove_all_but_n_full }}
         - REMOVE_ALL_INC_BUT_N_FULL={{ volumerize_all_inc_but_n_full }}
-
-backup_services: "{{ backed_up_services }}"
-backup_volumes: "{{ backed_up_volumes }}"

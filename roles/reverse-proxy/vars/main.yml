@@ -3,10 +3,28 @@ external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
 external_ip: "{{ external_zone.ipv4_subnet | ansible.utils.ipaddr(external_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
 
 reverse_proxy_extra_networks: "{%- set temp_reverse_proxy_extra_networks = { reverse_proxy_public_network: {} } -%}
-                               {%- for network in (reverse_proxy_internal_networks | default([])) -%}
+                               {%- for network in (__reverse_proxy_internal_networks | default([])) -%}
                                {%- set _ = temp_reverse_proxy_extra_networks.update(network) -%}
                                {%- endfor -%}
                                {{- temp_reverse_proxy_extra_networks -}}"
+
+reverse_proxy_public_site_config_files: "{%- set temp_public_site_config_files = [] -%}
+                                         {%- for file in __reverse_proxy_public_site_configs -%}
+                                         {%- set _ = temp_public_site_config_files.append({
+                                             'src': file.src,
+                                             'dest': public_reverse_proxy_dir + '/nginx/site-confs/' + file.name + '.conf',
+                                             'vars': file.vars | default({}) | combine({
+                                                 'domain': reverse_proxy_public_domain,
+                                              })
+                                         }) -%}
+                                         {%- endfor -%}
+                                         {{- temp_public_site_config_files -}}"
+
+reverse_proxy_files:
+  - src: roles/reverse-proxy/templates/nginx.conf.j2
+    dest: "{{ public_reverse_proxy_dir }}/nginx/nginx.conf"
+  - src: roles/reverse-proxy/templates/Dockerfile
+    dest: "{{ dockerfile_dir }}/{{ reverse_proxy_service_name }}.Dockerfile"
 
 reverse_proxy_role:
   directories:
@@ -17,11 +35,7 @@ reverse_proxy_role:
     - path: "{{ public_reverse_proxy_dir }}/log/nginx"
       volume:
         name: "{{ reverse_proxy_log_volume }}"
-  files:
-    - src: roles/reverse-proxy/templates/nginx.conf.j2
-      dest: "{{ public_reverse_proxy_dir }}/nginx/nginx.conf"
-    - src: roles/reverse-proxy/templates/Dockerfile
-      dest: "{{ dockerfile_dir }}/{{ reverse_proxy_service_name }}.Dockerfile"
+  files: "{{ reverse_proxy_files + (reverse_proxy_public_site_config_files | default([])) }}"
   intrusion_detection:
     jails:
       - jail_name: nginx-http-auth
@@ -40,19 +54,20 @@ reverse_proxy_role:
     private_site_configs:
       - src: roles/reverse-proxy/templates/default.j2
         name: default
-        nginx_port: 80
+        vars:
+          nginx_port: 80
     public_site_configs:
       - src: roles/reverse-proxy/templates/default.j2
         name: default
-        nginx_port: 443
-  files_changed_by_tasks: "{{ reverse_proxy_public_site_config_installation.results | default([]) }}"
+        vars:
+          nginx_port: 443
   docker:
     service:
       name: "{{ reverse_proxy_service_name }}"
       config_dir: "{{ public_reverse_proxy_dir }}"
       image: linuxserver/nginx
       volumes:
-        - "{{ reverse_proxy_certificate_volume }}:/config"
+        - "{{ __reverse_proxy_certificate_volume }}:/config"
         - "{{ reverse_proxy_config_volume }}:/config/nginx"
         - "{{ reverse_proxy_log_volume }}:/config/log/nginx"
       ports:
@@ -82,7 +97,3 @@ reverse_proxy_role:
       in_interface: "{{ reverse_proxy_public_network }}"
       cstate: [ESTABLISHED, RELATED]
       jump: ACCEPT
-
-reverse_proxy_public_site_configs: "{{ public_site_configs }}"
-reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
-reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"

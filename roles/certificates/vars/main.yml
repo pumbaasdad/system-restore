@@ -29,12 +29,10 @@ certificates_role:
         - SUBDOMAINS=wildcard
         - URL={{ letsencrypt_url }}
         - VALIDATION=duckdns
-        - DUCKDNSTOKEN={{ ddns_role.provides.duckdns_token }}
+        - DUCKDNSTOKEN={{ __certificates_duckdns_token }}
         - DHLEVEL=2048
       capabilities:
         - NET_ADMIN
       backup: true
   provides:
     certificate_volume: "{{ letsencrypt_certificate_volume }}"
-
-certificates_duckdns_token: "{{ ddns_role.provides.duckdns_token }}"

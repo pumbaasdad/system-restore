@@ -1,0 +1,28 @@
+docker_compose_role:
+  deb_repo:
+    url: "https://download.docker.com/linux/ubuntu"
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+  packages:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - git
+    - software-properties-common
+    - docker-ce
+  service: docker
+  pip_modules:
+    environment: "{{ docker_compose_virtual_env }}"
+    modules:
+    - docker
+    - docker-compose
+  groups:
+    - name: "{{ docker_group_name }}"
+      users:
+        - "{{ ansible_env.USER }}"
+  root_files:
+    - src: roles/docker-compose/templates/daemon.json.j2
+      dest: /etc/docker/daemon.json
+      notify:
+        - Restart docker daemon
+        - Stop docker containers

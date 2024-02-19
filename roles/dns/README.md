@@ -18,3 +18,10 @@ hijack port 53 and sets up `resolve.conf` to use the new name server.
 | dns_cache_volume   | No       | The name of the volume that will be used by bind9 for caching.                      | dns_cache                                                      |
 | dns_service_name   | No       | The name of the docker-compose service that will provide DNS.                       | dns                                                            |
 | dns_container_name | No       | The name of the docker container that will provide DNS.                             | bind9                                                          |
+
+# Parameters
+
+| Parameter  | Member | Description                                   |
+|:-----------|:-------|:----------------------------------------------|
+| dns_server |        | The name of the DNS server, without the zone. |
+| dns_zone   |        | The zone in which the DNS server is located.  |
