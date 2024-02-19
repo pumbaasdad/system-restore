@@ -10,12 +10,13 @@ docker_compose_role:
     - git
     - software-properties-common
     - docker-ce
+    - docker-compose-plugin
   service: docker
   pip_modules:
     environment: "{{ docker_compose_virtual_env }}"
     modules:
     - docker
-    - docker-compose
+    - docker-composer-v2
   groups:
     - name: "{{ docker_group_name }}"
       users:

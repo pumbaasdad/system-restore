@@ -7,7 +7,7 @@
 - name: Stop docker containers
   vars:
     ansible_python_interpreter: "{{ docker_compose_virtual_env }}/bin/python3"
-  docker_compose:
+  community.docker.docker_compose_v2:
     project_src: "{{ docker_compose_dir }}"
-    stopped: yes
+    state: stopped
   loop: "{{ all_changed_files | selectattr('dest', 'match', docker_compose_dir + '/docker-compose.yml') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"

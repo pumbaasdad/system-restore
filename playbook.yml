@@ -182,6 +182,13 @@
           vars:
             iptables_rules: "{{ iptable_rules }}"
 
+    - name: Update pip
+      pip:
+        name: pip
+        state: latest
+        virtualenv: "{{ item }}"
+      loop: "{{ virtual_environments }}"
+
     - name: Install python modules
       pip:
         name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
