@@ -1,1 +1,1 @@
-FROM fekide/volumerize:1.8.2
+FROM fekide/volumerize:1.8.1
