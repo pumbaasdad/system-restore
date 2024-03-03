@@ -6,6 +6,7 @@
       community.docker.docker_compose_v2:
         project_src: "{{ docker_compose_dir }}"
         state: "{{ force_docker_compose_restart | default(false) | ternary('restarted', 'present') }}"
+        build: "always"
       register: compose
 
     - name: Restart docker containers
