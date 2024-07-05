@@ -20,14 +20,16 @@ backup_role:
   files:
     - src: roles/backup/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ volumerize_service_name }}.Dockerfile"
+    - src: roles/backup/templates/google_service_account.json.j2
+      dest: "{{ volumerize_dir }}/credentials/google_service_account.json"
   docker:
     service:
       name: "{{ volumerize_service_name }}"
-      image: fekide/volumerize
       volumes: "{{ volumerize_standard_volumes + (__volumerize_custom_volumes | default([])) }}"
       environment:
         - VOLUMERIZE_SOURCE=/source
-        - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
+        # - VOLUMERIZE_TARGET=gdocs://{{ volumerize_email }}/{{ volumerize_google_drive_dir }}
+        - VOLUMERIZE_TARGET=gdrive://{{ volumerize_google_service_account_email }}?myDriveFolderID={{ volumerize_google_drive_folder_id }}
         - VOLUMERIZE_EXCLUDE_1=**/*.log*
         - PASSPHRASE={{ volumerize_passphrase }}
         - VOLUMERIZE_JOBBER_TIME={{ volumerize_schedule }}
@@ -35,3 +37,4 @@ backup_role:
         - VOLUMERIZE_FULL_IF_OLDER_THAN={{ volumerize_full_if_older_than }}
         - REMOVE_ALL_BUT_N_FULL={{ volumerize_remove_all_but_n_full }}
         - REMOVE_ALL_INC_BUT_N_FULL={{ volumerize_all_inc_but_n_full }}
+        - GOOGLE_SERVICE_JSON_FILE=/credentials/google_service_account.json

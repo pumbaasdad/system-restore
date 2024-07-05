@@ -49,7 +49,6 @@ home_automation_role:
     service:
       name: "{{ home_automation_service_name }}"
       container_name: "{{ home_automation_container_name }}"
-      image: lscr.io/linuxserver/homeassistant:latest
       volumes:
         - "{{ hass_config_volume }}:/config"
         - "{{ hass_db_volume }}:/db"

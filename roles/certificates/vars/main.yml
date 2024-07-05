@@ -18,7 +18,6 @@ certificates_role:
     service:
       name: "{{ letsencrypt_service_name }}"
       config_dir: "{{ fail2ban_dir }}"
-      image: linuxserver/swag
       volumes:
         - "{{ letsencrypt_certificate_volume }}:/config"
         - public-nginx-log:/config/log/nginx-public

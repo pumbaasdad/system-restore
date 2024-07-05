@@ -2,7 +2,6 @@ dhcp_relay_role:
   docker:
     service:
       name: "{{ dhcp_relay_service_name }}"
-      image: pumbaasdad/dhcp-helper
       networks:
         host: true
       capabilities:

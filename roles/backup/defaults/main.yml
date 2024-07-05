@@ -1,8 +1,13 @@
 volumerize_dir: "{{ docker_compose_dir }}/volumerize"
 
 volumerize_passphrase: "{{ secrets['volumerize_passphrase'] }}"
-volumerize_email: "{{ secrets['volumerize_email'] }}"
-volumerize_google_drive_dir: "{{ secrets['volumerize_google_drive_dir'] | default('backups') }}"
+
+volumerize_google_project_id: "{{ secrets['volumerize_google_project_id'] }}"
+volumerize_google_service_account_private_key_id: "{{ secrets['volumerize_google_service_account_private_key_id'] }}"
+volumerize_google_service_account_private_key: "{{ secrets['volumerize_google_service_account_private_key'] }}"
+volumerize_google_service_account_email: "{{ secrets['volumerize_google_service_account_email'] }}"
+volumerize_google_client_id: "{{ secrets['volumerize_google_client_id'] }}"
+volumerize_google_drive_folder_id: "{{ secrets['volumerize_google_drive_folder_id'] }}"
 
 volumerize_cache_volume: volumerize-cache
 volumerize_credentials_volume: volumerize-credentials

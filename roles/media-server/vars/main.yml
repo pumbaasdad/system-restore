@@ -13,7 +13,6 @@ media_server_role:
   docker:
     service:
       name: "{{ media_server_service_name }}"
-      image: linuxserver/plex
       environment:
         - VERSION=docker
       volumes:

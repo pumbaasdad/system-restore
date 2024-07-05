@@ -2,7 +2,7 @@
 {%- import 'networks.j2' as networks -%}
 {%- import 'volumes.j2' as volumes -%}
 
-{%- set compose = {'version': '3.8'} -%}
+{%- set compose = {} -%}
 
 {{- services.configure(__docker_services, compose, docker_default_environment, docker_primary_network, dockerfile_dir) -}}
 {{- networks.configure(docker_builtin_networks + __docker_extra_networks, compose) -}}

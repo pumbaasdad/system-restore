@@ -1,1 +1,1 @@
-FROM fekide/volumerize:1.8.1
+FROM ghcr.io/pumbaasdad/volumerize:latest

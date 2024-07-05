@@ -21,7 +21,6 @@ media_rip_role:
   docker:
     service:
       name: "{{ media_rip_service_name }}"
-      image: jlesage/makemkv
       ports:
         - "{{ media_rip_port }}:5800"
       environment:

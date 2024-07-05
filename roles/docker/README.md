@@ -49,7 +49,6 @@ receives that traffic must be set in the `public_port` variable.
 
 | Member         | Child Member | Required | Description                                                                                                                                             | Default                                           |
 |:---------------|:-------------|:---------|---------------------------------------------------------------------------------------------------------------------------------------------------------|:--------------------------------------------------|
-| image          |              | Yes      | The image that will be used to run the service.                                                                                                         |                                                   |
 | name           |              | Yes      | The name that docker-compose will use to identify the service.  There must be a Dockerfile named `<name>.Dockerfile` in `<dockerfile_dir>/dockerfiles`. |                                                   |
 | container_name |              | No       | The name that will be assigned to the docker container.                                                                                                 | The value of `name`.                              |
 | config_dir     |              | No       | The host directory where configuration for this service is stored.                                                                                      | No value.                                         |
