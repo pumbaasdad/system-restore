@@ -65,7 +65,6 @@ reverse_proxy_role:
     service:
       name: "{{ reverse_proxy_service_name }}"
       config_dir: "{{ public_reverse_proxy_dir }}"
-      image: linuxserver/nginx
       volumes:
         - "{{ __reverse_proxy_certificate_volume }}:/config"
         - "{{ reverse_proxy_config_volume }}:/config/nginx"

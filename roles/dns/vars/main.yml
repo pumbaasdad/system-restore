@@ -116,7 +116,6 @@ dns_role:
     service:
       name: "{{ dns_service_name }}"
       config_dir: "{{ dns_dir }}"
-      image: resystit/bind9
       container_name: "{{ dns_container_name }}"
       ports:
         - "53:53"

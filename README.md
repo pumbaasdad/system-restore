@@ -141,7 +141,6 @@ of the following keys:
      * `container_name` - Optional.  The name of the container used to run the service.  Defaults to the value of
                           `name`.
      * `config_dir` - The directory where configuration for the service will be created.
-     * `image` - The image used to run the service
      * `volumes` - A list of mappings of volume names to container paths
      * `environment` - A list of environment variables that will be set in the container.
      * `ports` - A mapping of host ports to container ports.

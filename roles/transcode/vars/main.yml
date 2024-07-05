@@ -13,7 +13,6 @@ transcode_role:
   docker:
     service:
       name: "{{ transcode_service_name }}"
-      image: jlesage/handbrake
       ports:
         - "{{ transcode_port }}:5800"
       environment:

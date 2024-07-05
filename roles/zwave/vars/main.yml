@@ -19,7 +19,6 @@ zwave_role:
     service:
       name: "{{ zwave_service_name }}"
       config_dir: "{{ zwave_dir }}"
-      image: zwavejs/zwavejs2mqtt:latest
       ports:
         - "{{ zwave_http_port }}:8091"
         - "{{ zwave_websocket_port }}:3000"

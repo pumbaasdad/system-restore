@@ -13,7 +13,6 @@ unifi_role:
   docker:
     service:
       name: "{{ unifi_service_name }}"
-      image: linuxserver/unifi-controller
       volumes:
         - "{{ unifi_volume }}:/config"
       ports:

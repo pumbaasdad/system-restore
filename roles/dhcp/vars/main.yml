@@ -18,7 +18,6 @@ dhcp_role:
     service:
       name: "{{ dhcp_service_name }}"
       config_dir: "{{ dhcp_dir }}"
-      image: networkboot/dhcpd
       volumes:
         - "{{ dhcp_volume }}:/data"
       networks:
