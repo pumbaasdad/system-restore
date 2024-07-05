@@ -9,6 +9,8 @@ volumerize_google_service_account_email: "{{ secrets['volumerize_google_service_
 volumerize_google_client_id: "{{ secrets['volumerize_google_client_id'] }}"
 volumerize_google_drive_folder_id: "{{ secrets['volumerize_google_drive_folder_id'] }}"
 
+volumerize_apprise_url: "{{ secrets['volumerize_apprise_url'] }}"
+
 volumerize_cache_volume: volumerize-cache
 volumerize_credentials_volume: volumerize-credentials
 
