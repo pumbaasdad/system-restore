@@ -15,6 +15,7 @@ This role configures the unifi controller that will be used to manage all unifi 
 | unifi_mongodb_service_name | No       | No     | The name of the docker-compose service running unifi controller's mongodb database.    | unifi-db                           |
 | unifi_mongodb_user         | No       | No     | The name of the user the unifi controller will use to access the mongodb database.     | unifi                              |
 | unifi_mongodb_password     | Yes      | Yes    | The password of the user the unifi controller will use to access the mongodb database. |                                    |
+| unifi_mongodb_dbname       | No       | No     | The name of the mongodb database used by the unifi controller.                         | unifi-db                           |
 
 # Docker Volumes
 

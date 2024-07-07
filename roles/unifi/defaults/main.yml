@@ -8,3 +8,4 @@ unifi_mongodb_volume: unifi-db
 unifi_mongodb_service_name: unifi-db
 unifi_mongodb_user: unifi
 unifi_mongodb_password: "{{ secrets.unifi_mongodb_password }}"
+unifi_mongodb_dbname: unifi-db
