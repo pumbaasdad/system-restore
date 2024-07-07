@@ -1,8 +1,8 @@
 # Description
 
-This role configured `docker-compose` to run a number of services on the target machine.  All containers will be
-configured to restart unless they are explicitly stopped.  Multiple docker networks will be created in an attempt to
-isolate the blast radius should any container be compromised.
+This role configures `docker-compose` to run a number of services on the target machine, but it does not actually run
+`docker-compose`.  All containers will be configured to restart unless they are explicitly stopped.  Multiple docker
+networks will be created in an attempt to isolate the blast radius should any container be compromised.
 
 ## Networks
 
