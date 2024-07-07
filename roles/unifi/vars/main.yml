@@ -7,9 +7,17 @@ unifi_role:
       volume:
         name: "{{ unifi_backups_volume }}"
         backup: true
+    - path: "{{ unifi_dir }}/mongodb/db"
+      volume:
+        name: "{{ unifi_mongodb_volume }}"
+    - path: "{{ unifi_dir }}/mongodb/init"
   files:
     - src: roles/unifi/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ unifi_service_name }}.Dockerfile"
+    - src: roles/unifi/templates/mongodb.Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ unifi_mongodb_service_name }}.Dockerfile"
+    - src: roles/unifi/templates/init-mongo.js.j2
+      dest: "{{ unifi_dir }}/mongodb/init/init-mongo.js"
   docker:
     services:
       - name: "{{ unifi_service_name }}"
@@ -25,3 +33,7 @@ unifi_role:
           - 8880:8880
           - 6789:6789
         backup: true
+      - name: "{{ unifi_mongodb_service_name }}"
+        volumes:
+          - "{{ unifi_mongodb_volume }}:/data/db"
+          - "{{ unifi_dir }}/mongodb/init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro"
