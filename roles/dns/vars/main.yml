@@ -113,13 +113,13 @@ dns_role:
       dest: /etc/resolv.conf
 
   docker:
-    service:
-      name: "{{ dns_service_name }}"
-      config_dir: "{{ dns_dir }}"
-      container_name: "{{ dns_container_name }}"
-      ports:
-        - "53:53"
-        - "53:53/udp"
-      volumes:
-        - "{{ dns_config_volume }}:/etc/bind"
-        - "{{ dns_cache_volume }}:/var/cache/bind"
+    services:
+      - name: "{{ dns_service_name }}"
+        config_dir: "{{ dns_dir }}"
+        container_name: "{{ dns_container_name }}"
+        ports:
+          - "53:53"
+          - "53:53/udp"
+        volumes:
+          - "{{ dns_config_volume }}:/etc/bind"
+          - "{{ dns_cache_volume }}:/var/cache/bind"

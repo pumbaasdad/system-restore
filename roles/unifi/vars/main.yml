@@ -11,17 +11,17 @@ unifi_role:
     - src: roles/unifi/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ unifi_service_name }}.Dockerfile"
   docker:
-    service:
-      name: "{{ unifi_service_name }}"
-      volumes:
-        - "{{ unifi_volume }}:/config"
-      ports:
-        - 3478:3478/udp
-        - 10001:10001/udp
-        - 8080:8080
-        - 8081:8081
-        - "{{ unifi_ui_port }}:8443"
-        - 8843:8843
-        - 8880:8880
-        - 6789:6789
-      backup: true
+    services:
+      - name: "{{ unifi_service_name }}"
+        volumes:
+          - "{{ unifi_volume }}:/config"
+        ports:
+          - 3478:3478/udp
+          - 10001:10001/udp
+          - 8080:8080
+          - 8081:8081
+          - "{{ unifi_ui_port }}:8443"
+          - 8843:8843
+          - 8880:8880
+          - 6789:6789
+        backup: true

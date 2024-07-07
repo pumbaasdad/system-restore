@@ -62,21 +62,21 @@ reverse_proxy_role:
         vars:
           nginx_port: 443
   docker:
-    service:
-      name: "{{ reverse_proxy_service_name }}"
-      config_dir: "{{ public_reverse_proxy_dir }}"
-      volumes:
-        - "{{ __reverse_proxy_certificate_volume }}:/config"
-        - "{{ reverse_proxy_config_volume }}:/config/nginx"
-        - "{{ reverse_proxy_log_volume }}:/config/log/nginx"
-      ports:
-        - "{{ external_ip }}:{{ public_port }}:443"
-        - "{{ external_ip }}:80:80"
-      environment:
-        - DHLEVEL=2048
-      networks:
-        default: false
-        extra: "{{ reverse_proxy_extra_networks }}"
+    services:
+      - name: "{{ reverse_proxy_service_name }}"
+        config_dir: "{{ public_reverse_proxy_dir }}"
+        volumes:
+          - "{{ __reverse_proxy_certificate_volume }}:/config"
+          - "{{ reverse_proxy_config_volume }}:/config/nginx"
+          - "{{ reverse_proxy_log_volume }}:/config/log/nginx"
+        ports:
+          - "{{ external_ip }}:{{ public_port }}:443"
+          - "{{ external_ip }}:80:80"
+        environment:
+          - DHLEVEL=2048
+        networks:
+          default: false
+          extra: "{{ reverse_proxy_extra_networks }}"
     networks:
       - name: "{{ reverse_proxy_public_network }}"
   iptable_rules:
