@@ -1,15 +1,4 @@
 homeassistant:
-  # Name of the location where Home Assistant is running
-  name: Home
-  # Location required to calculate the time the sun rises and sets
-  latitude: 0
-  longitude: 0
-  # Impacts weather/sunrise data (altitude above sea level in meters)
-  elevation: 0
-  # metric for Metric, imperial for Imperial
-  unit_system: metric
-  # Pick yours from here: http://en.wikipedia.org/wiki/List_of_tz_database_time_zones
-  time_zone: UTC
   # Customization file
   customize: !include customize.yaml
   auth_mfa_modules:
@@ -26,8 +15,6 @@ http:
   use_x_forwarded_for: true
   trusted_proxies:
     {{ [home_automation_reverse_proxy_ip] | to_nice_yaml | indent(4) }}
-# Discover some devices automatically
-discovery:
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
@@ -37,9 +24,6 @@ history:
 
 # View all events in a logbook
 logbook:
-
-# Enables a map showing the location of tracked devices
-map:
 
 # Track the sun
 sun:
