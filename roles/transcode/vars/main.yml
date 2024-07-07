@@ -11,20 +11,20 @@ transcode_role:
       volume:
         name: "{{ transcode_destination_volume }}"
   docker:
-    service:
-      name: "{{ transcode_service_name }}"
-      ports:
-        - "{{ transcode_port }}:5800"
-      environment:
-        - USER_ID=1000
-        - GROUP_ID=999
-        - KEEP_APP_RUNNING={{ transcode_keep_app_running }}
-        - AUTOMATED_CONVERSION_PRESET={{ transcode_preset }}
-        - AUTOMATED_CONVERSION_KEEP_SOURCE={{ transcode_keep_source_file }}
-        - AUTOMATED_CONVERSION_OUTPUT_SUBDIR={{ transcode_output_subdir }}
-        - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME={{ transcode_input_stability_seconds }}
-        - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
-      volumes:
-        - "{{ transcode_config_volume }}:/config"
-        - "{{ __transcode_src_volume }}:/watch"
-        - "{{ transcode_destination_volume }}:/output"
+    services:
+      - name: "{{ transcode_service_name }}"
+        ports:
+          - "{{ transcode_port }}:5800"
+        environment:
+          - USER_ID=1000
+          - GROUP_ID=999
+          - KEEP_APP_RUNNING={{ transcode_keep_app_running }}
+          - AUTOMATED_CONVERSION_PRESET={{ transcode_preset }}
+          - AUTOMATED_CONVERSION_KEEP_SOURCE={{ transcode_keep_source_file }}
+          - AUTOMATED_CONVERSION_OUTPUT_SUBDIR={{ transcode_output_subdir }}
+          - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME={{ transcode_input_stability_seconds }}
+          - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
+        volumes:
+          - "{{ transcode_config_volume }}:/config"
+          - "{{ __transcode_src_volume }}:/watch"
+          - "{{ transcode_destination_volume }}:/output"

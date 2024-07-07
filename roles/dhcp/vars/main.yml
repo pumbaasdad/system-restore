@@ -15,14 +15,14 @@ dhcp_role:
     - src: roles/dhcp/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ dhcp_service_name }}.Dockerfile"
   docker:
-    service:
-      name: "{{ dhcp_service_name }}"
-      config_dir: "{{ dhcp_dir }}"
-      volumes:
-        - "{{ dhcp_volume }}:/data"
-      networks:
-        default: false
-        extra: "{{ dhcp_network_configuration }}"
+    services:
+      - name: "{{ dhcp_service_name }}"
+        config_dir: "{{ dhcp_dir }}"
+        volumes:
+          - "{{ dhcp_volume }}:/data"
+        networks:
+          default: false
+          extra: "{{ dhcp_network_configuration }}"
     networks:
       - name: "{{ dhcp_docker_network }}"
         subnet: "{{ dhcp_docker_subnet }}"

@@ -15,23 +15,23 @@ certificates_role:
     - src: roles/certificates/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ letsencrypt_service_name }}.Dockerfile"
   docker:
-    service:
-      name: "{{ letsencrypt_service_name }}"
-      config_dir: "{{ fail2ban_dir }}"
-      volumes:
-        - "{{ letsencrypt_certificate_volume }}:/config"
-        - public-nginx-log:/config/log/nginx-public
-        - "{{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log"
-        - fail2ban-jails:/etc/fail2ban/jail.d
-      environment:
-        - EMAIL={{ letsencrypt_email }}
-        - SUBDOMAINS=wildcard
-        - URL={{ letsencrypt_url }}
-        - VALIDATION=duckdns
-        - DUCKDNSTOKEN={{ __certificates_duckdns_token }}
-        - DHLEVEL=2048
-      capabilities:
-        - NET_ADMIN
-      backup: true
+    services:
+      - name: "{{ letsencrypt_service_name }}"
+        config_dir: "{{ fail2ban_dir }}"
+        volumes:
+          - "{{ letsencrypt_certificate_volume }}:/config"
+          - public-nginx-log:/config/log/nginx-public
+          - "{{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log"
+          - fail2ban-jails:/etc/fail2ban/jail.d
+        environment:
+          - EMAIL={{ letsencrypt_email }}
+          - SUBDOMAINS=wildcard
+          - URL={{ letsencrypt_url }}
+          - VALIDATION=duckdns
+          - DUCKDNSTOKEN={{ __certificates_duckdns_token }}
+          - DHLEVEL=2048
+        capabilities:
+          - NET_ADMIN
+        backup: true
   provides:
     certificate_volume: "{{ letsencrypt_certificate_volume }}"

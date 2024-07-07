@@ -7,21 +7,39 @@ unifi_role:
       volume:
         name: "{{ unifi_backups_volume }}"
         backup: true
+    - path: "{{ unifi_dir }}/mongodb/db"
+      volume:
+        name: "{{ unifi_mongodb_volume }}"
+    - path: "{{ unifi_dir }}/mongodb/init"
   files:
-    - src: roles/unifi/templates/Dockerfile
+    - src: roles/unifi/templates/unifi.Dockerfile
       dest: "{{ dockerfile_dir }}/{{ unifi_service_name }}.Dockerfile"
+    - src: roles/unifi/templates/mongodb.Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ unifi_mongodb_service_name }}.Dockerfile"
+    - src: roles/unifi/templates/init-mongo.js.j2
+      dest: "{{ unifi_dir }}/mongodb/init/init-mongo.js"
   docker:
-    service:
-      name: "{{ unifi_service_name }}"
-      volumes:
-        - "{{ unifi_volume }}:/config"
-      ports:
-        - 3478:3478/udp
-        - 10001:10001/udp
-        - 8080:8080
-        - 8081:8081
-        - "{{ unifi_ui_port }}:8443"
-        - 8843:8843
-        - 8880:8880
-        - 6789:6789
-      backup: true
+    services:
+      - name: "{{ unifi_service_name }}"
+        environment:
+          - MONGO_USER={{ unifi_mongodb_user }}
+          - MONGO_PASS={{ unifi_mongodb_password }}
+          - MONGO_HOST={{ unifi_mongodb_service_name }}
+          - MONGO_PORT=27017
+          - MONGO_DBNAME={{ unifi_mongodb_dbname }}
+        volumes:
+          - "{{ unifi_volume }}:/config"
+        ports:
+          - "{{ unifi_ui_port }}:8443"
+          - 3478:3478/udp
+          - 10001:10001/udp
+          - 8080:8080
+          - 8843:8843
+          - 8880:8880
+          - 6789:6789
+          - 5514:5514/udp
+        backup: true
+      - name: "{{ unifi_mongodb_service_name }}"
+        volumes:
+          - "{{ unifi_mongodb_volume }}:/data/db"
+          - "{{ unifi_dir }}/mongodb/init/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro"

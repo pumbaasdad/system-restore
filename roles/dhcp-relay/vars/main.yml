@@ -1,12 +1,12 @@
 dhcp_relay_role:
   docker:
-    service:
-      name: "{{ dhcp_relay_service_name }}"
-      networks:
-        host: true
-      capabilities:
-        - NET_ADMIN
-      command: -s {{ __dhcp_relay_dhcp_server_ip }}
+    services:
+      - name: "{{ dhcp_relay_service_name }}"
+        networks:
+          host: true
+        capabilities:
+          - NET_ADMIN
+        command: -s {{ __dhcp_relay_dhcp_server_ip }}
   files:
     - src: roles/dhcp-relay/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ dhcp_relay_service_name }}.Dockerfile"

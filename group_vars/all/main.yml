@@ -38,7 +38,7 @@ public_site_configs: "{{ reverse_proxy_configs | selectattr('public_site_configs
 all_reverse_proxy_networks: "{{ reverse_proxy_configs | selectattr('networks', 'defined') | map(attribute='networks') | flatten }}"
 
 docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='docker') | flatten }}"
-all_docker_services: "{{ docker_config | selectattr('service', 'defined') | map(attribute='service') }}"
+all_docker_services: "{{ docker_config | selectattr('services', 'defined') | map(attribute='services') | flatten }}"
 all_docker_services_with_config: "{{ docker_services | selectattr('config_dir', 'defined') | map(attribute='name') }}"
 
 local_docker_volumes: "{{ directories | selectattr('volume', 'defined') }}"

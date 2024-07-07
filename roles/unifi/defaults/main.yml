@@ -3,3 +3,9 @@ unifi_volume: unifi
 unifi_backups_volume: unifi-backup
 unifi_service_name: unifi
 unifi_ui_port: 8443
+
+unifi_mongodb_volume: unifi-db
+unifi_mongodb_service_name: unifi-db
+unifi_mongodb_user: unifi
+unifi_mongodb_password: "{{ secrets.unifi_mongodb_password }}"
+unifi_mongodb_dbname: unifi-db

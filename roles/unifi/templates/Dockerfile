@@ -1,1 +1,0 @@
-FROM linuxserver/unifi-controller:8.0.24

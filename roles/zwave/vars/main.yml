@@ -16,22 +16,22 @@ zwave_role:
     - src: roles/zwave/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ zwave_service_name }}.Dockerfile"
   docker:
-    service:
-      name: "{{ zwave_service_name }}"
-      config_dir: "{{ zwave_dir }}"
-      ports:
-        - "{{ zwave_http_port }}:8091"
-        - "{{ zwave_websocket_port }}:3000"
-      volumes:
-        - "{{ zwave_config_volume }}:/usr/src/app/store"
-      environment:
-        - SESSION_SECRET={{ zwave_session_secret }}
-        - KEY_S0_Legacy={{ zwave_s0_legacy_key }}
-        - KEY_S2_Unauthenticated={{ zwave_s2_unauthenticated_key }}
-        - KEY_S2_Authenticated={{ zwave_s2_authenticated_key }}
-        - KEY_S2_AccessControl={{ zwave_s2_access_control_key }}
-      devices:
-        - /dev/{{ zwave_usbstick_symlink }}:/dev/zwave
-      tty: true
-      stop_signal: SIGINT
-      backup: true
+    services:
+      - name: "{{ zwave_service_name }}"
+        config_dir: "{{ zwave_dir }}"
+        ports:
+          - "{{ zwave_http_port }}:8091"
+          - "{{ zwave_websocket_port }}:3000"
+        volumes:
+          - "{{ zwave_config_volume }}:/usr/src/app/store"
+        environment:
+          - SESSION_SECRET={{ zwave_session_secret }}
+          - KEY_S0_Legacy={{ zwave_s0_legacy_key }}
+          - KEY_S2_Unauthenticated={{ zwave_s2_unauthenticated_key }}
+          - KEY_S2_Authenticated={{ zwave_s2_authenticated_key }}
+          - KEY_S2_AccessControl={{ zwave_s2_access_control_key }}
+        devices:
+          - /dev/{{ zwave_usbstick_symlink }}:/dev/zwave
+        tty: true
+        stop_signal: SIGINT
+        backup: true
