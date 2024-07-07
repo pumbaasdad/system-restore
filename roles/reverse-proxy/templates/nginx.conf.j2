@@ -71,6 +71,9 @@ http {
         '' close;
     }   
 
+    # Enable http2 by default for all servers
+    http2 on;
+
     # Sets the path, format, and configuration for a buffered log write.
     access_log /config/log/nginx/access.log;
 
