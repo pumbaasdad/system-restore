@@ -16,8 +16,8 @@ transcode_role:
         ports:
           - "{{ transcode_port }}:5800"
         environment:
-          - USER_ID=1000
-          - GROUP_ID=999
+          - USER_ID={{ __transcode_uid | default(0) }}
+          - GROUP_ID={{ __transcode_gid | default(0) }}
           - KEEP_APP_RUNNING={{ transcode_keep_app_running }}
           - AUTOMATED_CONVERSION_PRESET={{ transcode_preset }}
           - AUTOMATED_CONVERSION_KEEP_SOURCE={{ transcode_keep_source_file }}
@@ -26,5 +26,5 @@ transcode_role:
           - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
         volumes:
           - "{{ transcode_config_volume }}:/config"
-          - "{{ __transcode_src_volume }}:/watch"
+          - "{{ __transcode_src_volume | default('undefined') }}:/watch"
           - "{{ transcode_destination_volume }}:/output"

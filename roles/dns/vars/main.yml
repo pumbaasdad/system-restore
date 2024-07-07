@@ -17,7 +17,6 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                      'src': 'roles/dns/templates/db.zone.j2',
                      'dest': dns_config_dir + '/db.' + zone.name + '.' + dns_root_domain,
                      'zone_name': zone.name,
-                     'mode': '0644',
                      'notify': 'Update DNS zone serial numbers',
                      'label': zone.name
                  })-%}
@@ -28,7 +27,6 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                      'dest': dns_config_dir + '/db.' + zone_name[:-13],
                      'zone_name': zone.name,
                      'reverse_zone_name': zone_name,
-                     'mode': '0644',
                      'notify': 'Update DNS zone serial numbers',
                      'label': zone_name
                  })-%}
@@ -38,7 +36,6 @@ dns_zone_files: "{%- set temp_zone_files = [] -%}
                      'dest': dns_config_dir + '/db.' + zone_name[:-13],
                      'zone_name': zone.name,
                      'reverse_zone_name': zone_name,
-                     'mode': '0644',
                      'notify': 'Update DNS zone serial numbers',
                      'label': zone_name
                  })-%}                                                  
@@ -49,53 +46,42 @@ dns_files:
   - src: roles/dns/files/db.0
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/db.127
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/db.255
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/db.empty
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/db.local
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/db.root
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/named.conf
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/files/named.conf.default-zones
     dest: "{{ dns_config_dir }}"
     force: no
-    mode: "0644"
   - src: roles/dns/templates/named.conf.local.j2
     dest: "{{ dns_config_dir }}/named.conf.local"
-    mode: "0644"
   - src: roles/dns/templates/named.conf.options.j2
     dest: "{{ dns_config_dir }}/named.conf.options"
-    mode: "0644"
   - src: roles/dns/templates/db.root_zone.j2
     dest: "{{ dns_config_dir }}/db.{{ dns_root_domain }}"
     zone_name: "{{ dns_root_domain }}"
-    mode: "0644"
     notify: Update DNS zone serial numbers
   - src: roles/dns/templates/db.reverse_ipv6_link_local_zone.j2
     dest: "{{ dns_config_dir }}/db.{{ reverse_ipv6_zone }}"
     zone_name: "{{ reverse_ipv6_zone }}"
-    mode: "0644"
     notify: Update DNS zone serial numbers
   - src: roles/dns/templates/Dockerfile
     dest: "{{ dockerfile_dir }}/{{ dns_service_name }}.Dockerfile"
+
 
 dns_role:
   directories:
@@ -103,6 +89,7 @@ dns_role:
       volume:
         name: "{{ dns_config_volume }}"
     - path: "{{ dns_cache_dir }}"
+      group: 101
       volume:
         name: "{{ dns_cache_volume }}"
   disabled_services:

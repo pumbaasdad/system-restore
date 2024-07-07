@@ -1,0 +1,12 @@
+docker_config_role:
+  files:
+    - src: roles/docker-config/templates/docker-compose.yml.j2
+      dest: "{{ docker_compose_dir }}/docker-compose.yml"
+
+docker_builtin_networks:
+  - name: "{{ docker_primary_network }}"
+
+docker_default_environment:
+  - TZ={{ TZ }}
+  - PUID={{ __docker_config_uid }}
+  - PGID={{ __docker_config_gid }}

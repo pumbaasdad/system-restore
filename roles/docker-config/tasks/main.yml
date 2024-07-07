@@ -5,3 +5,5 @@
     __docker_nas_volumes: "{{ docker_nas_volumes }}"
     __docker_nas_ip: "{{ docker_nas_ip }}"
     __docker_extra_networks: "{{ docker_extra_networks }}"
+    __docker_config_uid: "{{ docker_config_puid }}"
+    __docker_config_gid: "{{ docker_config_pgid }}"

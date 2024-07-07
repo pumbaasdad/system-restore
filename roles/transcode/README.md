@@ -25,10 +25,12 @@ transcoder output directory.
 
 # Parameters
 
-| Parameter                  | Member | Description                                              |
-|:---------------------------|:-------|:---------------------------------------------------------|
-| transcode_src_volume       |        | The volume that the transcoder will watch for new media. |
-| transcode_media_mountpoint |        | The NAS mountpoint where media files are stored. |
+| Parameter                  | Member | Description                                                             |
+|:---------------------------|:-------|:------------------------------------------------------------------------|
+| transcode_src_volume       |        | The volume that the transcoder will watch for new media.                |
+| transcode_media_mountpoint |        | The NAS mountpoint where media files are stored.                        |
+| transcode_uid              |        | The id of the user that should be used to run the transcode container.  |
+| transcode_gid              |        | The id of the group that should be used to run the transcode container. |
 
 # Docker Volumes
 

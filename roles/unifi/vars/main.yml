@@ -8,6 +8,7 @@ unifi_role:
         name: "{{ unifi_backups_volume }}"
         backup: true
     - path: "{{ unifi_dir }}/mongodb/db"
+      owner: 999
       volume:
         name: "{{ unifi_mongodb_volume }}"
     - path: "{{ unifi_dir }}/mongodb/init"
