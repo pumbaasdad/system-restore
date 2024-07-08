@@ -52,9 +52,6 @@
             home_automation_wemo_hosts: "{{ wemo_hosts }}"
 
         - import_role:
-            name: media-rip
-
-        - import_role:
             name: media-server
           vars:
             media_server_media_mountpoint: "{{ media_mountpoint }}"
@@ -63,16 +60,48 @@
             name: security
 
         - import_role:
-            name: transcode
-          vars:
-            transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
-            transcode_media_mountpoint: "{{ media_mountpoint }}"
-
-        - import_role:
             name: unifi
 
         - import_role:
             name: zwave
+
+        - import_role:
+            name: docker
+
+    - name: As root
+      become: yes
+      block:
+        - name: Create users
+          user:
+            name: "{{ item }}"
+          loop: "{{ users }}"
+          register: system_users
+
+        - name: Create groups
+          group:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ user_group_names }}"
+          register: system_groups
+
+    - name: Import roles requiring users
+      vars:
+        puid: "{{ (system_users.results | selectattr('name', 'equalto', docker_role.provides.docker_user) | first)['uid'] }}"
+        pgid: "{{ (system_groups.results | selectattr('name', 'equalto', docker_role.provides.docker_group) | first)['gid'] }}"
+      block:
+        - import_role:
+            name: media-rip
+          vars:
+            media_rip_puid: "{{ puid }}"
+            media_rip_pgid: "{{ pgid }}"
+
+        - import_role:
+            name: transcode
+          vars:
+            transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
+            transcode_media_mountpoint: "{{ media_mountpoint }}"
+            transcode_puid: "{{ puid }}"
+            transcode_pgid: "{{ pgid }}"
 
         - import_role:
             name: reverse-proxy
@@ -94,23 +123,19 @@
             backup_volumes: "{{ backed_up_volumes }}"
 
         - import_role:
-            name: docker
+            name: docker-config
           vars:
             docker_services: "{{ all_docker_services }}"
             docker_local_volumes: "{{ local_docker_volumes }}"
             docker_nas_volumes: "{{ nas_docker_volumes }}"
             docker_nas_ip: "{{ nas_ip }}"
             docker_extra_networks: "{{ extra_docker_networks }}"
+            docker_config_puid: "{{ puid }}"
+            docker_config_pgid: "{{ pgid }}"
 
     - name: As root
       become: yes
       block:
-        - name: Create groups
-          group:
-            name: "{{ item }}"
-            state: present
-          loop: "{{ user_group_names }}"
-
         - name: Add users to groups
           user:
             name: "{{ item.1 }}"
@@ -182,6 +207,31 @@
           vars:
             iptables_rules: "{{ iptable_rules }}"
 
+        - name: Create files and directories
+          file:
+            path: "{{ item.path }}"
+            state: directory
+            owner: "{{ item.owner | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
+            group: "{{ item.group | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
+            mode: "{{ item.mode | default(item.path.startswith(docker_compose_dir) | ternary('0775', omit)) }}"
+          loop: "{{ directories }}"
+
+        - name: Install configuration files
+          vars:
+            file_vars: "{{ item.vars | default(omit) }}"
+          template:
+            src: "{{ item.src }}"
+            dest: "{{ item.dest }}"
+            force: "{{ item.force | default(omit) }}"
+            owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
+            group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
+            mode: "{{ item.mode | default(item.dest.startswith(docker_compose_dir) | ternary('0664', omit)) }}"
+          loop: "{{ files }}"
+          loop_control:
+            label: "{{ item.label | default(item) }}"
+          register: changed_files
+          notify: "{{ item.notify | default(omit) }}"
+
     - name: Update pip
       pip:
         name: pip
@@ -196,30 +246,6 @@
         virtualenv: "{{ item }}"
       loop: "{{ virtual_environments }}"
 
-    - name: Create directories
-      file:
-        path: "{{ item.path }}"
-        state: directory
-        owner: "{{ item.owner | default(omit) }}"
-        group: "{{ item.group | default(omit) }}"
-      loop: "{{ directories }}"
-
-    - name: Install configuration files
-      vars:
-        file_vars: "{{ item.vars | default(omit) }}"
-      template:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        force: "{{ item.force | default(omit) }}"
-        owner: "{{ item.owner | default(omit) }}"
-        group: "{{ item.group | default(omit) }}"
-        mode: "{{ item.mode | default(omit) }}"
-      loop: "{{ files }}"
-      loop_control:
-        label: "{{ item.label | default(item) }}"
-      register: changed_files
-      notify: "{{ item.notify | default(omit) }}"
-
     - import_role:
         name: shell
 
@@ -228,6 +254,7 @@
       vars:
         docker_services: "{{ all_docker_services }}"
         docker_services_with_config: "{{ all_docker_services_with_config }}"
+        docker_compose_user: "{{ docker_role.provides.docker_user }}"
 
     - name: As root
       become: yes

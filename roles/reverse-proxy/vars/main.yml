@@ -66,7 +66,7 @@ reverse_proxy_role:
       - name: "{{ reverse_proxy_service_name }}"
         config_dir: "{{ public_reverse_proxy_dir }}"
         volumes:
-          - "{{ __reverse_proxy_certificate_volume }}:/config"
+          - "{{ __reverse_proxy_certificate_volume | default('undefined') }}:/config"
           - "{{ reverse_proxy_config_volume }}:/config/nginx"
           - "{{ reverse_proxy_log_volume }}:/config/log/nginx"
         ports:

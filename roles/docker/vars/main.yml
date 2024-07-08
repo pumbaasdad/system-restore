@@ -17,24 +17,19 @@ docker_role:
     modules:
     - docker
     - docker-composer-v2
+  users:
+    - "{{ docker_user_name }}"
   groups:
     - name: "{{ docker_group_name }}"
       users:
         - "{{ ansible_env.USER }}"
+        - "{{ docker_user_name }}"
   root_files:
     - src: roles/docker/templates/daemon.json.j2
       dest: /etc/docker/daemon.json
       notify:
         - Restart docker daemon
         - Stop docker containers
-  files:
-    - src: roles/docker/templates/docker-compose.yml.j2
-      dest: "{{ docker_compose_dir }}/docker-compose.yml"
-
-docker_builtin_networks:
-  - name: "{{ docker_primary_network }}"
-
-docker_default_environment:
-  - TZ={{ TZ }}
-  - PUID=1000
-  - PGID=999
+  provides:
+    docker_user: "{{ docker_user_name }}"
+    docker_group: "{{ docker_group_name }}"

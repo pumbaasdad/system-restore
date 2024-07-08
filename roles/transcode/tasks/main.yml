@@ -1,4 +1,6 @@
-- name: Load Transcode Relay Configuration
+- name: Load Transcode Configuration
   set_fact:
     __transcode_src_volume: "{{ transcode_src_volume }}"
     __transcode_media_mountpoint: "{{ transcode_media_mountpoint }}"
+    __transcode_uid: "{{ transcode_puid }}"
+    __transcode_gid: "{{ transcode_pgid }}"

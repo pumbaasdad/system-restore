@@ -1,4 +1,5 @@
 - name: Using docker virtual environment
+  become_user: "{{ docker_compose_user }}"
   vars:
     ansible_python_interpreter: "{{ docker_compose_virtual_env }}/bin/python3"
   block:
