@@ -1,4 +1,0 @@
-- name: Load Transcode Configuration
-  set_fact:
-    __media_rip_uid: "{{ media_rip_puid }}"
-    __media_rip_gid: "{{ media_rip_pgid }}"

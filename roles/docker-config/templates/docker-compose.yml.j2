@@ -4,7 +4,7 @@
 
 {%- set compose = {} -%}
 
-{{- services.configure(__docker_services, compose, docker_default_environment, docker_primary_network, dockerfile_dir) -}}
+{{- services.configure(__docker_services, compose, docker_default_args, docker_default_environment, docker_primary_network, dockerfile_dir) -}}
 {{- networks.configure(docker_builtin_networks + __docker_extra_networks, compose) -}}
 {{- volumes.configure(__docker_local_volumes, __docker_nas_volumes, __docker_nas_ip, compose) -}}
 
