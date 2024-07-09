@@ -19,13 +19,6 @@ The container is configured to automatically rip any media inserted into the PC.
 | media_rip_port                        | No       | The port on which the `MakeMKV` web UI will be available.                                               | 5801                                                |
 | media_rip_config_volume               | No       | The name of the volume into which ripped media will be stored.                                          | media_rip_config                                    |
 
-# Parameters
-
-| Parameter     | Member | Description                                                             |
-|:--------------|:-------|:------------------------------------------------------------------------|
-| media_rip_uid |        | The id of the user that should be used to run the media rip container.  |
-| media_rip_gid |        | The id of the group that should be used to run the media rip container. |
-
 # Docker Volumes
 
 | Volume                | Description                                                            |

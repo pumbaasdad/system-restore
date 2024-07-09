@@ -1,5 +1,5 @@
-{%- macro configure_build(service, service_definition, dockerfiles_dir) -%}
-    {%- set build = { 'context': dockerfiles_dir, 'dockerfile': service.name + '.Dockerfile' } -%}
+{%- macro configure_build(service, service_definition, dockerfiles_dir, default_args) -%}
+    {%- set build = { 'context': dockerfiles_dir, 'dockerfile': service.name + '.Dockerfile', 'args': default_args } -%}
     {%- set _ = service_definition.update({ 'build': build }) -%}
 {%- endmacro -%}
 
@@ -51,10 +51,10 @@
     {%- set _ = service_definition.update({ 'environment': environment }) -%}
 {%- endmacro -%}
 
-{%- macro configure_service(service, services, default_environment, primary_network_name, dockerfiles_dir) -%}
+{%- macro configure_service(service, services, default_args, default_environment, primary_network_name, dockerfiles_dir) -%}
     {%- set service_definition = {} -%}
 
-    {{- configure_build(service, service_definition, dockerfiles_dir) -}}
+    {{- configure_build(service, service_definition, dockerfiles_dir, default_args) -}}
 
     {{- configure_value('command', service, service_definition) -}}
     {{- configure_value('tty', service, service_definition) -}}
@@ -75,10 +75,10 @@
     {%- set _ = services.update({ service.name: service_definition }) %}
 {%- endmacro -%}
 
-{%- macro configure(services, compose, default_environment, primary_network_name, dockerfiles_dir) -%}
+{%- macro configure(services, compose, default_args, default_environment, primary_network_name, dockerfiles_dir) -%}
     {%- set docker_services = {} -%}
     {%- for service in services -%}
-        {{- configure_service(service, docker_services, default_environment, primary_network_name, dockerfiles_dir) -}}
+        {{- configure_service(service, docker_services, default_args, default_environment, primary_network_name, dockerfiles_dir) -}}
     {%- endfor -%}
 
     {%- set _ = compose.update({'services': docker_services}) -%}

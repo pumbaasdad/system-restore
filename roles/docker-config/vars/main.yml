@@ -10,3 +10,7 @@ docker_default_environment:
   - TZ={{ TZ }}
   - PUID={{ __docker_config_uid }}
   - PGID={{ __docker_config_gid }}
+
+docker_default_args:
+  - PUID={{ __docker_config_uid }}
+  - PGID={{ __docker_config_gid }}

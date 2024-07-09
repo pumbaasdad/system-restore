@@ -68,40 +68,14 @@
         - import_role:
             name: docker
 
-    - name: As root
-      become: yes
-      block:
-        - name: Create users
-          user:
-            name: "{{ item }}"
-          loop: "{{ users }}"
-          register: system_users
-
-        - name: Create groups
-          group:
-            name: "{{ item }}"
-            state: present
-          loop: "{{ user_group_names }}"
-          register: system_groups
-
-    - name: Import roles requiring users
-      vars:
-        puid: "{{ (system_users.results | selectattr('name', 'equalto', docker_role.provides.docker_user) | first)['uid'] }}"
-        pgid: "{{ (system_groups.results | selectattr('name', 'equalto', docker_role.provides.docker_group) | first)['gid'] }}"
-      block:
         - import_role:
             name: media-rip
-          vars:
-            media_rip_puid: "{{ puid }}"
-            media_rip_pgid: "{{ pgid }}"
 
         - import_role:
             name: transcode
           vars:
             transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
             transcode_media_mountpoint: "{{ media_mountpoint }}"
-            transcode_puid: "{{ puid }}"
-            transcode_pgid: "{{ pgid }}"
 
         - import_role:
             name: reverse-proxy
@@ -122,16 +96,32 @@
             backup_services: "{{ backed_up_services }}"
             backup_volumes: "{{ backed_up_volumes }}"
 
-        - import_role:
-            name: docker-config
-          vars:
-            docker_services: "{{ all_docker_services }}"
-            docker_local_volumes: "{{ local_docker_volumes }}"
-            docker_nas_volumes: "{{ nas_docker_volumes }}"
-            docker_nas_ip: "{{ nas_ip }}"
-            docker_extra_networks: "{{ extra_docker_networks }}"
-            docker_config_puid: "{{ puid }}"
-            docker_config_pgid: "{{ pgid }}"
+    - name: As root
+      become: yes
+      block:
+        - name: Create users
+          user:
+            name: "{{ item }}"
+          loop: "{{ users }}"
+          register: system_users
+
+        - name: Create groups
+          group:
+            name: "{{ item }}"
+            state: present
+          loop: "{{ user_group_names }}"
+          register: system_groups
+
+    - import_role:
+        name: docker-config
+      vars:
+        docker_services: "{{ all_docker_services }}"
+        docker_local_volumes: "{{ local_docker_volumes }}"
+        docker_nas_volumes: "{{ nas_docker_volumes }}"
+        docker_nas_ip: "{{ nas_ip }}"
+        docker_extra_networks: "{{ extra_docker_networks }}"
+        docker_config_puid: "{{ (system_users.results | selectattr('name', 'equalto', docker_role.provides.docker_user) | first)['uid'] }}"
+        docker_config_pgid: "{{ (system_groups.results | selectattr('name', 'equalto', docker_role.provides.docker_group) | first)['gid'] }}"
 
     - name: As root
       become: yes

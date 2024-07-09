@@ -78,8 +78,17 @@ options are supported.
 
 The following environment variables will be provided to all services:
 
-| Variable | Description                                                                          |
-|:---------|:-------------------------------------------------------------------------------------|
-| TZ       | The timezone in which the container is running.                                      |
-| PUID     | The ID of the user on the host machine that is responsible for running the service.  |
-| PGID     | The ID of the group on the host machine that is responsible for running the service. |
+| Variable | Description                                                    |
+|:---------|:---------------------------------------------------------------|
+| TZ       | The timezone in which the container is running.                |
+| PUID     | The value of the `docker_config_uid` parameter to this module. |
+| PGID     | The value of the `docker_config_gid` parameter to this module. |
+
+### Default Args
+
+The following arguments will be provided to dockerfiles when they are built:
+
+| Variable | Description                                                    |
+|:---------|:---------------------------------------------------------------|
+| PUID     | The value of the `docker_config_uid` parameter to this module. |
+| PGID     | The value of the `docker_config_gid` parameter to this module. |
