@@ -74,6 +74,7 @@ of the following keys:
    * `path` - The path of a directory that will be created by `ansible_become_user`.
    * `owner` - The owner of the directory.  Defaults to `ansible_become_user`.
    * `group` - The group that owns the directory.  Defaults to the group of `ansible_become_user`.
+   * `mode` - The permissions that the directory will have.  Defaults to the default `umask` on the machine being configured.
  * `root_files`
    * `dest` - A file that will be created by `ansible_become_user`.
    * `src` - The source template to use to create the file.
@@ -90,6 +91,8 @@ of the following keys:
                provisioned.
    * `group` - The group that owns the directory.  Defaults to the group of the user that ansible uses to connect to the
                machine being provisioned.
+   * `mode` - The permissions that the directory will have.  For directories in `docker_compose_dir` defaults to 0755.
+              For other directories defaults to the default `umask` on the machine being configured.
    * `volume` - Optional.  Describes how the directory will be mounted to containers.  If no
      * `name` - Required.  The name that should be assigned to this directory if it is to be used as a docker volume.
      * `backup` - Optional.  If this directory needs to be backed up.
@@ -97,11 +100,12 @@ of the following keys:
    * `dest` - A file that will be created by the user that ansible uses to connect to the machine being provisioned.
    * `src` - The source template to use to create the file.
    * `force` - If the file should be replaced if it already exists.  Defaults to `true`.
-   * `owner` - The owner of the file.  Defaults to the user that ansible uses to connect to the machine being
-               provisioned.
-   * `group` - The group that owns the file.  Defaults to the group of the user that ansible uses to connect to the
-               machine being provisioned.
-   * `mode` - The permissions that the file will have.  Defaults to the default `umask` on the machine being configured.
+   * `owner` - The owner of the file.  For files in `docker_compose_dir` defaults to `docker_user`.  For other files,
+               defaults to `ansible_env.USER`.
+   * `group` - The group that owns the file.  For directories in `docker_compose_dir` defaults to `docker_group`.  For
+               other directories, defaults to the primary group of `ansible_env.USER`.
+   * `mode` - The permissions that the file will have.  For files in `docker_compose_dir` defaults to 644.  For other
+              files defaults to the default `umask` on the machine being configured.
    * `notify` - Optional.  The name of an ansible handler to be run when this file is modified.
    * `vars` - Optional.  A dictionary of variables that should be passed to the template task used to create the file.
               If provided, the variables wile be available in a variable named `file_vars`
