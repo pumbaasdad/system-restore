@@ -1,1 +1,7 @@
-FROM resystit/bind9@sha256:b9d834c7ca1b3c0fb32faedc786f2cb96fa2ec00976827e3f0c44f647375e18c
+FROM ubuntu/bind9:9.18-24.04_beta
+
+ARG PUID
+ARG PGID
+
+RUN groupadd -g $PGID docker; \
+    useradd -g $PGID -MN -s /sbin/nologin -u $PUID docker
