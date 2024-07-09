@@ -89,7 +89,6 @@ dns_role:
       volume:
         name: "{{ dns_config_volume }}"
     - path: "{{ dns_cache_dir }}"
-      group: 101
       volume:
         name: "{{ dns_cache_volume }}"
   disabled_services:
@@ -104,6 +103,8 @@ dns_role:
       - name: "{{ dns_service_name }}"
         config_dir: "{{ dns_dir }}"
         container_name: "{{ dns_container_name }}"
+        environment:
+          - BIND9_USER=docker
         ports:
           - "53:53"
           - "53:53/udp"
