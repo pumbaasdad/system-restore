@@ -12,11 +12,6 @@ This network is supposed to be the general purpose network used by all docker co
 by the public internet.  It fails in that regard as `plex` needs to be publicly accessible but is currently on this
 network.  `plex` should be moved to an internal network behind the reverse proxy.
 
-# Initial Setup
-
-You must configure a port on your router that will forward traffic to the server being configured.  The port that
-receives that traffic must be set in the `public_port` variable. 
-
 # Variables
 
 | Variable                   | Required | Secret | Description                                                                                                        | Default         |

@@ -6,3 +6,5 @@ reverse_proxy_config_volume: public-nginx-config
 reverse_proxy_log_volume: public-nginx-log
 reverse_proxy_service_name: public-nginx
 reverse_proxy_public_network: public0
+
+public_port: "{{ secrets['public_port'] | default(12345) }}"
