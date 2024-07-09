@@ -3,16 +3,22 @@
 This role provides a reverse proxy for accessing other services running on the server being configured.  The service is
 assigned a specific IPv4 address so that other services can trust it as an allowed proxy.
 
+# Initial Setup
+
+You must configure a port on your router that will forward traffic to the server being configured.  The port that
+receives that traffic must be set in the `public_port` variable.
+
 # Variables
 
-| Variable                            | Required | Secret | Description                                                                            | Default                                  |
-|:------------------------------------|:---------|:-------|:---------------------------------------------------------------------------------------|:-----------------------------------------|
-| public_reverse_proxy_dir            | No       | No     | The directory in which nginx configuration will be stored.                             | `{{ docker_compose_dir }}/nginx-public`  |
-| reverse_proxy_config_volume         | No       | No     | The name of the volume used to store reverse proxy configuration.                      | public-nginx-config                      |
-| reverse_proxy_log_volume            | No       | No     | The name of the volume used to store reverse proxy logs.                               | public-nginx-log                         |
-| reverse_proxy_service_name          | No       | No     | The name of the docker-compose service that runs the reverse proxy.                    | public-nginx                             |
-| reverse_proxy_public_network        | No       | No     | The name of the docker network that is exposed to the public internet.                 | public0                                  |
-| reverse_proxy_public_domain         | Yes      | Yes    | The public domain that the reverse proxy is serving.                                   |                                          |
+| Variable                     | Required | Secret | Description                                                                                                                 | Default                                 |
+|:-----------------------------|:---------|:-------|:----------------------------------------------------------------------------------------------------------------------------|:----------------------------------------|
+| public_reverse_proxy_dir     | No       | No     | The directory in which nginx configuration will be stored.                                                                  | `{{ docker_compose_dir }}/nginx-public` |
+| reverse_proxy_config_volume  | No       | No     | The name of the volume used to store reverse proxy configuration.                                                           | public-nginx-config                     |
+| reverse_proxy_log_volume     | No       | No     | The name of the volume used to store reverse proxy logs.                                                                    | public-nginx-log                        |
+| reverse_proxy_service_name   | No       | No     | The name of the docker-compose service that runs the reverse proxy.                                                         | public-nginx                            |
+| reverse_proxy_public_network | No       | No     | The name of the docker network that is exposed to the public internet.                                                      | public0                                 |
+| reverse_proxy_public_domain  | Yes      | Yes    | The public domain that the reverse proxy is serving.                                                                        |                                         |
+| public_port                  | Yes      | Yes    | The port that has been setup on your router to forward packets to the interface connected to reverse_proxy_public_network`. |                                         |
 
 # Parameters
 
