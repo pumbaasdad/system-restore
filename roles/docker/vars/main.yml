@@ -14,11 +14,6 @@ docker_role:
     - docker-ce
     - docker-compose-plugin
   service: docker
-  pip_modules:
-    environment: "{{ docker_compose_virtual_env }}"
-    modules:
-    - docker
-    - docker-composer-v2
   users:
     - "{{ docker_user_name }}"
   groups:
