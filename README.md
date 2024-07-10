@@ -25,7 +25,8 @@ The following variables must be defined for the playbook to run:
 |:-------------------|:------------------------------------------------------------------------------------------------------------|
 | docker_compose_dir | The root directory that will contain configuration for all services running on the server being configured. |
 
-A `become_password` must also be defined in your network configuration for the host being configured.
+A `<ansible_username>_password` must also be defined in your secrets that specifies the password the ansible user should
+use when using `sudo`.
  
 # Running
 
@@ -227,7 +228,6 @@ external: An optional boolean that should only be set to true on the host being 
 internal: An optional boolean that should only be set to true on the host being configured by ansible.  It indicates
           that this is the interface of the host that is not exposed to the public internet.  If unspecified, false is
           assumed (i.e. this is not the internal interface of the host being configured).
-become_password: The password used by ansible to elevate privileges while provisioning this host.
 wemo: If this is a wemo device that will be controlled by home-automation services.  If unspeciid, false is assumed.
 nas: Optional details about a NAS host.  Only one device may have this configuration.
 ```
