@@ -12,10 +12,8 @@ packages: "{{ role_vars | selectattr('packages', 'defined') | sum(attribute='pac
 services: "{{ role_vars | selectattr('service', 'defined') | map(attribute='service') | list }}"
 all_udev_devices: "{{ role_vars | selectattr('udev_devices', 'defined') | map(attribute='udev_devices') | flatten }}"
 directories: "{{ (role_vars | selectattr('directories', 'defined') | map(attribute='directories') | flatten) + [{ 'path': dockerfile_dir}] }}"
-root_directories: "{{ role_vars | selectattr('root_directories', 'defined') | map(attribute='root_directories') | flatten }}"
 nas_directories: "{{ role_vars | selectattr('nas_directories', 'defined') | map(attribute='nas_directories') | flatten }}"
 files: "{{ role_vars | selectattr('files', 'defined') | map(attribute='files') | flatten }}"
-root_files: "{{ role_vars | selectattr('root_files', 'defined') | map(attribute='root_files') | flatten }}"
 iptable_rules: "{{ role_vars | selectattr('iptable_rules', 'defined') | map(attribute='iptable_rules') | flatten }}"
 disabled_services: "{{ role_vars | selectattr('disabled_services', 'defined') | map(attribute='disabled_services') | flatten | unique }}"
 
@@ -52,7 +50,7 @@ backed_up_volumes: "{{ local_docker_volumes | map(attribute='volume') | selectat
 
 extra_docker_networks: "{{ docker_config | selectattr('networks', 'defined') | map(attribute='networks') | flatten }}"
 
-all_changed_files: "{{ changed_files.results + changed_root_files.results }}"
+all_changed_files: "{{ changed_files.results }}"
 
 lastpass_secrets_path: Infrastructure/Secrets
 

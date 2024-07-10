@@ -178,28 +178,6 @@
             enabled: no
           loop: "{{ disabled_services }}"
 
-        - name: Create root directories
-          file:
-            path: "{{ item.path }}"
-            state: directory
-            owner: "{{ item.owner | default(omit) }}"
-            group: "{{ item.group | default(omit) }}"
-          loop: "{{ root_directories }}"
-
-        - name: Install root configuration files
-          template:
-            src: "{{ item.src }}"
-            dest: "{{ item.dest }}"
-            force: "{{ item.force | default(omit) }}"
-            owner: "{{ item.owner | default(omit) }}"
-            group: "{{ item.group | default(omit) }}"
-            mode: "{{ item.mode | default(omit) }}"
-          loop: "{{ root_files }}"
-          loop_control:
-            label: "{{ item.label | default(item) }}"
-          register: changed_root_files
-          notify: "{{ item.notify | default(omit) }}"
-
         - import_role:
             name: udev
           vars:
