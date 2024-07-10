@@ -1,4 +1,5 @@
 - name: Using docker virtual environment
+  become: true
   become_user: "{{ docker_compose_user }}"
   vars:
     ansible_python_interpreter: "{{ docker_compose_virtual_env }}/bin/python3"
@@ -28,17 +29,17 @@
         containers: yes
         timeout: 300
 
-    - name: Prune docker images 
+    - name: Prune docker images
       community.docker.docker_prune:
         images: yes
         timeout: 300
 
-    - name: Prune docker networks 
+    - name: Prune docker networks
       community.docker.docker_prune:
         networks: yes
         timeout: 300
 
-    - name: Prune docker volumes 
+    - name: Prune docker volumes
       community.docker.docker_prune:
         volumes: yes
         timeout: 300

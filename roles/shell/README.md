@@ -1,9 +1,10 @@
 # Description
 
-This role configures the default shell for the user running ansible.
+This role configures the default shell for the users.
 
 # Variables
 
-| Variable  | Required | Description                                                            | Default                            |
-|:----------|:---------|:-----------------------------------------------------------------------|:-----------------------------------|
-| unifi_dir | Yes      | The path of the directory in which unifi configuration will be stored. | "`{{ docker_compose_dir }}`/unifi" | 
+| Variable           | Required | Description                                         | Default |
+|:-------------------|:---------|:----------------------------------------------------|:--------|
+| shell_users        | Yes      | Usernames for which the shell should be configured. |         |
+| shell_user_details | Yes      | The output produced by ansible when creating users. |         | 

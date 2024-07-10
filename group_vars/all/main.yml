@@ -22,7 +22,8 @@ disabled_services: "{{ role_vars | selectattr('disabled_services', 'defined') | 
 pip_modules: "{{ role_vars | selectattr('pip_modules', 'defined') | map(attribute='pip_modules') | flatten }}"
 virtual_environments: "{{ pip_modules | selectattr('environment', 'defined') | map(attribute='environment') | unique }}"
 
-users: "{{ role_vars | selectattr('users', 'defined') | map(attribute='users') | flatten }}"
+usernames: "{{ users | map(attribute='name') | list }}"
+all_users: "{{ usernames + (role_vars | selectattr('users', 'defined') | map(attribute='users') | flatten) }}"
 
 user_groups: "{{ role_vars | selectattr('groups', 'defined') | map(attribute='groups') | flatten }}"
 user_group_names: "{{ user_groups | map(attribute='name') | unique }}"
