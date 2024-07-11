@@ -1,5 +1,6 @@
-hass_dir: "{{ docker_compose_dir }}/hass"
-hass_db_dir: "{{ docker_compose_dir }}/hass-db"
+home_automation_dir: "{{ docker_compose_dir }}/home-automation"
+hass_dir: "{{ home_automation_dir }}/hass"
+hass_db_dir: "{{ home_automation_dir }}/hass-db"
 
 google_assistant_project_id: "{{ secrets['google_assistant_project_id'] }}"
 google_assistant_api_key: "{{ secrets['google_assistant_api_key'] }}"
@@ -20,3 +21,20 @@ home_automation_network: ha-proxy0
 
 home_automation_subnet: "{{ secrets['home_automation_subnet'] | default('172.32.128.0/24') }}"
 home_automation_reverse_proxy_ip: "{{ secrets['home_automation_reverse_proxy_ip'] | default('172.32.128.20') }}"
+
+zwave_dir: "{{ home_automation_dir }}/zwave"
+
+zwave_vendor: "{{ secrets['zwave_vendor'] }}"
+zwave_product: "{{ secrets['zwave_product'] }}"
+zwave_session_secret: "{{ secrets['zwave_session_secret'] }}"
+zwave_s0_legacy_key: "{{ secrets['zwave_s0_legacy_key'] }}"
+zwave_s2_unauthenticated_key: "{{ secrets['zwave_s2_unauthenticated_key'] }}"
+zwave_s2_authenticated_key: "{{ secrets['zwave_s2_authenticated_key'] }}"
+zwave_s2_access_control_key: "{{ secrets['zwave_s2_access_control_key'] }}"
+
+zwave_usbstick_symlink: zwaveusbstick
+
+zwave_config_volume: zwave-config
+zwave_service_name: zwavejs2mqtt
+zwave_http_port: 8091
+zwave_websocket_port: 3000

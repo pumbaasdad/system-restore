@@ -57,7 +57,7 @@ lastpass_secrets_path: Infrastructure/Secrets
 secrets_files:
   - lastpass.yml
 
-docker_compose_dir: "{{ secrets['docker_compose_dir'] | default('~/docker') }}"
+docker_compose_dir: "{{ secrets['docker_compose_dir'] | default('/opt/docker-services') }}"
 dockerfile_dir: "{{ docker_compose_dir }}/dockerfiles"
 
 network_hosts: "{%- set temp_network_hosts = {} -%}
