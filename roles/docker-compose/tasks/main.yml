@@ -5,10 +5,12 @@
     ansible_python_interpreter: "{{ docker_compose_virtual_env }}/bin/python3"
   block:
     - name: Create docker containers
+      vars:
+        dockerfile_changed: "{{ (all_changed_files | selectattr('dest', 'match', dockerfile_dir) | length) > 0 }}"
       community.docker.docker_compose_v2:
         project_src: "{{ docker_compose_dir }}"
         state: "{{ force_docker_compose_restart | default(false) | ternary('restarted', 'present') }}"
-        build: "always"
+        build: "{{ dockerfile_changed | ternary('always', 'never') }}"
       register: compose
 
     - name: Restart docker containers
