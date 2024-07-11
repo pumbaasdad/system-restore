@@ -25,7 +25,8 @@ The following variables must be defined for the playbook to run:
 |:-------------------|:------------------------------------------------------------------------------------------------------------|
 | docker_compose_dir | The root directory that will contain configuration for all services running on the server being configured. |
 
-A `become_password` must also be defined in your network configuration for the host being configured.
+A `<ansible_username>_password` must also be defined in your secrets that specifies the password the ansible user should
+use when using `sudo`.
  
 # Running
 
@@ -70,40 +71,23 @@ of the following keys:
  * `groups`
    * `name` - The name of a group to create on the machine being provisioned.
    * `users` - A list of users to be added to the group.
- * `root_directories`
-   * `path` - The path of a directory that will be created by `ansible_become_user`.
-   * `owner` - The owner of the directory.  Defaults to `ansible_become_user`.
-   * `group` - The group that owns the directory.  Defaults to the group of `ansible_become_user`.
-   * `mode` - The permissions that the directory will have.  Defaults to the default `umask` on the machine being configured.
- * `root_files`
-   * `dest` - A file that will be created by `ansible_become_user`.
-   * `src` - The source template to use to create the file.
-   * `force` - If the file should be replaced if it already exists.  Defaults to `true`.
-   * `owner` - The owner of the file.  Defaults to `ansible_become_user`.
-   * `group` - The group that owns the file.  Defaults to the group of `ansible_become_user`.
-   * `mode` - The permissions that the file will have.  Defaults to the default `umask` on the machine being
-              provisioned.
-   * `notify` - Optional.  The name of an ansible handler to be run when this file is modified.
  * `directories`
-   * `path` - The path of a directory that will be created by the user that ansible uses to connect to the machine being
-              provisioned.
-   * `owner` - The owner of the directory.  Defaults to the user that ansible uses to connect to the machine being
-               provisioned.
-   * `group` - The group that owns the directory.  Defaults to the group of the user that ansible uses to connect to the
-               machine being provisioned.
+   * `path` - The path of a directory that will be created.
+   * `owner` - The owner of the directory.  Defaults to the root user.
+   * `group` - The group that owns the directory.  Defaults to the root user group.
    * `mode` - The permissions that the directory will have.  For directories in `docker_compose_dir` defaults to 0755.
               For other directories defaults to the default `umask` on the machine being configured.
    * `volume` - Optional.  Describes how the directory will be mounted to containers.  If no
      * `name` - Required.  The name that should be assigned to this directory if it is to be used as a docker volume.
      * `backup` - Optional.  If this directory needs to be backed up.
  * `files`
-   * `dest` - A file that will be created by the user that ansible uses to connect to the machine being provisioned.
+   * `dest` - A file that will be created.
    * `src` - The source template to use to create the file.
    * `force` - If the file should be replaced if it already exists.  Defaults to `true`.
    * `owner` - The owner of the file.  For files in `docker_compose_dir` defaults to `docker_user`.  For other files,
-               defaults to `ansible_env.USER`.
+               defaults to the root user.
    * `group` - The group that owns the file.  For directories in `docker_compose_dir` defaults to `docker_group`.  For
-               other directories, defaults to the primary group of `ansible_env.USER`.
+               other directories, defaults to the root user group.
    * `mode` - The permissions that the file will have.  For files in `docker_compose_dir` defaults to 644.  For other
               files defaults to the default `umask` on the machine being configured.
    * `notify` - Optional.  The name of an ansible handler to be run when this file is modified.
@@ -201,9 +185,9 @@ official lookup doesn't support bulk loading of variables.
 
 ## Network Configuration
 
-You network configuration is stored as yaml with your secrets.  If your secrets are stored in LastPass, the yaml must
-be attached as a file to the `network.yml` secret (the name of the attachment is not important), and it must be the only
-file attached to that secret.  The file must have the following format:
+Your network configuration is stored as yaml with your secrets.  If your secrets are stored in LastPass, the yaml must
+be attached as a file to the `network.yml` secure note (the name of the attachment is not important), and it must be the
+only file attached to that note.  The file must have the following format:
 
 ```yaml
 network:
@@ -244,7 +228,6 @@ external: An optional boolean that should only be set to true on the host being 
 internal: An optional boolean that should only be set to true on the host being configured by ansible.  It indicates
           that this is the interface of the host that is not exposed to the public internet.  If unspecified, false is
           assumed (i.e. this is not the internal interface of the host being configured).
-become_password: The password used by ansible to elevate privileges while provisioning this host.
 wemo: If this is a wemo device that will be controlled by home-automation services.  If unspeciid, false is assumed.
 nas: Optional details about a NAS host.  Only one device may have this configuration.
 ```
@@ -273,3 +256,23 @@ mountpoints: A dictionary of mountpoints provided by this NAS device.  The key i
              value is the path that can be mounted.  Currently the only supported key is `media`, which is the mount
              point used to store media files.
 ```
+
+## Users
+
+Users that are not defined by roles are stored as yaml with your secrets.  If your secrets are stored in LastPass, the
+yaml must be attached as a file to the `users.yml` secure note (the name of the attachment is not important), and it
+must be the only file attached to that note.  Lastpass requires attachments to be at least 1Kb, so you may need to add
+additional content to the file.  Any valid yaml may be used for this purpose and if it is not expected, will be ignored.
+The file must have the following format:
+
+```yaml
+users:
+  - name: The name of the user.
+    uses_docker: A boolean indicating whether the user can run docker without sudo.
+    salt: Salt to be used when hashing the users password.
+```
+
+For each user defined in `users.yml`, the following secrets must also be defined:
+
+ * `<username>_password` - The password for username.
+ * `<username>_ssh_authorized_key` - The SSH key that the user can use to connect to the system being provisioned.

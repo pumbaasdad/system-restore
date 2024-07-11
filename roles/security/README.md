@@ -37,6 +37,7 @@ Now, re-run the ansible playbook to re-enable U2F for physical logins.
 
 # Variables
 
-| Variable              | Required | Description                                                                                         | Default |
-|:----------------------|:---------|:----------------------------------------------------------------------------------------------------|:--------|
-| ssh_authorized_key    | Yes      | An SSH key that may be used by the user running ansible to access the machine via SSH.              |         |
+| Variable              | Required | Description                                         | Default |
+|:----------------------|:---------|:----------------------------------------------------|:--------|
+| security_users        | Yes      | Usernames for which security should be configured.  |         |
+| security_user_details | Yes      | The output produced by ansible when creating users. |         |

@@ -1,1 +1,0 @@
-ssh_authorized_key: "{{ secrets['ssh_authorized_key'] }}"

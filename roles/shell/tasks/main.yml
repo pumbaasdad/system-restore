@@ -1,4 +1,10 @@
+- name: Load Shell Configuration
+  set_fact:
+    __shell_users: "{{ shell_users }}"
+    __shell_user_details: "{{ shell_user_details }}"
+
 - name: Set as default shell
   user:
-    name: "{{ ansible_env.USER }}"
+    name: "{{ item }}"
     shell: /usr/bin/fish
+  loop: "{{ shell_users }}"

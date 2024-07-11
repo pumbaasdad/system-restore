@@ -13,14 +13,11 @@
       set_fact:
         secrets: "{{ secrets_dictionary }}"
         network: "{{ secret_network.network }}"
+        users: "{{ secret_users.users }}"
 
     - name: Set become password
       set_fact:
-        ansible_become_password: "{{ network_hosts[inventory_hostname].become_password }}"
-
-    - name: Load network configuration
-      set_fact:
-        network: "{{ secret_network.network }}"
+        ansible_become_password: "{{ secrets[ansible_env.USER + '_password'] }}"
 
     - name: Load roles without tasks
       block:
@@ -55,9 +52,6 @@
             name: media-server
           vars:
             media_server_media_mountpoint: "{{ media_mountpoint }}"
-
-        - import_role:
-            name: security
 
         - import_role:
             name: unifi
@@ -100,9 +94,16 @@
       become: yes
       block:
         - name: Create users
+          vars:
+            password_key: "{{ item + '_password' }}"
+            password_defined: "{{ password_key in secrets }}"
+            salt: "{{ users | selectattr('name', 'equalto', item) | map(attribute='salt') | first | default('') }}"
+            hashed_password: "{{ secrets[password_key] | default('') | password_hash('sha512', salt) }}"
+            password: "{{ password_defined | ternary(hashed_password, omit) }}"
           user:
             name: "{{ item }}"
-          loop: "{{ users }}"
+            password: "{{ password }}"
+          loop: "{{ all_users }}"
           register: system_users
 
         - name: Create groups
@@ -132,6 +133,18 @@
             groups: "{{ item.0 }}"
             append: yes
           loop: "{{ unique_user_group_mappings }}"
+
+        - import_role:
+            name: security
+          vars:
+            security_users: "{{ usernames }}"
+            security_user_details: "{{ system_users.results }}"
+
+        - import_role:
+            name: shell
+          vars:
+            shell_users: "{{ usernames }}"
+            shell_user_details: "{{ system_users.results }}"
 
         - name: Add apt keys
           apt_key:
@@ -165,28 +178,6 @@
             enabled: no
           loop: "{{ disabled_services }}"
 
-        - name: Create root directories
-          file:
-            path: "{{ item.path }}"
-            state: directory
-            owner: "{{ item.owner | default(omit) }}"
-            group: "{{ item.group | default(omit) }}"
-          loop: "{{ root_directories }}"
-
-        - name: Install root configuration files
-          template:
-            src: "{{ item.src }}"
-            dest: "{{ item.dest }}"
-            force: "{{ item.force | default(omit) }}"
-            owner: "{{ item.owner | default(omit) }}"
-            group: "{{ item.group | default(omit) }}"
-            mode: "{{ item.mode | default(omit) }}"
-          loop: "{{ root_files }}"
-          loop_control:
-            label: "{{ item.label | default(item) }}"
-          register: changed_root_files
-          notify: "{{ item.notify | default(omit) }}"
-
         - import_role:
             name: udev
           vars:
@@ -201,8 +192,8 @@
           file:
             path: "{{ item.path }}"
             state: directory
-            owner: "{{ item.owner | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
-            group: "{{ item.group | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
+            owner: "{{ item.owner | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
+            group: "{{ item.group | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
             mode: "{{ item.mode | default(item.path.startswith(docker_compose_dir) | ternary('0775', omit)) }}"
           loop: "{{ directories }}"
 
@@ -213,8 +204,8 @@
             src: "{{ item.src }}"
             dest: "{{ item.dest }}"
             force: "{{ item.force | default(omit) }}"
-            owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
-            group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, ansible_env.USER)) }}"
+            owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
+            group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
             mode: "{{ item.mode | default(item.dest.startswith(docker_compose_dir) | ternary('0664', omit)) }}"
           loop: "{{ files }}"
           loop_control:
@@ -222,22 +213,19 @@
           register: changed_files
           notify: "{{ item.notify | default(omit) }}"
 
-    - name: Update pip
-      pip:
-        name: pip
-        state: latest
-        virtualenv: "{{ item }}"
-      loop: "{{ virtual_environments }}"
+        - name: Update pip
+          pip:
+            name: pip
+            state: latest
+            virtualenv: "{{ item }}"
+          loop: "{{ virtual_environments }}"
 
-    - name: Install python modules
-      pip:
-        name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
-        state: latest
-        virtualenv: "{{ item }}"
-      loop: "{{ virtual_environments }}"
-
-    - import_role:
-        name: shell
+        - name: Install python modules
+          pip:
+            name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
+            state: latest
+            virtualenv: "{{ item }}"
+          loop: "{{ virtual_environments }}"
 
     - import_role:
         name: docker-compose

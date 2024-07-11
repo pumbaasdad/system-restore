@@ -1,3 +1,5 @@
+docker_users: "{{ (users | selectattr('uses_docker', 'equalto', true) | map(attribute='name') | list) + [docker_user_name] }}"
+
 docker_role:
   deb_repo:
     url: "https://download.docker.com/linux/ubuntu"
@@ -12,19 +14,12 @@ docker_role:
     - docker-ce
     - docker-compose-plugin
   service: docker
-  pip_modules:
-    environment: "{{ docker_compose_virtual_env }}"
-    modules:
-    - docker
-    - docker-composer-v2
   users:
     - "{{ docker_user_name }}"
   groups:
     - name: "{{ docker_group_name }}"
-      users:
-        - "{{ ansible_env.USER }}"
-        - "{{ docker_user_name }}"
-  root_files:
+      users: "{{ docker_users }}"
+  files:
     - src: roles/docker/templates/daemon.json.j2
       dest: /etc/docker/daemon.json
       notify:

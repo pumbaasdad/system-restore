@@ -81,6 +81,8 @@ dns_files:
     notify: Update DNS zone serial numbers
   - src: roles/dns/templates/Dockerfile
     dest: "{{ dockerfile_dir }}/{{ dns_service_name }}.Dockerfile"
+  - src: roles/dns/templates/resolv.conf.j2
+    dest: /etc/resolv.conf
 
 
 dns_role:
@@ -94,10 +96,6 @@ dns_role:
   disabled_services:
     - systemd-resolved
   files: "{{ dns_files + dns_zone_files }}"
-  root_files:
-    - src: roles/dns/templates/resolv.conf.j2
-      dest: /etc/resolv.conf
-
   docker:
     services:
       - name: "{{ dns_service_name }}"

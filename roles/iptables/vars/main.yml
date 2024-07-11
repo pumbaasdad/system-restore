@@ -2,9 +2,9 @@ iptables_role:
   packages:
     - iptables-persistent
     - netfilter-persistent
-  root_directories:
+  directories:
     - path: /etc/systemd/system/netfilter-persistent.service.d
-  root_files:
+  files:
     - src: roles/iptables/files/override.conf
       dest: /etc/systemd/system/netfilter-persistent.service.d/override.conf
       notify: Reload systemd for netfilter-persistent
