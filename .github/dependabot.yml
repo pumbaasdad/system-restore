@@ -56,6 +56,11 @@ updates:
       day: "saturday"
       time: "01:00"
       timezone: "America/Toronto"
+    groups:
+      docker:
+        update-types:
+          - "minor"
+          - "patch"
   - package-ecosystem: "docker"
     directory: "/roles/media-rip/templates"
     schedule:
