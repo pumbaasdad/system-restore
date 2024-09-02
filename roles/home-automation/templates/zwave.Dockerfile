@@ -1,1 +1,1 @@
-FROM zwavejs/zwavejs2mqtt@sha256:082a56c0b0d431835788911acb4586ae80d89494b0ad622d118771a28fc51883
+FROM zwavejs/zwave-js-ui:9.18.0
