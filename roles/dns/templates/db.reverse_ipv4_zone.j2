@@ -3,4 +3,4 @@
 {%- set records = [] -%}
 {{- macros.append_records_for_zone(records, zone, __dns_zone, dns_root_domain) }}
 {%- set record_selector = { 'field': 'origin', 'test': 'equalto', 'value': item.reverse_zone_name } -%}
-{{ macros.print_file(item.reverse_zone_name, __dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0)) }}
+{{ macros.print_file(item.reverse_zone_name, __dns_hostname, dns_root_domain, records, record_selector, serial_number_increment | default(0)) }}
