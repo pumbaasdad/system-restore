@@ -4,4 +4,4 @@
 {{- macros.append_records_for_zone(records, zone, __dns_zone, dns_root_domain) }}
 {%- set zone_name = item.zone_name + '.' + dns_root_domain -%}
 {%- set record_selector = { 'field': 'type', 'test': 'in', 'value': ['A', 'AAAA'] } -%}
-{{ macros.print_file(zone_name, __dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0), dns_root_domain) }}
+{{ macros.print_file(zone_name, __dns_hostname, dns_root_domain, records, record_selector, serial_number_increment | default(0), dns_root_domain) }}

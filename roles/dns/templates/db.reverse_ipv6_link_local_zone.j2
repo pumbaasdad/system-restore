@@ -5,4 +5,4 @@
 {%- endfor -%}
 {%- set zone_name = ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] -%}
 {%- set record_selector = { 'field': 'origin', 'test': 'equalto', 'value': zone_name } -%}
-{{ macros.print_file(zone_name, __dns_hostname, dns_root_domain, records, record_selector, item.serial_number_increment | default(0)) }}
+{{ macros.print_file(zone_name, __dns_hostname, dns_root_domain, records, record_selector, serial_number_increment | default(0)) }}
