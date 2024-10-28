@@ -1,4 +1,5 @@
 - name: Update DNS zone serial numbers
+  become: yes
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"

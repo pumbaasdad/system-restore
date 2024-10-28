@@ -190,7 +190,7 @@
             path: "{{ item.path }}"
             state: directory
             owner: "{{ item.owner | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
-            group: "{{ item.group | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
+            group: "{{ item.group | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_group, omit)) }}"
             mode: "{{ item.mode | default(item.path.startswith(docker_compose_dir) | ternary('0775', omit)) }}"
           loop: "{{ directories }}"
 
@@ -202,7 +202,7 @@
             dest: "{{ item.dest }}"
             force: "{{ item.force | default(omit) }}"
             owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
-            group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
+            group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_group, omit)) }}"
             mode: "{{ item.mode | default(item.dest.startswith(docker_compose_dir) | ternary('0664', omit)) }}"
           loop: "{{ files }}"
           loop_control:
@@ -223,6 +223,9 @@
             state: latest
             virtualenv: "{{ item }}"
           loop: "{{ virtual_environments }}"
+
+    - name: Flush handlers
+      meta: flush_handlers
 
     - import_role:
         name: docker-compose
