@@ -7,7 +7,7 @@ if [ ! -z "${OLDPID}" ]; then
 fi
 
 GPGDIR="${HOME}/.gnupg"
-USERNAME=akowpak
+USERNAME=pumbaasdad
 # I use the same username for wsl and windows, but feel free to modify the paths below if that isn't the case
 WIN_GPGDIR="C:/Users/${USERNAME}/AppData/Roaming/gnupg"
 NPIPERELAY="/c/Users/${USERNAME}/wsl/bin/npiperelay.exe"
