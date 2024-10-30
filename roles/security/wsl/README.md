@@ -12,7 +12,7 @@ steps.
 1. Install [wsl-ssh-pageant](https://github.com/benpye/wsl-ssh-pageant) (and putty if it is not already installed).
 1. Install the wsl-ssh-pageant-helper scripts (and nodejs if it is not already installed).
 1. Add the following to ~/.config/fish/config.fish: 
-`set -x SSH_AUTH_SOCK /c/Users/akowpak/wsl/wsl-ssh-pageant/ssh-agent.sock`
+`set -x SSH_AUTH_SOCK /c/Users/pumbaasdad/wsl/wsl-ssh-pageant/ssh-agent.sock`
 1. Add the following to gpg-agent.conf (located in the windows gnupg config directory), or set them in putty:
    * `enable-putty-support`
    * `enable-ssh-support`

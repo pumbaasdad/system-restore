@@ -17,13 +17,13 @@ async function run()
     const gpgConnectAgent = ignoreAsyncErrors(cpp.spawn("gpg-connect-agent", ["/bye"], {detached: true} ));
 
     // Don't attempt to start the bridge if there is still an old socket.
-    const unlink = ignoreAsyncErrors(fs.promises.unlink("c:/Users/akowpak/wsl/wsl-ssh-pageant/ssh-agent.sock"));
+    const unlink = ignoreAsyncErrors(fs.promises.unlink("c:/Users/pumbaasdad/wsl/wsl-ssh-pageant/ssh-agent.sock"));
 
     await Promise.all([gpgConnectAgent, unlink]);
 
     cp.spawn(
-        'C:/Users/akowpak/wsl/bin/wsl-ssh-pageant-amd64.exe',
-        ['--wsl', 'c:/Users/akowpak/wsl/wsl-ssh-pageant/ssh-agent.sock', '--systray'],
+        'C:/Users/pumbaasdad/wsl/bin/wsl-ssh-pageant-amd64.exe',
+        ['--wsl', 'c:/Users/pumbaasdad/wsl/wsl-ssh-pageant/ssh-agent.sock', '--systray'],
         {detached: true});
 
     process.exit();

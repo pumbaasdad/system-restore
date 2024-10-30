@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "wsl-ssh-pageant.js.js",
-  "author": "Andrew Kowpak",
+  "author": "Pumbaa's Dad",
   "license": "ISC",
   "dependencies": {
     "child-process-promise": "^2.2.1"
