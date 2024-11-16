@@ -1,1 +1,1 @@
-FROM linuxserver/homeassistant:2024.10.4
+FROM linuxserver/homeassistant:2024.11.2
