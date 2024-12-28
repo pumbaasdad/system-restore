@@ -1,1 +1,1 @@
-FROM ghcr.io/pumbaasdad/volumerize:1.0.63
+FROM ghcr.io/pumbaasdad/volumerize:1.0.65
