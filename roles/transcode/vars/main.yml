@@ -3,13 +3,24 @@ transcode_role:
     - path: "{{ transcode_dir }}"
       volume:
         name: "{{ transcode_config_volume }}"
+    - path: "{{ transcode_dir }}/hooks"
   files:
     - src: roles/transcode/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ transcode_service_name }}.Dockerfile"
+    - src: roles/transcode/templates/post_conversion.sh
+      dest: "{{ transcode_dir }}/hooks/post_conversion.sh"
+    - src: roles/transcode/templates/post_watch_folder_processing.sh
+      dest: "{{ transcode_dir }}/hooks/post_watch_folder_processing.sh"
   nas_directories:
     - path: "{{ transcode_nas_dir }}"
       volume:
         name: "{{ transcode_destination_volume }}"
+    - path: "{{ transcode_trash_dir }}"
+      volume:
+        name: "{{ transcode_trash_volume }}"
+    - path: "{{ transcode_dvr_dir }}"
+      volume:
+        name: "{{ transcode_dvr_volume }}"
   docker:
     services:
       - name: "{{ transcode_service_name }}"
@@ -22,7 +33,12 @@ transcode_role:
           - AUTOMATED_CONVERSION_OUTPUT_SUBDIR={{ transcode_output_subdir }}
           - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME={{ transcode_input_stability_seconds }}
           - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
+          - AUTOMATED_CONVERSION_USE_TRASH=1
+          - AUTOMATED_CONVERSION_OUTPUT_DIR_2=/watch2
+          - AUTOMATED_CONVERSION_VIDEO_FILE_EXTENSIONS=ts TS
         volumes:
           - "{{ transcode_config_volume }}:/config"
           - "{{ __transcode_src_volume | default('undefined') }}:/watch"
           - "{{ transcode_destination_volume }}:/output"
+          - "{{ transcode_dvr_volume }}:/watch2"
+          - "{{ transcode_trash_volume }}:/trash:nocopy"
