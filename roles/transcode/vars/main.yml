@@ -3,6 +3,7 @@ transcode_role:
     - path: "{{ transcode_dir }}"
       volume:
         name: "{{ transcode_config_volume }}"
+        backup: true
     - path: "{{ transcode_dir }}/hooks"
   files:
     - src: roles/transcode/templates/Dockerfile
