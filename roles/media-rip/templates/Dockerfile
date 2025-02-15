@@ -1,4 +1,4 @@
-FROM jlesage/makemkv:v24.12.1
+FROM jlesage/makemkv:v25.02.2
 
 ARG PUID
 ARG PGID
