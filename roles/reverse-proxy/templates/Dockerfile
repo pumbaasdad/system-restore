@@ -1,1 +1,1 @@
-FROM linuxserver/nginx:1.26.2
+FROM linuxserver/nginx:1.26.3
