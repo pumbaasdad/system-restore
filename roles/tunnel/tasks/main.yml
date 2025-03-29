@@ -1,0 +1,3 @@
+- name: Load tunnel networks
+  set_fact:
+    __tunnel_internal_network: "{{ tunnel_internal_network }}"

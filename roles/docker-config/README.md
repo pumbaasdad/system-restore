@@ -14,10 +14,11 @@ network.  `plex` should be moved to an internal network behind the reverse proxy
 
 # Variables
 
-| Variable                   | Required | Secret | Description                                                                                                        | Default         |
-|:---------------------------|:---------|:-------|:-------------------------------------------------------------------------------------------------------------------|:----------------|
-| TZ                         | No       | No     | The timezone in which the docker host is running.                                                                  | America/Toronto |
-| docker_primary_network     | No       | No     | The name of the network that docker containers will use by default.                                                | docker1         |
+| Variable               | Required | Secret | Description                                                           | Default         |
+|:-----------------------|:---------|:-------|:----------------------------------------------------------------------|:----------------|
+| TZ                     | No       | No     | The timezone in which the docker host is running.                     | America/Toronto |
+| docker_primary_network | No       | No     | The name of the network that docker containers will use by default.   | docker1         |
+| docker_primary_subnet  | No       | Yes    | The subnet of the network that docker containers will use by default. | 172.32.2.0/24   |
 
 # Parameters
 

@@ -1,10 +1,13 @@
-public_reverse_proxy_dir: "{{ docker_compose_dir }}/nginx-public"
+reverse_proxy_dir: "{{ docker_compose_dir }}/reverse-proxy"
 
-reverse_proxy_public_domain: "{{ secrets.reverse_proxy_public_domain }}"
+reverse_proxy_config_volume: proxy-config
+reverse_proxy_bridge_network: proxy-bridge
+reverse_proxy_external_network: proxy-external
 
-reverse_proxy_config_volume: public-nginx-config
-reverse_proxy_log_volume: public-nginx-log
-reverse_proxy_service_name: public-nginx
-reverse_proxy_public_network: public0
+reverse_proxy_internal_log_volume: internal-proxy-log
+reverse_proxy_internal_site_configs_volume: internal-proxy-site-configs
+reverse_proxy_internal_service_name: internal-proxy
 
-public_port: "{{ secrets['public_port'] | default(12345) }}"
+reverse_proxy_external_log_volume: external-proxy-log
+reverse_proxy_external_site_configs_volume: external-proxy-site-configs
+reverse_proxy_external_service_name: external-proxy

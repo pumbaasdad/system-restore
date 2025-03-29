@@ -5,6 +5,7 @@ docker_config_role:
 
 docker_builtin_networks:
   - name: "{{ docker_primary_network }}"
+    subnet: "{{ docker_primary_subnet }}"
 
 docker_default_environment:
   - TZ={{ TZ }}

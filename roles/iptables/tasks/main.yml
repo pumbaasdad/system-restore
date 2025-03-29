@@ -2,11 +2,14 @@
   iptables:
     action: insert
     chain: "{{ item.chain }}"
-    in_interface: "{{ item.in_interface }}"
+    in_interface: "{{ item.in_interface | default(omit) }}"
+    out_interface: "{{ item.out_interface | default(omit) }}"
     ctstate: "{{ item.cstate | default(omit) }}"
     destination_port: "{{ item.destination_port | default(omit) }}"
+    destination: "{{ item.destination_ip | default(omit) }}"
     protocol: "{{ item.protocol | default(omit) }}"
     match: "{{ item.protocol | default(omit) }}"
+    ip_version: "{{ item.ip_version | default(omit) }}"
     jump: "{{ item.jump }}"
   loop: "{{ iptables_rules }}"
   notify: Restart netfilter-persistent

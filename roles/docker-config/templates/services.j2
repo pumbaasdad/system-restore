@@ -26,7 +26,11 @@
         {%- set networks = service.networks.extra | default({}) -%}
 
         {%- if service.networks.default | default(true) -%}
-            {%- set _ = networks.update({primary_network_name: {}}) -%}
+            {%- if service.networks.default_ipv4_address is defined -%}
+              {%- set _ = networks.update({primary_network_name: {'ipv4_address': service.networks.default_ipv4_address}}) -%}
+            {%- else -%}
+              {%- set _ = networks.update({primary_network_name: {}}) -%}
+            {%- endif -%}
         {%- endif -%}
     {%- else -%}
         {%- set networks = {primary_network_name: {}} -%}

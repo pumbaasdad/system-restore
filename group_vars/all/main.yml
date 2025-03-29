@@ -34,9 +34,8 @@ intrusion_detection: "{{ role_vars | selectattr('intrusion_detection', 'defined'
 intrusion_jails: "{{ intrusion_detection | selectattr('jails', 'defined') | map(attribute='jails') | flatten }}"
 intrusion_filters: "{{ intrusion_detection | selectattr('filters', 'defined') | map(attribute='filters') | flatten }}"
 
-reverse_proxy_configs: "{{ role_vars | selectattr('reverse_proxy', 'defined') | map(attribute='reverse_proxy') }}"
-public_site_configs: "{{ reverse_proxy_configs | selectattr('public_site_configs', 'defined') | map(attribute='public_site_configs') | flatten }}"
-all_reverse_proxy_networks: "{{ reverse_proxy_configs | selectattr('networks', 'defined') | map(attribute='networks') | flatten }}"
+all_reverse_proxy_configs: "{{ role_vars | selectattr('reverse_proxy', 'defined') | map(attribute='reverse_proxy') }}"
+all_reverse_proxy_networks: "{{ all_reverse_proxy_configs | selectattr('networks', 'defined') | map(attribute='networks') | flatten }}"
 
 docker_config: "{{ role_vars | selectattr('docker', 'defined') | map(attribute='docker') | flatten }}"
 all_docker_services: "{{ docker_config | selectattr('services', 'defined') | map(attribute='services') | flatten }}"
@@ -78,4 +77,6 @@ nas_zone: "{{ network.zones | selectattr('name', 'equalto', nas_host.zone) | fir
 nas_ip: "{{ nas_zone.ipv4_subnet | ansible.utils.ipaddr(nas_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
 
 media_mountpoint: "{{ (network_hosts | dict2items | json_query('[?value.nas.mountpoints.media]') | first).value.nas.mountpoints.media }}"
+
+reverse_proxy_docker_ip_address: "{{ secrets['reverse_proxy_docker_ip_address'] | default('172.32.2.2') }}"
 

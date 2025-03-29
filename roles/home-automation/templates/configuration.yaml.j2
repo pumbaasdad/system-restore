@@ -14,7 +14,7 @@ config:
 http:
   use_x_forwarded_for: true
   trusted_proxies:
-    {{ [home_automation_reverse_proxy_ip] | to_nice_yaml | indent(4) }}
+    {{ [__home_automation_reverse_proxy_ip] | to_nice_yaml | indent(4) }}
 
 # Allows you to issue voice commands from the frontend in enabled browsers
 conversation:
