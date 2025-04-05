@@ -1,2 +1,2 @@
-FROM cloudflare/cloudflared:2025.2.1
+FROM cloudflare/cloudflared:2025.4.0
 
