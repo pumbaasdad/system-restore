@@ -1,51 +1,57 @@
 # Description
 
-This role provides a reverse proxy for accessing other services running on the server being configured.  The service is
-assigned a specific IPv4 address so that other services can trust it as an allowed proxy.
-
-# Initial Setup
-
-You must configure a port on your router that will forward traffic to the server being configured.  The port that
-receives that traffic must be set in the `public_port` variable.
+This role provides reverse proxies for accessing other services running on the server being configured.  One proxy is
+configured to be accessible only from within the network.  The other proxy is on a network that can be exposed to
+containers that are in turn exposed to the public internet.  The external proxy will forward requests to the internal
+proxy.
 
 # Variables
 
-| Variable                     | Required | Secret | Description                                                                                                                 | Default                                 |
-|:-----------------------------|:---------|:-------|:----------------------------------------------------------------------------------------------------------------------------|:----------------------------------------|
-| public_reverse_proxy_dir     | No       | No     | The directory in which nginx configuration will be stored.                                                                  | `{{ docker_compose_dir }}/nginx-public` |
-| reverse_proxy_config_volume  | No       | No     | The name of the volume used to store reverse proxy configuration.                                                           | public-nginx-config                     |
-| reverse_proxy_log_volume     | No       | No     | The name of the volume used to store reverse proxy logs.                                                                    | public-nginx-log                        |
-| reverse_proxy_service_name   | No       | No     | The name of the docker-compose service that runs the reverse proxy.                                                         | public-nginx                            |
-| reverse_proxy_public_network | No       | No     | The name of the docker network that is exposed to the public internet.                                                      | public0                                 |
-| reverse_proxy_public_domain  | Yes      | Yes    | The public domain that the reverse proxy is serving.                                                                        |                                         |
-| public_port                  | Yes      | Yes    | The port that has been setup on your router to forward packets to the interface connected to reverse_proxy_public_network`. |                                         |
+| Variable                                   | Required | Secret | Description                                                                                       | Default                                  |
+|:-------------------------------------------|:---------|:-------|:--------------------------------------------------------------------------------------------------|:-----------------------------------------|
+| reverse_proxy_dir                          | No       | No     | The directory in which nginx configuration will be stored.                                        | `{{ docker_compose_dir }}/reverse-proxy` |
+| reverse_proxy_config_volume                | No       | No     | The name of the volume used to store reverse proxy configuration.                                 | proxy-config                             |
+| reverse_proxy_bridge_network               | No       | No     | The name of the internal network used to send traffic from the internal reverse proxy to services | proxy-bridge                             |
+| reverse_proxy_external_network             | No       | No     | The name of the internal network used to proxy traffic from the internet.                         | proxy-external-network                   |
+| reverse_proxy_internal_log_volume          | No       | No     | The name of the volume used to store internal reverse proxy logs.                                 | internal-proxy-log                       |
+| reverse_proxy_internal_service_name        | No       | No     | The name of the docker-compose service that runs the internal reverse proxy.                      | internal-proxy                           |
+| reverse_proxy_internal_site_configs_volume | No       | No     | The name of the docker volume used to store site configurations for internal access               | internal-proxy-site-configs              |
+| reverse_proxy_external_log_volume          | No       | No     | The name of the volume used to store external reverse proxy logs.                                 | external-proxy-log                       |
+| reverse_proxy_external_service_name        | No       | No     | The name of the docker-compose service that runs the external reverse proxy.                      | external-proxy                           |
+| reverse_proxy_external_site_configs_volume | No       | No     | The name of the docker volume used to store site configurations for external access               | external-proxy-site-configs              |
 
 # Parameters
 
-| Parameter                         | Member       | Description                                                                                                                   |
-|:----------------------------------|:-------------|:------------------------------------------------------------------------------------------------------------------------------|
-| reverse_proxy_public_site_configs |              | Reverse proxy configurations that can be accessed from outside the network.                                                   |
-|                                   | name         | The name of the reverse proxy.                                                                                                |
-|                                   | src          | The template that will be used to create the reverse proxy configuration.                                                     |
-| reverse_proxy_certificate_volume  |              | The name of the volume where SSL certificates are stored.                                                                     |
-| reverse_proxy_networks            |              | A list of dictionaries that maps networks to which the reverse proxy container will connect to the properties of the network. |
-|                                   | ipv4_address | The IPv4 address of the reverse proxy container on the network.                                                               |
+| Parameter                        | Member             | Description                                                                      |
+|:---------------------------------|:-------------------|:---------------------------------------------------------------------------------|
+| reverse_proxy_configs            |                    | Reverse proxy configuration for all internal services.                           |
+|                                  | subdomain          | The subdomain for which the proxy is being configured.                           |
+|                                  | external.port      | The port on which the proxy should listen for connections from the internet.     |
+|                                  | external.locations | A list of paths which should be forwarded from the internet.                     |
+|                                  | internal.host      | The name of the host on the internal network to which traffic should be proxied. |
+|                                  | internal.port      | The port on the internal network to which traffic should be proxied.             |
+| reverse_proxy_ip                 |                    | The IP address of the reverse proxy on `reverse_proxy_bridge_network`.           |
+| reverse_proxy_certificate_volume |                    | The name of the volume where SSL certificates are stored.                        |
 
 # Docker Volumes
 
- | Volume              | Description                                                                                                                                                                    |
-|:--------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | public-nginx-config | Configuration for the `nginx` service that is exposed to the public internet.  It contains configurations required to access sites from the public internet and local network. |
- | public-nginx-log    | The directory where logs from the `nginx` server that is exposed to the public internet are written.                                                                           |
+| Volume                                       | Description                                                                                     |
+|:---------------------------------------------|:------------------------------------------------------------------------------------------------|
+| `reverse_proxy_config_volume`                | Common configuration for both reverse proxy services.                                           |
+| `reverse_proxy_internal_log_volume`          | The direction where logs from the reverse proxy that is only accessible internally are written. |
+| `reverse_proxy_internal_site_configs_volume` | The direction where internally accessible site configurations are written.                      |
+| `reverse_proxy_external_log_volume`          | The direction where logs from the reverse proxy that is externally accessible are written.      |
+| `reverse_proxy_external_site_configs_volume` | The direction where externally accessible site configurations are written.                      |
 
 # Docker Networks
 
-| Network | Description                                                                                                                                                                                                                                       |
-|:--------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
- | public0 | This network is only accessible to the host interface that is exposed to the internet.  Its purpose is to prevent any requests to the local network or internet originating from the nginx container.  This is accomplished with `iptable` rules. |
+| Network                          | Description                                                                            |
+|:---------------------------------|:---------------------------------------------------------------------------------------|
+| `reverse_proxy_bridge_network`   | The internal network used to send traffic from the internal reverse proxy to services. |
+| `reverse_proxy_external_network` | The internal network used to proxy traffic from the internet.                          |
 
-# iptable Rules
+# Outputs
 
-This module defines `iptable` rules to ensure that no external connections can be initiated from the `public0` docker
-network to any other system on this network, or the public internet.  The rules will allow responses to requests and
-connections that are associated with existing connections.
+| Name             | Value                                                                      |
+|:-----------------|:---------------------------------------------------------------------------|
+| external_network | The name of the network which may be exposed to traffic from the internet. |

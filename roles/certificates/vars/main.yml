@@ -20,7 +20,7 @@ certificates_role:
         config_dir: "{{ fail2ban_dir }}"
         volumes:
           - "{{ letsencrypt_certificate_volume }}:/config"
-          - public-nginx-log:/config/log/nginx-public
+          - external-proxy-log:/config/log/reverse-proxy
           - "{{ hass_dir }}/home-assistant.log:/config/log/hass/home-assistant.log"
           - fail2ban-jails:/etc/fail2ban/jail.d
         environment:

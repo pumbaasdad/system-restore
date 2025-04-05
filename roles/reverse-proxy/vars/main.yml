@@ -1,98 +1,118 @@
-external_zone: "{{ network | json_query('zones[?hosts[*].external] | [0]') }}"
-external_host: "{{ external_zone | json_query('hosts[?external] | [0]') }}"
-external_ip: "{{ external_zone.ipv4_subnet | ansible.utils.ipaddr(external_host.ipv4_offset) | ansible.utils.ipaddr('address') }}"
+reverse_proxy_internal_site_config_files: "{%- set temp_internal_site_config_files = [] -%}
+                                           {%- for config in __reverse_proxy_configs -%}
+                                           {%- set _ = temp_internal_site_config_files.append({
+                                               'src': 'roles/reverse-proxy/templates/internal-reverse-proxy.j2',
+                                               'dest': reverse_proxy_dir + '/internal/site-confs/' + config.subdomain + '.conf',
+                                               'vars': {
+                                                 'subdomain': config.subdomain,
+                                                 'target_host': config.internal.host,
+                                                 'target_port': config.internal.port
+                                               }
+                                           }) -%}
+                                           {%- endfor -%}
+                                           {{- temp_internal_site_config_files -}}"
 
-reverse_proxy_extra_networks: "{%- set temp_reverse_proxy_extra_networks = { reverse_proxy_public_network: {} } -%}
-                               {%- for network in (__reverse_proxy_internal_networks | default([])) -%}
-                               {%- set _ = temp_reverse_proxy_extra_networks.update(network) -%}
-                               {%- endfor -%}
-                               {{- temp_reverse_proxy_extra_networks -}}"
+reverse_proxy_internal_aliases: "{%- set temp_internal_aliases = [] -%}
+                                 {%- for config in __reverse_proxy_configs -%}
+                                 {%- set _ = temp_internal_aliases.append(config.subdomain + '.' + network.domain + '.' + network.suffix) -%}                                 
+                                 {%- endfor -%}
+                                 {{- temp_internal_aliases -}}"
 
-reverse_proxy_public_site_config_files: "{%- set temp_public_site_config_files = [] -%}
-                                         {%- for file in __reverse_proxy_public_site_configs -%}
-                                         {%- set _ = temp_public_site_config_files.append({
-                                             'src': file.src,
-                                             'dest': public_reverse_proxy_dir + '/nginx/site-confs/' + file.name + '.conf',
-                                             'vars': file.vars | default({}) | combine({
-                                                 'domain': reverse_proxy_public_domain,
-                                              })
-                                         }) -%}
-                                         {%- endfor -%}
-                                         {{- temp_public_site_config_files -}}"
+reverse_proxy_external_site_config_files: "{%- set temp_external_site_config_files = [] -%}
+                                           {%- for config in __reverse_proxy_configs -%}
+                                           {%- if config.external is defined -%} 
+                                           {%- set _ = temp_external_site_config_files.append({
+                                               'src': 'roles/reverse-proxy/templates/external-reverse-proxy.j2',
+                                               'dest': reverse_proxy_dir + '/external/site-confs/' + config.subdomain + '.conf',
+                                               'vars': {
+                                                 'subdomain': config.subdomain,
+                                                 'listen_port': config.external.port,
+                                                 'locations': config.external.locations
+                                               }
+                                           }) -%}
+                                           {%- endif -%}
+                                           {%- endfor -%}
+                                           {{- temp_external_site_config_files -}}"
 
 reverse_proxy_files:
   - src: roles/reverse-proxy/templates/nginx.conf.j2
-    dest: "{{ public_reverse_proxy_dir }}/nginx/nginx.conf"
+    dest: "{{ reverse_proxy_dir }}/nginx/nginx.conf"
   - src: roles/reverse-proxy/templates/Dockerfile
-    dest: "{{ dockerfile_dir }}/{{ reverse_proxy_service_name }}.Dockerfile"
+    dest: "{{ dockerfile_dir }}/{{ reverse_proxy_internal_service_name }}.Dockerfile"
+  - src: roles/reverse-proxy/templates/Dockerfile
+    dest: "{{ dockerfile_dir }}/{{ reverse_proxy_external_service_name }}.Dockerfile"
+  - src: roles/reverse-proxy/templates/default.j2
+    dest: "{{ reverse_proxy_dir }}/external/site-confs/default.conf"
+    vars:
+      listen_port: 80
+
+reverse_proxy_extra_internal_networks: "{%- set temp_reverse_proxy_extra_internal_networks = { reverse_proxy_bridge_network: { 'aliases': reverse_proxy_internal_aliases } } -%}
+                                        {{- temp_reverse_proxy_extra_internal_networks -}}"
 
 reverse_proxy_role:
   directories:
-    - path: "{{ public_reverse_proxy_dir }}"
-    - path: "{{ public_reverse_proxy_dir }}/nginx"
+    - path: "{{ reverse_proxy_dir }}"
+    - path: "{{ reverse_proxy_dir }}/nginx"
       volume:
         name: "{{ reverse_proxy_config_volume }}"
-    - path: "{{ public_reverse_proxy_dir }}/log/nginx"
+    - path: "{{ reverse_proxy_dir }}/internal/log/nginx"
       volume:
-        name: "{{ reverse_proxy_log_volume }}"
-  files: "{{ reverse_proxy_files + (reverse_proxy_public_site_config_files | default([])) }}"
+        name: "{{ reverse_proxy_internal_log_volume }}"
+    - path: "{{ reverse_proxy_dir }}/internal/site-confs"
+      volume:
+        name: "{{ reverse_proxy_internal_site_configs_volume }}"
+    - path: "{{ reverse_proxy_dir }}/external/log/nginx"
+      volume:
+        name: "{{ reverse_proxy_external_log_volume }}"
+    - path: "{{ reverse_proxy_dir }}/external/site-confs"
+      volume:
+        name: "{{ reverse_proxy_external_site_configs_volume }}"
+  files: "{{ reverse_proxy_files + (reverse_proxy_internal_site_config_files | default([])) + (reverse_proxy_external_site_config_files | default([])) }}"
   intrusion_detection:
     jails:
       - jail_name: nginx-http-auth
-        file: nginx-public/error.log
+        file: reverse-proxy/error.log
         max_retries: 5
         port: https
       - jail_name: nginx-badbots
-        file: nginx-public/access.log
+        file: reverse-proxy/access.log
         max_retries: 2
         port: https
       - jail_name: nginx-botsearch
-        file: nginx-public/access.log
+        file: reverse-proxy/access.log
         max_retries: 5
         port: https
-  reverse_proxy:
-    private_site_configs:
-      - src: roles/reverse-proxy/templates/default.j2
-        name: default
-        vars:
-          nginx_port: 80
-    public_site_configs:
-      - src: roles/reverse-proxy/templates/default.j2
-        name: default
-        vars:
-          nginx_port: 443
   docker:
     services:
-      - name: "{{ reverse_proxy_service_name }}"
-        config_dir: "{{ public_reverse_proxy_dir }}"
+      - name: "{{ reverse_proxy_internal_service_name }}"
+        config_dir: "{{ reverse_proxy_dir }}"
         volumes:
           - "{{ __reverse_proxy_certificate_volume | default('undefined') }}:/config"
           - "{{ reverse_proxy_config_volume }}:/config/nginx"
-          - "{{ reverse_proxy_log_volume }}:/config/log/nginx"
+          - "{{ reverse_proxy_internal_site_configs_volume }}:/config/nginx/site-confs"
+          - "{{ reverse_proxy_internal_log_volume }}:/config/log/nginx"
         ports:
-          - "{{ external_ip }}:{{ public_port }}:443"
-          - "{{ external_ip }}:80:80"
+          - "80:80"
         environment:
           - DHLEVEL=2048
         networks:
+          default_ipv4_address: "{{ __reverse_proxy_ip | default('') }}"
+          extra: "{{ reverse_proxy_extra_internal_networks | default([]) }}"
+      - name: "{{ reverse_proxy_external_service_name }}"
+        config_dir: "{{ reverse_proxy_dir }}"
+        volumes:
+          - "{{ reverse_proxy_config_volume }}:/config/nginx"
+          - "{{ reverse_proxy_external_site_configs_volume }}:/config/nginx/site-confs"
+          - "{{ reverse_proxy_external_log_volume }}:/config/log/nginx"
+        networks:
           default: false
-          extra: "{{ reverse_proxy_extra_networks }}"
+          extra:
+            - "{{ reverse_proxy_bridge_network }}"
+            - "{{ reverse_proxy_external_network }}"
     networks:
-      - name: "{{ reverse_proxy_public_network }}"
-  iptable_rules:
-    - chain: INPUT
-      in_interface: "{{ reverse_proxy_public_network }}"
-      cstate: []
-      jump: DROP
-    - chain: INPUT
-      in_interface: "{{ reverse_proxy_public_network }}"
-      cstate: [ESTABLISHED, RELATED]
-      jump: ACCEPT
-    - chain: DOCKER-USER
-      in_interface: "{{ reverse_proxy_public_network }}"
-      cstate: []
-      jump: DROP
-    - chain: DOCKER-USER
-      in_interface: "{{ reverse_proxy_public_network }}"
-      cstate: [ESTABLISHED, RELATED]
-      jump: ACCEPT
+      - name: "{{ reverse_proxy_bridge_network }}"
+        internal: true
+      - name: "{{ reverse_proxy_external_network }}"
+        internal: true
+  provides:
+    external_network: "{{ reverse_proxy_external_network }}"

@@ -47,6 +47,7 @@
             name: home-automation
           vars:
             home_automation_wemo_hosts: "{{ wemo_hosts }}"
+            home_automation_reverse_proxy_ip: "{{ reverse_proxy_docker_ip_address }}"
 
         - import_role:
             name: media-server
@@ -71,9 +72,15 @@
         - import_role:
             name: reverse-proxy
           vars:
-            reverse_proxy_public_site_configs: "{{ public_site_configs }}"
+            reverse_proxy_configs: "{{ all_reverse_proxy_configs }}"
             reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
             reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"
+            reverse_proxy_ip: "{{ reverse_proxy_docker_ip_address }}"
+
+        - import_role:
+            name: tunnel
+          vars:
+            tunnel_internal_network: "{{ reverse_proxy_role.provides.external_network }}"
 
         - import_role:
             name: fail2ban

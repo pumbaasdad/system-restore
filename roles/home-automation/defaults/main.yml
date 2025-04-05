@@ -9,6 +9,8 @@ hass_google_assistant_api: "{{ secrets['hass_google_assistant_api'] }}"
 hass_auth_authorize: "{{ secrets['hass_auth_authorize'] }}"
 hass_auth_token: "{{ secrets['hass_auth_token'] }}"
 
+home_automation_internal_web_port: 8123
+home_automation_external_port: "{{ secrets['home_automation_external_port'] | default(home_automation_internal_web_port) }}"
 home_automation_wemo_server_port: 8990
 
 hass_config_volume: hass-config
@@ -16,11 +18,7 @@ hass_db_volume: hass-db
 
 home_automation_service_name: homeassistant
 home_automation_container_name: hass
-
-home_automation_network: ha-proxy0
-
-home_automation_subnet: "{{ secrets['home_automation_subnet'] | default('172.32.128.0/24') }}"
-home_automation_reverse_proxy_ip: "{{ secrets['home_automation_reverse_proxy_ip'] | default('172.32.128.20') }}"
+home_automation_subdomain: home
 
 zwave_dir: "{{ home_automation_dir }}/zwave"
 

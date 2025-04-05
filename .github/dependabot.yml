@@ -90,6 +90,13 @@ updates:
       time: "01:00"
       timezone: "America/Toronto"
   - package-ecosystem: "docker"
+    directory: "/roles/tunnel/templates"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "01:00"
+      timezone: "America/Toronto"
+  - package-ecosystem: "docker"
     directory: "/roles/unifi/templates"
     schedule:
       interval: "weekly"

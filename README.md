@@ -115,12 +115,6 @@ of the following keys:
      * `dest`: The name of an intrusion detection filter file to create. 
      * `src`: The template that will be used to create the filter.
  * `reverse_proxy`
-   * `public_site_configs`
-     * `name` - The name of an external reverse proxy configuration to create.
-     * `src` - The template that will be used to create the configuration.
-   * `networks` - A list of dictionaries that maps networks to which the reverse proxy container will connect to the
-                  properties of the network.
-     * `ipv4_address` - The IPv4 address of the reverse proxy on the network.
  * `docker`
    * `services`
      * `name` - The name of the docker service to create.  The role must create a dockerfile located in
@@ -136,6 +130,8 @@ of the following keys:
        * `host` - Optional.  If the network runs in host mode.  If this value is true, all other options in the
                   `networks` object are ignored.  Defaults to `false`.
        * `default` - Optional.  If this service runs on the default docker network.  Defaults to true.
+       * `default_ipv4_address` - Optional.  The IPv4 address that will be assigned to the service on the default docker
+                                  network.  Will be assigned randomly if not specified.
        * `internal` - Optional.  If this service runs on the internal docker network.  Defaults to false.
        * `extra` - Optional.  A list of non-standard docker networks that the service will run on.  Defaults to an empty
                    list.
@@ -222,9 +218,6 @@ alias: A list of strings that will be used to create aliases for this host.  Ali
        their FQDN.
 connected: An optional boolean that specifies if the host is currently connected to the internet.  If not present, it is
            assumed that the host is connected.  At present, this value is not used, but it may be in the future.
-external: An optional boolean that should only be set to true on the host being configured by ansible.  It indicates
-          that this is the interface of the host that is exposed to the public internet.  If unspecified, false is
-          assumed.
 internal: An optional boolean that should only be set to true on the host being configured by ansible.  It indicates
           that this is the interface of the host that is not exposed to the public internet.  If unspecified, false is
           assumed (i.e. this is not the internal interface of the host being configured).

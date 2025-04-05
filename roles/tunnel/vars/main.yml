@@ -1,0 +1,92 @@
+cloudflare_subnets:
+  - 173.245.48.0/20
+  - 103.21.244.0/22
+  - 103.22.200.0/22
+  - 103.31.4.0/22
+  - 141.101.64.0/18
+  - 108.162.192.0/18
+  - 190.93.240.0/20
+  - 188.114.96.0/20
+  - 197.234.240.0/22
+  - 198.41.128.0/17
+  - 162.158.0.0/15
+  - 104.16.0.0/13
+  - 104.24.0.0/14
+  - 172.64.0.0/13
+  - 131.0.72.0/22
+  - 2400:cb00::/32
+  - 2606:4700::/32
+  - 2803:f800::/32
+  - 2405:b500::/32
+  - 2405:8100::/32
+  - 2a06:98c0::/29
+  - 2c0f:f248::/32
+
+drop_out_to_internet_iptable_rules:
+  - chain: DOCKER-USER
+    in_interface: "{{ tunnel_external_network }}"
+    jump: DROP
+    ip_version: ipv4
+  - chain: DOCKER-USER
+    in_interface: "{{ tunnel_external_network }}"
+    jump: DROP
+    ip_version: ipv6
+
+allow_out_to_cloudflare_iptable_rules: "{%- set temp_allow_out_to_cloudflare_iptable_rules = [] -%}
+                                        {%- for subnet in cloudflare_subnets -%}
+                                        {%- set _ = temp_allow_out_to_cloudflare_iptable_rules.append({
+                                           'chain': 'DOCKER-USER',
+                                           'in_interface': tunnel_external_network,
+                                           'destination_ip': subnet,
+                                           'jump': 'ACCEPT',
+                                           'ip_version': subnet is ansible.utils.ipv6 | ternary('ipv6', 'ipv4')
+                                        }) -%}
+                                        {%- endfor -%}
+                                        {{- temp_allow_out_to_cloudflare_iptable_rules -}}"
+
+other_iptable_rules:
+  - chain: DOCKER-USER
+    out_interface: "{{ tunnel_external_network }}"
+    jump: DROP
+    ip_version: ipv4
+  - chain: DOCKER-USER
+    out_interface: "{{ tunnel_external_network }}"
+    cstate: [ESTABLISHED, RELATED]
+    jump: ACCEPT
+    ip_version: ipv4
+  - chain : INPUT
+    in_interface: "{{ tunnel_external_network }}"
+    jump: DROP
+    ip_version: ipv4
+  - chain: DOCKER-USER
+    out_interface: "{{ tunnel_external_network }}"
+    jump: DROP
+    ip_version: ipv6
+  - chain: DOCKER-USER
+    out_interface: "{{ tunnel_external_network }}"
+    cstate: [ESTABLISHED, RELATED]
+    jump: ACCEPT
+    ip_version: ipv6
+  - chain : INPUT
+    in_interface: "{{ tunnel_external_network }}"
+    jump: DROP
+    ip_version: ipv6
+
+tunnel_role:
+  files:
+    - src: roles/tunnel/templates/Dockerfile
+      dest: "{{ dockerfile_dir }}/{{ tunnel_service_name }}.Dockerfile"
+  docker:
+    services:
+      - name: "{{ tunnel_service_name }}"
+        environment:
+          - TUNNEL_TOKEN={{ secrets['cloudflared_token'] }}
+        command: tunnel run
+        networks:
+          default: false
+          extra:
+            - "{{ tunnel_external_network }}"
+            - "{{ __tunnel_internal_network | default('undefined') }}"
+    networks:
+      - name: "{{ tunnel_external_network }}"
+  iptable_rules: "{{ drop_out_to_internet_iptable_rules + allow_out_to_cloudflare_iptable_rules + other_iptable_rules }}"

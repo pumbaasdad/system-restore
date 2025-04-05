@@ -4,5 +4,5 @@
 
 - name: Load reverse proxy configuration
   set_fact:
-    __reverse_proxy_internal_networks: "{{ reverse_proxy_networks }}"
-    __reverse_proxy_public_site_configs: "{{ reverse_proxy_public_site_configs }}"
+    __reverse_proxy_configs: "{{ reverse_proxy_configs }}"
+    __reverse_proxy_ip: "{{ reverse_proxy_ip }}"
