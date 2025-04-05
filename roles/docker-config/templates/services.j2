@@ -74,7 +74,7 @@
 
     {{- configure_environment(service, service_definition, default_environment) -}}
 
-    {%- set _ = service_definition.update({ 'restart': 'unless-stopped' }) -%}
+    {%- set _ = service_definition.update({ 'restart': 'always' }) -%}
 
     {%- set _ = services.update({ service.name: service_definition }) %}
 {%- endmacro -%}
