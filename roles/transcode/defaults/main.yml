@@ -6,6 +6,7 @@ transcode_trash_dir: "{{ __transcode_media_mountpoint | default('undefined') }}/
 transcode_dvr_dir: "{{ __transcode_media_mountpoint | default('undefined') }}/DVR"
 transcode_keep_app_running: 1
 transcode_preset: "General/Very Fast 1080p30"
+transcode_dvr_preset: "Custom/DVR"
 transcode_keep_source_file: 0
 transcode_output_subdir: "SAME_AS_SRC"
 transcode_input_stability_seconds: 30
