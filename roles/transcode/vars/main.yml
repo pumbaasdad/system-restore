@@ -15,6 +15,7 @@ transcode_role:
       dest: "{{ transcode_dir }}/hooks/post_watch_folder_processing.sh"
     - src: roles/transcode/templates/presets.json
       dest: "{{ transcode_dir }}/ghb/presets.json"
+      backup: true
   nas_directories:
     - path: "{{ transcode_nas_dir }}"
       volume:

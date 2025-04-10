@@ -211,6 +211,7 @@
             owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
             group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_group, omit)) }}"
             mode: "{{ item.mode | default(item.dest.startswith(docker_compose_dir) | ternary('0664', omit)) }}"
+            backup: "{{ item.backup | default(omit) }}"
           loop: "{{ files }}"
           loop_control:
             label: "{{ item.label | default(item) }}"

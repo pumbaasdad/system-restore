@@ -31,8 +31,10 @@ home_automation_role:
       dest: "{{ dockerfile_dir }}/{{ home_automation_service_name }}.Dockerfile"
     - src: roles/home-automation/templates/configuration.yaml.j2
       dest: "{{ hass_dir }}/configuration.yaml"
+      backup: true
     - src: roles/home-automation/templates/settings.json.j2
       dest: "{{ zwave_dir }}/settings.json"
+      backup: true
     - src: roles/home-automation/templates/zwave.Dockerfile
       dest: "{{ dockerfile_dir }}/{{ zwave_service_name }}.Dockerfile"
   intrusion_detection:

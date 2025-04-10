@@ -90,6 +90,7 @@ of the following keys:
                other directories, defaults to the root user group.
    * `mode` - The permissions that the file will have.  For files in `docker_compose_dir` defaults to 644.  For other
               files defaults to the default `umask` on the machine being configured.
+   * `backup` - Optional.  If this file should be backed up before it is changed.  Defaults to `false`.
    * `notify` - Optional.  The name of an ansible handler to be run when this file is modified.
    * `vars` - Optional.  A dictionary of variables that should be passed to the template task used to create the file.
               If provided, the variables wile be available in a variable named `file_vars`
