@@ -10945,8 +10945,10 @@
                     "SubtitleBurnBDSub": true,
                     "SubtitleBurnBehavior": "foreign",
                     "SubtitleBurnDVDSub": true,
-                    "SubtitleLanguageList": [],
-                    "SubtitleTrackSelectionBehavior": "none",
+                    "SubtitleLanguageList": [
+                        "eng"
+                    ],
+                    "SubtitleTrackSelectionBehavior": "all",
                     "Type": 1,
                     "UsesPictureFilters": true,
                     "VideoAvgBitrate": 4000,

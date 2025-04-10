@@ -10,9 +10,7 @@ You must have a Z-Wave USB stick plugged into the system being configured.
 # Initial Setup
 
 A Google Cloud Platform project must be setup by following
-[these instructions](https://www.home-assistant.io/integrations/google_assistant/#manual-setup).  Note that when you
-specify URLs, they must also be set in the `hass_google_assistant_api`, `hass_auth_authorize` and `hass_auth_token`
-variables in the `reverse-proxy` role.
+[these instructions](https://www.home-assistant.io/integrations/google_assistant/#manual-setup).
 
 # Variables
 
@@ -31,9 +29,6 @@ variables in the `reverse-proxy` role.
 | home_automation_subdomain         | No       | The subdomain on which Home Assistant will be available.                                                         | home                                       |
 | google_assistant_project_id       | Yes      | The ID of the Google Cloud Platform project that will be used to integrate Home Assistant with Google Assistant. |                                            |
 | google_assistant_api_key          | Yes      | The API key used to authorize Home Assistant with your Google Cloud Platform project.                            |                                            |
-| hass_google_assistant_api         | Yes      | The path that the reverse proxy will forward to the /api/google_assistant endpoint of home assistant.            |                                            |
-| hass_auth_authorize               | Yes      | The path that the reverse proxy will forward to the /auth/authorize endpoint of home assistant.                  |                                            |
-| hass_auth_token                   | Yes      | The path that the reverse proxy will forward to the /auth/token endpoint of home assistant.                      |                                            |
 | zwave_dir                         | No       | The directory in which zwave2mqtt configuration will be stored.                                                  | `"{{ home_automation_dir }}/zwave"`        |
 | zwave_usbstick_symlink            | No       | The name of the symlink in /dev that points to the zwave USB stick                                               | zwaveusbstick                              |
 | zwave_config_volume               | No       | The name of the volume in which zwave configuration is stored.                                                   | zwave-config                               |
