@@ -5,10 +5,6 @@ hass_db_dir: "{{ home_automation_dir }}/hass-db"
 google_assistant_project_id: "{{ secrets['google_assistant_project_id'] }}"
 google_assistant_api_key: "{{ secrets['google_assistant_api_key'] }}"
 
-hass_google_assistant_api: "{{ secrets['hass_google_assistant_api'] }}"
-hass_auth_authorize: "{{ secrets['hass_auth_authorize'] }}"
-hass_auth_token: "{{ secrets['hass_auth_token'] }}"
-
 home_automation_internal_web_port: 8123
 home_automation_external_port: "{{ secrets['home_automation_external_port'] | default(home_automation_internal_web_port) }}"
 home_automation_wemo_server_port: 8990
