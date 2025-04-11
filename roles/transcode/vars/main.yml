@@ -40,7 +40,7 @@ transcode_role:
           - AUTOMATED_CONVERSION_CHECK_INTERVAL={{ transcode_input_check_seconds }}
           - AUTOMATED_CONVERSION_USE_TRASH=1
           - AUTOMATED_CONVERSION_OUTPUT_DIR_2=/watch2
-          - AUTOMATED_CONVERSION_PRESET2={{ transcode_dvr_preset }}
+          - AUTOMATED_CONVERSION_PRESET_2={{ transcode_dvr_preset }}
           - AUTOMATED_CONVERSION_VIDEO_FILE_EXTENSIONS=ts TS
         volumes:
           - "{{ transcode_config_volume }}:/config"
