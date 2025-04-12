@@ -14,6 +14,9 @@ certificates_role:
   files:
     - src: roles/certificates/templates/Dockerfile
       dest: "{{ dockerfile_dir }}/{{ letsencrypt_service_name }}.Dockerfile"
+    - src: roles/certificates/templates/cloudflare.ini.j2
+      dest: "{{ letsencrypt_dir }}/dns-conf/cloudflare.ini"
+      mode: '0600'
   docker:
     services:
       - name: "{{ letsencrypt_service_name }}"
@@ -25,11 +28,11 @@ certificates_role:
           - fail2ban-jails:/etc/fail2ban/jail.d
         environment:
           - EMAIL={{ letsencrypt_email }}
-          - SUBDOMAINS=wildcard
-          - URL={{ letsencrypt_url }}
-          - VALIDATION=duckdns
-          - DUCKDNSTOKEN={{ __certificates_duckdns_token }}
-          - DHLEVEL=2048
+          - URL={{ network.domain }}.{{ network.suffix }}
+          - SUBDOMAINS={{ __certificates_subdomains | default([]) | join(',') }}
+          - VALIDATION=dns
+          - DNSPLUGIN=cloudflare
+          - PROPAGATION=30
         capabilities:
           - NET_ADMIN
         backup: true

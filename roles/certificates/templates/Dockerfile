@@ -1,1 +1,1 @@
-FROM linuxserver/swag:3.0.1
+FROM linuxserver/swag:4.0.0

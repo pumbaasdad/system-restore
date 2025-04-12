@@ -8,7 +8,7 @@ server {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
 
-{% set proxy_pass = 'http://' + file_vars['subdomain'] + '.' + network.domain + '.' + network.suffix %}
+{% set proxy_pass = 'https://' + file_vars['subdomain'] + '.' + network.domain + '.' + network.suffix %}
 {% for path in file_vars['locations'] %}
     location {{ path }} {
         proxy_pass {{ proxy_pass }};

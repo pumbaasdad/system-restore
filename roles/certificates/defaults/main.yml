@@ -4,3 +4,5 @@ letsencrypt_url: "{{ secrets['letsencrypt_url'] }}"
 letsencrypt_certificate_volume: letsencrypt-config
 letsencrypt_etc_volume: letsencrypt-etc
 letsencrypt_service_name: letsencrypt
+
+certificates_cloudflare_api_token: "{{ secrets['cloudflare_certificates_api_token'] }}"

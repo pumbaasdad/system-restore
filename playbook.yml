@@ -22,14 +22,6 @@
     - name: Load roles without tasks
       block:
         - import_role:
-            name: ddns
-
-        - import_role:
-            name: certificates
-          vars:
-            certificates_duckdns_token: "{{ ddns_role.provides.duckdns_token }}"
-
-        - import_role:
             name: dhcp
 
         - import_role:
@@ -67,6 +59,11 @@
           vars:
             transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
             transcode_media_mountpoint: "{{ media_mountpoint }}"
+
+        - import_role:
+            name: certificates
+          vars:
+            certificates_subdomains: "{{ subdomains }}"
 
         - import_role:
             name: reverse-proxy
