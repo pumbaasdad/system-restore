@@ -45,7 +45,9 @@ scene: !include scenes.yaml
 
 google_assistant:
   project_id: {{ google_assistant_project_id }}
-  api_key: {{ google_assistant_api_key }}
+  service_account: !include google_service_account.json
+  report_state: true
+  secure_devices_pin: "{{ google_assistant_secure_devices_pin }}"
 
 logger:
   default: info
