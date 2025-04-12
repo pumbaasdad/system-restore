@@ -3,7 +3,11 @@ hass_dir: "{{ home_automation_dir }}/hass"
 hass_db_dir: "{{ home_automation_dir }}/hass-db"
 
 google_assistant_project_id: "{{ secrets['google_assistant_project_id'] }}"
-google_assistant_api_key: "{{ secrets['google_assistant_api_key'] }}"
+google_assistant_secure_devices_pin: "{{ secrets['google_assistant_secure_devices_pin'] }}"
+google_assistant_service_account_private_key_id: "{{ secrets['google_assistant_service_account_private_key_id'] }}"
+google_assistant_service_account_private_key: "{{ secrets['google_assistant_service_account_private_key'] }}"
+google_assistant_service_account_name: "{{ secrets['google_assistant_service_account_name'] }}"
+google_assistant_service_account_client_id: "{{ secrets['google_assistant_service_account_client_id'] }}"
 
 home_automation_internal_web_port: 8123
 home_automation_external_port: "{{ secrets['home_automation_external_port'] | default(home_automation_internal_web_port) }}"

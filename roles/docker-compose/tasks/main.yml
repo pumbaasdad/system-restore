@@ -11,6 +11,7 @@
         project_src: "{{ docker_compose_dir }}"
         state: "{{ force_docker_compose_restart | default(false) | ternary('restarted', 'present') }}"
         build: "{{ dockerfile_changed | ternary('always', 'never') }}"
+        remove_orphans: true
       register: compose
 
     - name: Restart docker containers
@@ -34,7 +35,7 @@
     - name: Prune docker images
       community.docker.docker_prune:
         images: yes
-        image_filters:
+        images_filters:
           dangling: false
         timeout: 300
 
