@@ -25,7 +25,6 @@ A Google Cloud Platform project must be setup by following
 | home_automation_container_name    | No       | The name of the docker container running Home Assistant.                                                         | hass                                       |
 | home_automation_internal_web_port | No       | The port on which the Home Assistant web UI will listen for connections.                                         | 8123                                       |
 | home_automation_external_port     | No       | The port on which Home Assistant will listen for connections from the public internet                            | `home_automation_internal_web_port`        |
-| home_assistant_wemo_server_port   | No       | The port that will be used in the home assistant container to listed for wemo callbacks.                         | 8990                                       |
 | home_automation_subdomain         | No       | The subdomain on which Home Assistant will be available.                                                         | home                                       |
 | google_assistant_project_id       | Yes      | The ID of the Google Cloud Platform project that will be used to integrate Home Assistant with Google Assistant. |                                            |
 | google_assistant_api_key          | Yes      | The API key used to authorize Home Assistant with your Google Cloud Platform project.                            |                                            |
@@ -47,9 +46,6 @@ A Google Cloud Platform project must be setup by following
 
 | Parameter                        | Member      | Description                                                                            |
 |:---------------------------------|:------------|:---------------------------------------------------------------------------------------|
-| home_automation_wemo_hosts       |             | A list of wemo devices to be controlled.                                               |
-|                                  | zone        | The name of the DNS zone to which the device belongs.                                  |
-|                                  | ipv4_offset | The offset of the devices IP address from the start of the DNS zone's subnet.          |
 | home_automation_reverse_proxy_ip |             | The IP address of the reverse proxy server that will be used to access Home Assistant. |
 
 # Docker Volumes

@@ -25,14 +25,14 @@ home_automation_role:
     - src: roles/home-automation/files/home-assistant.log
       dest: "{{ hass_dir }}/home-assistant.log"
       force: no
-    - src: roles/home-automation/templates/wemo.yaml.j2
-      dest: "{{ hass_dir }}/wemo.yaml"
     - src: roles/home-automation/templates/hass.Dockerfile
       dest: "{{ dockerfile_dir }}/{{ home_automation_service_name }}.Dockerfile"
     - src: roles/home-automation/templates/configuration.yaml.j2
       dest: "{{ hass_dir }}/configuration.yaml"
+      backup: true
     - src: roles/home-automation/templates/settings.json.j2
       dest: "{{ zwave_dir }}/settings.json"
+      backup: true
     - src: roles/home-automation/templates/zwave.Dockerfile
       dest: "{{ dockerfile_dir }}/{{ zwave_service_name }}.Dockerfile"
   intrusion_detection:
@@ -65,11 +65,6 @@ home_automation_role:
         volumes:
           - "{{ hass_config_volume }}:/config"
           - "{{ hass_db_volume }}:/db"
-        ports:
-          - "{{ home_automation_wemo_server_port }}:{{ home_automation_wemo_server_port }}"
-        environment:
-          - PYWEMO_HTTP_SERVER_PORT={{ home_automation_wemo_server_port }}
-          - PYWEMO_CALLBACK_ADDRESS={{ home_automation_internal_ip }}:{{ home_automation_wemo_server_port }}
         config_dir: "{{ hass_dir }}"
         backup: true
       - name: "{{ zwave_service_name }}"

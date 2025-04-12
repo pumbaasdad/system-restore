@@ -7,7 +7,6 @@ google_assistant_api_key: "{{ secrets['google_assistant_api_key'] }}"
 
 home_automation_internal_web_port: 8123
 home_automation_external_port: "{{ secrets['home_automation_external_port'] | default(home_automation_internal_web_port) }}"
-home_automation_wemo_server_port: 8990
 
 hass_config_volume: hass-config
 hass_db_volume: hass-db

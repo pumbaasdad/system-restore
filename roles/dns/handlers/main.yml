@@ -5,6 +5,6 @@
     dest: "{{ item.dest }}"
   vars:
     serial_number_increment: 1
-  loop: "{{ all_changed_files | selectattr('dest', 'match', dns_config_dir) | selectattr('changed', 'equalto', true) | map(attribute='item') }}"
+  loop: "{{ all_changed_files | selectattr('dest', 'match', dns_config_dir + '/db') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"
   loop_control:
     label: "{{ item.zone_name }}"

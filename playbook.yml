@@ -46,7 +46,6 @@
         - import_role:
             name: home-automation
           vars:
-            home_automation_wemo_hosts: "{{ wemo_hosts }}"
             home_automation_reverse_proxy_ip: "{{ reverse_proxy_docker_ip_address }}"
 
         - import_role:
@@ -211,6 +210,7 @@
             owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
             group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_group, omit)) }}"
             mode: "{{ item.mode | default(item.dest.startswith(docker_compose_dir) | ternary('0664', omit)) }}"
+            backup: "{{ item.backup | default(omit) }}"
           loop: "{{ files }}"
           loop_control:
             label: "{{ item.label | default(item) }}"
