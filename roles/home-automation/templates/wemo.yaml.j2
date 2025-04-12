@@ -1,9 +1,0 @@
-{%- set wemo_ips = [] %}
-{%- for host in __home_automation_wemo_hosts -%}
-    {%- set zone = network.zones | selectattr('name', 'equalto', host.zone) | first -%}
-    {%- set ipv4_address = zone.ipv4_subnet | ansible.utils.ipaddr(host.ipv4_offset + 256) | ansible.utils.ipaddr('address') -%}
-    {%- set _ = wemo_ips.append(ipv4_address) %}
-{%- endfor -%}
-{%- set wemo_yaml = { 'static': wemo_ips } -%}
-
-{{ wemo_yaml | to_nice_yaml }}

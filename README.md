@@ -222,7 +222,6 @@ connected: An optional boolean that specifies if the host is currently connected
 internal: An optional boolean that should only be set to true on the host being configured by ansible.  It indicates
           that this is the interface of the host that is not exposed to the public internet.  If unspecified, false is
           assumed (i.e. this is not the internal interface of the host being configured).
-wemo: If this is a wemo device that will be controlled by home-automation services.  If unspeciid, false is assumed.
 nas: Optional details about a NAS host.  Only one device may have this configuration.
 ```
 

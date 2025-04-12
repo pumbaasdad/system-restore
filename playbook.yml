@@ -46,7 +46,6 @@
         - import_role:
             name: home-automation
           vars:
-            home_automation_wemo_hosts: "{{ wemo_hosts }}"
             home_automation_reverse_proxy_ip: "{{ reverse_proxy_docker_ip_address }}"
 
         - import_role:
