@@ -6,26 +6,27 @@ This role provides support for generating certificates.  It provides this functi
 
 # Initial Setup
 
-Because certificate generation is tied to [Duck DNS](www.duckdns.org), you must follow the initial setup steps for the
-[ddns module](../ddns/README.md).
+A Cloudflare token must be created to allow the `letsencrypt` service to respond to ACME challenges.  This token must
+have DNS::Edit permissions for the domain for all zones in your account.
 
 # Variables
 
-| Variable                       | Required | Description                                                       | Default                                |
-|:-------------------------------|:---------|:------------------------------------------------------------------|:---------------------------------------|
-| letsencrypt_dir                | No       | The directory where `letsencrypt` configuration is stored.        | `{{ docker_compose_dir }}/letsencrypt` |
-| letsencrypt_certificate_volume | No       | The name of the volume used to store `letsencrypt` configuration. | letsencrypt-config                     |
-| letsencrypt_etc_volume         | No       | The name of the volume used to store `letsencrypt` certificates.  | letsencrypt-etc                        |
-| letsencrypt_service_name       | No       | The name given to the docker-compose `letsencrypt` srevice.       | letsencrypt                            |
-| letsencrypt_email              | Yes      | The email address associated with generated certificates.         |                                        |
-| letsencrypt_url                | Yes      | The public URL for which certificates will be generated.          |                                        |
+| Variable                       | Required | Description                                                                               | Default                                |
+|:-------------------------------|:---------|:------------------------------------------------------------------------------------------|:---------------------------------------|
+| letsencrypt_dir                | No       | The directory where `letsencrypt` configuration is stored.                                | `{{ docker_compose_dir }}/letsencrypt` |
+| letsencrypt_certificate_volume | No       | The name of the volume used to store `letsencrypt` configuration.                         | letsencrypt-config                     |
+| letsencrypt_etc_volume         | No       | The name of the volume used to store `letsencrypt` certificates.                          | letsencrypt-etc                        |
+| letsencrypt_service_name       | No       | The name given to the docker-compose `letsencrypt` srevice.                               | letsencrypt                            |
+| letsencrypt_email              | Yes      | The email address associated with generated certificates.                                 |                                        |
+| letsencrypt_url                | Yes      | The public URL for which certificates will be generated.                                  |                                        |
+| certificates_cloudflare_token  | Yes      | The token that can be used to authenticate with Cloudflare to respond to ACME challenges. |                                        |
 
 
 # Parameters
 
-| Parameter                  | Member | Description                                                                            |
-|:---------------------------|:-------|:---------------------------------------------------------------------------------------|
-| certificates_duckdns_token |        | The token that can be used to authenticate with DuckDNS to respond to ACME challenges. |
+| Parameter               | Member | Description                                                      |
+|:------------------------|:-------|:-----------------------------------------------------------------|
+| certificates_subdomains |        | The list of subdomains for which certificates will be generated. |
 
 # Docker Volumes
 

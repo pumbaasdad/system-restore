@@ -35,7 +35,7 @@ reverse_proxy_external_site_config_files: "{%- set temp_external_site_config_fil
                                            {{- temp_external_site_config_files -}}"
 
 reverse_proxy_files:
-  - src: roles/reverse-proxy/templates/nginx.conf.j2
+  - src: roles/reverse-proxy/templates/nginx.conf
     dest: "{{ reverse_proxy_dir }}/nginx/nginx.conf"
   - src: roles/reverse-proxy/templates/Dockerfile
     dest: "{{ dockerfile_dir }}/{{ reverse_proxy_internal_service_name }}.Dockerfile"
@@ -92,7 +92,7 @@ reverse_proxy_role:
           - "{{ reverse_proxy_internal_site_configs_volume }}:/config/nginx/site-confs"
           - "{{ reverse_proxy_internal_log_volume }}:/config/log/nginx"
         ports:
-          - "80:80"
+          - "443:443"
         environment:
           - DHLEVEL=2048
         networks:

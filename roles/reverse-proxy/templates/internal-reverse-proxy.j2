@@ -1,6 +1,8 @@
 server {
-    listen 80;
+    listen 443;
     server_name {{ file_vars['subdomain'] }}.{{ network.domain }}.{{ network.suffix }};
+    include /config/nginx/ssl.conf;
+    client_max_body_size 0;
 
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;

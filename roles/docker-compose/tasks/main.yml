@@ -34,6 +34,8 @@
     - name: Prune docker images
       community.docker.docker_prune:
         images: yes
+        image_filters:
+          dangling: false
         timeout: 300
 
     - name: Prune docker networks
