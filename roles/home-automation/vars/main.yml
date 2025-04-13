@@ -29,9 +29,8 @@ home_automation_role:
     - src: roles/home-automation/templates/home-assistant.log
       dest: "{{ hass_dir }}/home-assistant.log"
       force: no
-    - src: roles/home-automation/templates/google_service_account.json
+    - src: roles/home-automation/templates/google_service_account.json.j2
       dest: "{{ hass_dir }}/google_service_account.json"
-      force: no
     - src: roles/home-automation/templates/configuration.yaml.j2
       dest: "{{ hass_dir }}/configuration.yaml"
       backup: true
