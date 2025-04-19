@@ -1,1 +1,1 @@
-FROM zwavejs/zwave-js-ui:10.1.5
+FROM zwavejs/zwave-js-ui:10.2.0
