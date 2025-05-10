@@ -1,1 +1,1 @@
-FROM lscr.io/linuxserver/unifi-network-application:8.6.9
+FROM lscr.io/linuxserver/unifi-network-application:9.1.120
