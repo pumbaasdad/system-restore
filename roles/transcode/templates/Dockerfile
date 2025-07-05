@@ -1,4 +1,4 @@
-FROM jlesage/handbrake:v24.12.1
+FROM jlesage/handbrake:v25.06.3
 
 ARG PUID
 ARG PGID
