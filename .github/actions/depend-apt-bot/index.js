@@ -292,6 +292,10 @@ async function main() {
 
     updateYamlFile(filePath, config, topKey, packageManager);
 
+    console.log(updatedPackageNames)
+    console.log('!!!')
+    console.log(JSON.stringify(updatedPackageNames))
+
     core.setOutput('updated', updatedPackageNames.length > 0 ? 'true' : 'false');
     core.setOutput('updated-packages', JSON.stringify(updatedPackageNames));
 

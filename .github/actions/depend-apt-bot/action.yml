@@ -8,6 +8,9 @@ inputs:
   key:
     description: 'Name of the top-level key in the YAML file'
     required: true
+  package-manager:
+    description: 'Package manager to use (default: apt)'
+    required: true
 outputs:
   updated:
     description: 'Whether any packages were updated (true/false)'

@@ -82,6 +82,7 @@ jobs:
         with:
           file: 'mongo.yml'
           key: 'mongo'
+          package-manager: 'apt'
         id: update-mongo
       
       - name: Create Pull Request
