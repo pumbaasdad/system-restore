@@ -1,0 +1,144 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure nginx web server
+    description:
+      - Installs nginx web server package
+      - Configures nginx for various use cases (reverse proxy, proxy cache)
+      - Sets up SSL/HTTPS support when required
+      - Manages nginx configuration files and site configurations
+    author: Pumbaa's Dad
+    options:
+      nginx_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.
+      nginx_cache_200_cache_valid_duration:
+        type: str
+        required: false
+        description: Cache validity duration for 200 and 206 responses
+      nginx_cache_custom_locations:
+        type: list
+        elements: dict
+        required: false
+        description: Cache locations that override the default cache configuration
+        options:
+          buffering:
+            type: bool
+            required: true
+            description: Proxy buffering setting for this location
+          cache_valid:
+            type: list
+            elements: dict
+            required: true
+            description: Cache configuration for this location
+            options:
+              codes:
+                type: list
+                elements: int
+                required: true
+                description: HTTP response codes to cache
+              duration:
+                type: str
+                required: true
+                description: Cache duration for these response codes
+          name:
+            type: str
+            required: true
+            description: Name of the cache location
+          path:
+            type: str
+            required: true
+            description: URL path for the cache location
+          request_buffering:
+            type: bool
+            required: false
+            description: Proxy request buffering setting for this location
+      nginx_cache_error_cache_valid_duration:
+        type: str
+        required: false
+        description: Cache validity duration for error responses
+      nginx_cache_inactive_duration:
+        type: str
+        required: false
+        description: Time after which cached items are eligible for removal if not accessed
+      nginx_cache_keys_zone_name:
+        type: str
+        required: false
+        description: Name of the cache keys zone
+      nginx_cache_keys_zone_size:
+        type: str
+        required: false
+        description: Size of the cache keys zone
+      nginx_cache_levels:
+        type: str
+        required: false
+        description: Cache directory levels
+      nginx_cache_lock_timeout:
+        type: str
+        required: false
+        description: Timeout for cache lock operations
+      nginx_cache_max_size:
+        type: str
+        required: false
+        description: Maximum size of the cache (e.g., "1g")
+      nginx_cache_path:
+        type: str
+        required: false
+        description: Filesystem path for nginx proxy cache storage
+      nginx_extra_packages:
+        type: list
+        elements: str
+        required: false
+        default: []
+        description: Additional packages to install alongside nginx
+      nginx_resolver:
+        type: str
+        required: true
+        description: DNS resolver that nginx will use
+      nginx_reverse_proxy_config:
+        type: list
+        elements: dict
+        required: false
+        description: List of reverse proxy configurations
+        options:
+          paths:
+            type: list
+            elements: str
+            required: true
+            description: List of paths to proxy for this configuration
+          subdomain:
+            type: str
+            required: true
+            description: Subdomain for the reverse proxy
+          target:
+            type: str
+            required: true
+            description: Backend target URL
+      nginx_root_domain:
+        type: str
+        required: false
+        description: Root domain name for reverse proxied sites managed by nginx
+      nginx_set_host_header:
+        type: bool
+        required: false
+        description: Whether to set the Host header in proxy requests
+      nginx_ssl_cert_path:
+        type: str
+        required: false
+        description: Path to the SSL certificate file
+      nginx_ssl_key_path:
+        type: str
+        required: false
+        description: Path to the SSL private key file
+      nginx_type:
+        type: str
+        required: true
+        description: Type of nginx configuration to deploy
+        choices:
+          - reverse-proxy
+          - proxy-cache
+      nginx_use_https:
+        type: bool
+        required: true
+        description: Whether to enable HTTPS/SSL support

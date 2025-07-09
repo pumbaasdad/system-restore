@@ -1,4 +1,0 @@
-- name: Load fail2ban configuration
-  set_fact:
-    __fail2ban_jails: "{{ fail2ban_jails }}"
-    __fail2ban_filters: "{{ fail2ban_filters }}"

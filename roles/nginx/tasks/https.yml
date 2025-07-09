@@ -1,0 +1,12 @@
+- become: true
+  block:
+    - name: Install deffie-hellman parameters
+      get_url:
+        url: https://ssl-config.mozilla.org/ffdhe4096.txt
+        dest: /etc/nginx/dhparams.pem
+
+    - name: Install SSL configuration
+      template:
+        src: ssl.conf.j2
+        dest: /etc/nginx/ssl.conf
+      notify: Reload nginx

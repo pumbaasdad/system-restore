@@ -1,4 +1,0 @@
-- name: Load Backup Configuration
-  set_fact:
-    __volumerize_containers_to_stop: "{{ volumerize_lazy_containers_to_stop | join(' ') }}"
-    __volumerize_custom_volumes: "{{ backup_volumes | map('regex_replace', '(^.*$)', '\\1:/source/\\1:ro') }}"

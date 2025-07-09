@@ -1,0 +1,11 @@
+java_packages:
+  apt:
+    name: adoptium
+    key: https://packages.adoptium.net/artifactory/api/gpg/key/public
+    repository: https://packages.adoptium.net/artifactory/deb
+    distribution: noble
+    arch: amd64
+    components:
+      - main
+    packages:
+      temurin-17-jre: 17.0.15.0.0+6-0

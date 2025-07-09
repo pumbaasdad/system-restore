@@ -1,0 +1,87 @@
+{
+  "Dhcp4": {
+    "valid-lifetime": 172800,
+    "max-valid-lifetime": 345600,
+    "interfaces-config": {
+      "interfaces": [ "*" ],
+      "dhcp-socket-type": "raw"
+    },
+    "subnet4": [
+      {
+        "id": 1,
+        "subnet": "{{ kea_subnet }}",
+        "authoritative": true,
+        "pools": [
+          {
+            "pool": "{{ kea_dhcp_subnet | ansible.utils.ipaddr('net') | ansible.utils.ipaddr(1) | ansible.utils.ipaddr('address') }} - {{ kea_dhcp_subnet | ansible.utils.ipaddr('net') | ansible.utils.ipaddr(-2) | ansible.utils.ipaddr('address') }}"
+          }
+        ],
+        "option-data": [
+          {
+            "space": "dhcp4",
+            "name": "domain-name-servers",
+            "code": 6,
+            "data": "{{ kea_nameservers | join(',') }}"
+          },
+          {
+            "space": "dhcp4",
+            "name": "domain-name",
+            "code": 15,
+            "data": "{{ kea_domain }}"
+          },
+          {
+            "space": "dhcp4",
+            "name": "routers",
+            "code": 3,
+            "data": "{{ kea_gateway }}"
+          },
+          {
+            "space": "dhcp4",
+            "name": "broadcast-address",
+            "code": 28,
+            "data": "{{ kea_subnet | ansible.utils.ipaddr('net') | ansible.utils.ipaddr(-1) | ansible.utils.ipaddr('address') }}"
+          }
+        ],
+        "reservations": [
+{% set types = [
+    { 'self': 'ethernet', 'other': 'wifi', 'offset': 0 },
+    { 'self': 'wifi', 'other': 'ethernet', 'offset': 256 }
+] %}
+{% for zone in kea_zones %}
+    {%- if loop.last %}
+        {%- set last_zone = true %}
+    {%- else %}
+        {%- set last_zone = false %}
+    {%- endif %}
+    {%- for host in zone.hosts %}
+        {%- if last_zone and loop.last %}
+            {%- set comma = '' %}
+        {%- else %}
+            {%- set comma = ',' %}
+        {%- endif %}
+        {%- for type in types %}
+
+            {%- set connector_type = '' %}
+            {%- if host[type.other] is defined %}
+                {%- set connector_type = type.self + '.' %}
+            {%- endif %}
+
+            {%- if host[type.self] is defined %}
+
+          {
+            "hostname": "{{ connector_type }}{{ host.name }}.{{ zone.name }}",
+            "hw-address": "{{ host[type.self].mac }}",
+            "ip-address": "{{ zone.ipv4_subnet | ansible.utils.ipaddr(host.ipv4_offset + type.offset) | ansible.utils.ipaddr('address') }}"
+          }{{ comma }}
+            {%- endif %}
+        {% endfor %}
+    {% endfor %}
+{% endfor %}
+        ]
+      }
+    ],
+    "host-reservation-identifiers": [
+      "hw-address"
+    ]
+  }
+}

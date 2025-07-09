@@ -1,0 +1,311 @@
+#!/bin/bash
+
+log () {
+  echo "${1}" > /dev/tty
+}
+
+read_config() {
+    local parameter="${1}"
+
+    if [[ ! -f ".ansible-lastpass" ]]; then
+        return 1
+    fi
+
+    while IFS= read -r line; do
+        case "$line" in
+            "${parameter}="*)
+                echo "${line#${parameter}=}"
+                return 0
+                ;;
+            *) ;;
+        esac
+    done < ".ansible-lastpass"
+
+    return 1
+}
+
+# Function to read password using pinentry
+read_password_with_pinentry() {
+    local prompt="${1:-Enter password:}"
+    local description="${2:-Please enter your password}"
+    local title="${3:-Password Required}"
+
+    # Find available pinentry program
+    local pinentry_cmd=""
+    for cmd in pinentry-mac pinentry-gnome3 pinentry-gtk2 pinentry-qt pinentry-tty pinentry; do
+        if command -v "$cmd" >/dev/null 2>&1; then
+            pinentry_cmd="$cmd"
+            break
+        fi
+    done
+
+    if [[ -z "$pinentry_cmd" ]]; then
+        log "Error: No pinentry program found"
+        return 1
+    fi
+
+    # Use process substitution to communicate with pinentry
+    local password=""
+    local exit_code=1
+
+    while IFS= read -r line; do
+        case "$line" in
+            "OK"*)
+                exit_code=0
+                ;;
+            "D "*)
+                password="${line#D }"
+                ;;
+            "ERR"*)
+                exit_code=1
+                break
+                ;;
+        esac
+    done < <(
+        {
+            echo "SETTITLE $title"
+            echo "SETDESC $description"
+            echo "SETPROMPT $prompt"
+            echo "GETPIN"
+            echo "BYE"
+        } | "$pinentry_cmd" 2>&1
+    )
+
+    if [[ $exit_code -eq 0 && -n "$password" ]]; then
+        echo "$password"
+        return 0
+    else
+        return 1
+    fi
+}
+
+read_or_get_config() {
+    local parameter="${1}"
+    local prompt="${2}"
+    local description="${3}"
+    local title="${4}"
+
+    if ! value=$(read_config "${parameter}"); then
+        if ! value=$(read_password_with_pinentry "${prompt}" "${description}" "${title}"); then
+            return 1
+        fi
+
+        echo "${parameter}=${value}" >> ".ansible-lastpass"
+    fi
+
+    echo "${value}"
+}
+
+lastpass_login() {
+    local lastpass_username lastpass_password lastpass_otp lastpass_account_name yubikey_pin otp
+    
+    if ! lastpass_username=$(read_or_get_config "username" "Lastpass User Name:" "Enter your username" "Authentication Required"); then
+        return 1
+    fi
+
+    if ! lastpass_password=$(read_password_with_pinentry "Lastpass Master Password:" "Enter your password" "Authentication Required"); then
+        return 1
+    fi
+
+    case "$(read_config "otp")" in
+        "yubikey_oath")
+            # Validate ykman is available for YubiKey operations
+            if ! command -v ykman >/dev/null 2>&1; then
+                log "Error: ykman command not found. Please install YubiKey Manager CLI."
+                return 1
+            fi
+
+            if ! lastpass_account_name=$(read_or_get_config "lastpass_oauth_id" "Lastpass Account:" "Enter the name of the OATH account used for LastPass" "Authentication Required"); then
+                return 1
+            fi
+
+            if ! yubikey_pin=$(read_password_with_pinentry "Yubikey PIN:" "Enter your PIN" "Authentication Required"); then
+                return 1
+            fi
+
+            lastpass_otp="$(ykman oath accounts code -p "${yubikey_pin}" "${lastpass_account_name}" 2>/dev/tty | awk '{print $NF}')"
+            ;;
+        "enabled")
+            if ! otp=$(read_password_with_pinentry "Yubikey PIN:" "Enter your PIN" "Authentication Required"); then
+                return 1
+            fi
+
+            lastpass_otp="${otp}"
+            ;;
+        *)
+            lastpass_otp=""
+            ;;
+    esac
+
+    if ! echo -e "${lastpass_password}\n${lastpass_otp}" | LPASS_DISABLE_PINENTRY=1 lpass login "${lastpass_username}"; then
+        return 1
+    fi
+
+    echo "Logged Into Lastpass"
+}
+
+save_encrypted_password() {
+    local password="${1}"
+
+    if ! gpg_recipient=$(read_config "gpg"); then
+        return
+    fi
+
+    printf "%s" "${password}" | gpg --encrypt --recipient "${gpg_recipient}" > ".ansible-lastpass.gpg"
+}
+
+read_encrypted_password() {
+    if [[ ! -f ".ansible-lastpass.gpg" ]]; then
+        return 1
+    fi
+
+    log "Attempting to read GPG encrypted password"
+
+    if password=$(gpg --decrypt ".ansible-lastpass.gpg"); then
+        echo "${password}"
+        return 0
+    else
+        return 1
+    fi
+}
+
+configure_one_time_password() {
+    local otp_mode="${1}"
+
+    if [[ -z "$otp_mode" ]]; then
+        log "Error: --otp requires a value"
+        show_help
+        exit 1
+    fi
+
+    case "$otp_mode" in
+        disabled|enabled|yubikey_oath)
+            if [[ -f ".ansible-lastpass" ]]; then
+                grep -v "^otp=" ".ansible-lastpass" > ".ansible-lastpass.tmp" && mv ".ansible-lastpass.tmp" ".ansible-lastpass"
+            fi
+
+            echo "otp=${otp_mode}" >> ".ansible-lastpass"
+            ;;
+        *)
+            log "Error: --otp value must be one of: disabled, enabled, yubikey_oath"
+            show_help
+            exit 1
+            ;;
+    esac
+}
+
+configure_gpg_recipient() {
+    local gpg_recipient="${1}"
+
+    if [[ -z "$gpg_recipient" ]]; then
+        log "Error: --gpg requires a recipient value"
+        show_help
+        exit 1
+    fi
+
+    if [[ -f ".ansible-lastpass" ]]; then
+        grep -v "^gpg=" ".ansible-lastpass" > ".ansible-lastpass.tmp" && mv ".ansible-lastpass.tmp" ".ansible-lastpass"
+    fi
+
+    echo "gpg=${gpg_recipient}" >> ".ansible-lastpass"
+}
+
+process_flags() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -h|--help)
+                show_help
+                exit 0
+                ;;
+            --vault-id)
+                if [[ -z "$2" ]]; then
+                    log "Error: --vault-id requires a value"
+                    show_help
+                    exit 1
+                fi
+                echo "$2"
+                break
+                ;;
+            --otp)
+                configure_one_time_password "$2"
+                exit 1
+                ;;
+            --gpg)
+                configure_gpg_recipient "$2"
+                exit 1
+                ;;
+            -*)
+                log "Unknown option: $1"
+                break
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+}
+
+# Show help message
+show_help() {
+    cat << EOF > /dev/tty
+Usage: $(basename "$0") [OPTIONS] [VAULT_ID]
+
+OPTIONS:
+    -h, --help        Show this help message
+    --otp VALUE       Set OTP mode (disabled|enabled|yubikey_oath)
+                      When --otp is used, VAULT_ID is not required
+    --gpg RECIPIENT   Specify GPG recipient for encryption
+
+VAULT_ID:
+    Ansible vault entry identifier (required unless using --otp)
+EOF
+}
+
+# Main script
+main() {
+    if ! vault_id="$(process_flags "$@")"; then
+      exit 0
+    fi
+
+    if [[ -z "$vault_id" ]]; then
+        log "Error: VAULT_ID is required"
+        show_help
+        exit 1
+    fi
+
+    # Validate lpass executable is available
+    if ! command -v lpass >/dev/null 2>&1; then
+        log "Error: lpass command not found. Please install LastPass CLI."
+        exit 1
+    fi
+
+    if lpass status -q; then
+      if password="$(lpass show --password "${vault_id}")"; then
+          echo "${password}"
+          exit 0
+      fi
+    fi
+
+    if password="$(read_encrypted_password)"; then
+        echo "${password}"
+        exit 0
+    fi
+
+    logged_in="$(lastpass_login)"
+
+    if [[ -z "$logged_in" ]]; then
+      exit 1
+    fi
+
+    password=$(lpass show --password "${vault_id}")
+
+    save_encrypted_password "${password}"
+
+    echo "${password}"
+}
+
+# Run main function if script is executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi
+

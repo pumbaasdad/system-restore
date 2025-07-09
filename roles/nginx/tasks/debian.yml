@@ -1,0 +1,10 @@
+- include_vars:
+    file: "{{ nginx_type }}-debian.yml"
+
+- become: true
+  block:
+    - name: Install nginx
+      apt:
+        name: "{{ ['nginx'] + nginx_extra_packages }}"
+        update_cache: true
+        cache_valid_time: "{{ nginx_apt_cache_valid_time }}"

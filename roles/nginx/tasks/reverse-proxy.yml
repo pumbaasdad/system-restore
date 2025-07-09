@@ -1,0 +1,18 @@
+- become: true
+  block:
+    - name: Install default server configuration
+      template:
+        src: default.conf.j2
+        dest: /etc/nginx/site-confs/default.conf
+      notify: Reload nginx
+
+    - name: Install site configuration
+      vars:
+        nginx_server_name: "{{ item.subdomain }}.{{ nginx_root_domain }}"
+        nginx_target: "{{ item.target }}"
+        nginx_paths: "{{ item.paths }}"
+      template:
+        src: reverse-proxy.conf.j2
+        dest: "/etc/nginx/site-confs/{{ item.subdomain }}.conf"
+      loop: "{{ nginx_reverse_proxy_config }}"
+      notify: Reload nginx

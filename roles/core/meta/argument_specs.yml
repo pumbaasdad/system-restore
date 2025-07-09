@@ -1,0 +1,35 @@
+---
+argument_specs:
+  main:
+    short_description: Configure settings relevant to all hosts
+    description:
+      - This role configures basic system utilities and settings
+      - Sets up the default shell for the specified user
+      - Configures the default editor
+      - Installs htop configuration
+    author: Pumbaa's Dad
+    options:
+      core_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again
+      core_apt_proxy_server:
+        type: str
+        required: true
+        description:
+          - The URL of the apt proxy server to use for package management
+          - This server will always be accessed using http
+      core_project_name:
+        type: str
+        required: true
+        description: Name to assign to any system configuration files created by this role
+      core_user:
+        type: str
+        required: true
+        description: Username for which the environment will be configured
+  prune:
+    short_description: Remove unused packages and clean up the system
+    description:
+      - This role removes unused packages and cleans up the system
+      - It helps to free up disk space by removing resources that are no longer in use
+    author: Pumbaa's Dad

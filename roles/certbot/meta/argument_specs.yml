@@ -1,0 +1,48 @@
+---
+argument_specs:
+  main:
+    short_description: Installs and configures Certbot for Let's Encrypt certificate management
+    description:
+      - This role installs Certbot in a Python virtual environment
+      - Configures Certbot to use Cloudflare DNS for domain validation
+      - Sets up automatic certificate renewal via cron
+      - Configures post-renewal hooks to reload the webserver
+    author: Pumbaa's Dad
+    options:
+      certbot_cert_name:
+        type: str
+        required: true
+        description: Name of the certificate managed by certbot
+      certbot_cloudflare_api_token:
+        type: str
+        required: true
+        description: Cloudflare API token for DNS validation
+      certbot_domains:
+        type: list
+        elements: str
+        required: true
+        description: List of domains for which to request certificates
+      certbot_email:
+        type: str
+        required: true
+        description: Email address to provide to Let's Encrypt
+      certbot_project_directory:
+        type: str
+        required: true
+        description: Directory to store certbot configuration files
+      certbot_renew_hour:
+        type: int
+        required: true
+        description: Hour (0-23) to run the certificate renewal cron job
+      certbot_renew_minute:
+        type: int
+        required: true
+        description: Minute (0-59) to run the certificate renewal cron job
+      certbot_virtualenv:
+        type: str
+        required: true
+        description: Path to the Python virtual environment for certbot
+      certbot_webserver:
+        type: str
+        required: true
+        description: Name of the webserver that uses the certificates

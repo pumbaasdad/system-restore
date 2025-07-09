@@ -1,0 +1,22 @@
+name: 'Depend APT Bot'
+description: 'Action for managing APT package dependencies'
+author: "Pumbaa's Dad"
+inputs:
+  file:
+    description: 'YAML file path to update with latest package versions'
+    required: true
+  key:
+    description: 'Name of the top-level key in the YAML file'
+    required: true
+outputs:
+  updated:
+    description: 'Whether any packages were updated (true/false)'
+  updated-packages:
+    description: 'JSON array of updated package names'
+runs:
+  using: 'node20'
+  main: 'index.js'
+branding:
+  icon: 'package'
+  color: 'orange'
+

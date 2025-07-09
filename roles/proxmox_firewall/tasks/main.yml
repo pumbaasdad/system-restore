@@ -1,0 +1,17 @@
+- delegate_to: "{{ proxmox_firewall_proxmox_inventory_name }}"
+  block:
+    - name: Check if firewall configuration exists
+      stat:
+        path: /etc/pve/firewall/{{ proxmox_firewall_id }}.fw
+      register: firewall
+
+    - name: Create firewall configuration file
+      file:
+        dest: /etc/pve/firewall/{{ proxmox_firewall_id }}.fw
+        state: touch
+      when: not firewall.stat.exists
+
+    - name: Configure firewall
+      template:
+        src: firewall.fw.j2
+        dest: /etc/pve/firewall/{{ proxmox_firewall_id }}.fw

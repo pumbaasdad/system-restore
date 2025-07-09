@@ -1,1 +1,0 @@
-FROM linuxserver/homeassistant:2025.4.1

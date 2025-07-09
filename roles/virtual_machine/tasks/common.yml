@@ -1,0 +1,96 @@
+- name: Install hookscript
+  delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
+  vars:
+    virtual_machine_user: "{{ hostvars[inventory_hostname].virtual_machine_user }}"
+  template:
+    src: "{{ virtual_machine_hookscript }}.j2"
+    dest: /var/lib/vz/snippets/{{ virtual_machine_id }}{{ virtual_machine_hookscript | splitext | last }}
+    mode: '0755'
+  when: virtual_machine_hookscript is defined
+
+- vars:
+    proxmox_firewall_proxmox_inventory_name: "{{ virtual_machine_proxmox_inventory_name }}"
+    proxmox_firewall_id: "{{ virtual_machine_id }}"
+    proxmox_firewall_enabled: "{{ virtual_machine_firewall_enabled }}"
+    proxmox_firewall_policy_out: "{{ virtual_machine_firewall_policy_out }}"
+    proxmox_firewall_policy_in: "{{ virtual_machine_firewall_policy_in }}"
+    proxmox_firewall_ipsets: "{{ virtual_machine_firewall_ipsets }}"
+    proxmox_firewall_rules: "{{ virtual_machine_firewall_rules }}"
+  include_role:
+    name: proxmox_firewall
+    
+- delegate_to: localhost
+  block:
+    - name: Create new VM
+      community.general.proxmox_kvm:
+        vmid: "{{ virtual_machine_id }}"
+        node: "{{ virtual_machine_proxmox_node }}"
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        name: "{{ virtual_machine_name }}"
+        net:
+          net0: "virtio={{ virtual_machine_mac_address }},bridge=vmbr0,firewall={{ virtual_machine_firewall_enabled | ternary(1, 0) }}"
+        boot: order={{ virtual_machine_boot_order }}
+        cores: "{{ virtual_machine_cores }}"
+        memory: "{{ virtual_machine_memory }}"
+        balloon: "{{ virtual_machine_minimum_memory }}"
+        onboot: true
+        scsihw: virtio-scsi-pci
+        agent: true
+        localtime: true
+        tablet: false
+        bios: "{{ virtual_machine_bios }}"
+        cpu: host
+        ostype: "{{ virtual_machine_ostype }}"
+        efidisk0: "{{ virtual_machine_efidisk }}"
+        ide: "{{ virtual_machine_ide }}"
+        scsi:
+          scsi0: "{{ ['local-zfs:0,import-from=' + virtual_machine_image, virtual_machine_scsi_options] | reject('eq', '') | join(',') }}"
+        hotplug: "{{ virtual_machine_hotplug }}"
+        usb: "{{ virtual_machine_usb_devices }}"
+        serial: "{{ virtual_machine_serial }}"
+        vga: "{{ virtual_machine_vga }}"
+        ciupgrade: "{{ virtual_machine_ciupgrade }}"
+        cicustom: "{{ virtual_machine_cicustom }}"
+        searchdomains: "{{ virtual_machine_search_domain }}"
+        nameservers: "{{ virtual_machine_nameservers | join(',') }}"
+        ipconfig: "{{ virtual_machine_ipconfig }}"
+        hookscript: "{{ virtual_machine_hookscript is defined | ternary('local:snippets:/' + virtual_machine_hookscript_local_name, omit) }}"
+      register: virtual_machine_create
+
+    - name: Get the disk size
+      community.general.proxmox_vm_info:
+        vmid: "{{ virtual_machine_id }}"
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        config: current
+      register: info
+
+    - name: Set the disk size
+      vars:
+        current_size: "{{ info.proxmox_vms[0].config.scsi0.split(',') | select('regex', 'size') | first | split('=' ) | last | human_to_bytes(default_unit='B') }}"
+        target_size: "{{ virtual_machine_disk_size | human_to_bytes(default_unit='B') }}"
+        required_increase: "{{ target_size | int - current_size | int }}"
+      community.general.proxmox_disk:
+        vmid: "{{ virtual_machine_id }}"
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        state: "{{ (required_increase | int > 0) | ternary('resized', 'present') }}"
+        size: +{{ required_increase }}
+        disk: scsi0
+
+    - name: Start the VM
+      community.general.proxmox_kvm:
+        vmid: "{{ virtual_machine_id }}"
+        node: "{{ virtual_machine_proxmox_node }}"
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        state: started

@@ -1,4 +1,0 @@
-search {{ network.domain }}.{{ network.suffix }}
-nameserver ::1
-nameserver 127.0.0.1
-nameserver {{ dns_forwarders | ansible.utils.ipv4 | first }}

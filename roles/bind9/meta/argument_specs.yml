@@ -1,0 +1,117 @@
+---
+argument_specs:
+  main:
+    short_description: Configure BIND9 DNS server
+    description:
+      - This role installs and configures BIND9 DNS server for local network zones
+      - Manages forward and reverse DNS zone files
+      - Handles IPv4 and IPv6 reverse lookups
+    author: Pumbaa's Dad
+    options:
+      bind9_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.
+      bind9_forwarders:
+        type: list
+        elements: str
+        required: true
+        description: List of IP addresses for DNS forwarders
+      bind9_host_ip:
+        type: str
+        required: true
+        description: The IP address of the BIND9 server on the local network
+      bind9_hostname:
+        type: str
+        required: true
+        description: The fully qualified domain name of the BIND9 server
+      bind9_ipv4_subnet:
+        type: str
+        required: true
+        description: The IPv4 subnet for the network that the BIND9 server is authoritative for.
+      bind9_reverse_ipv6_zone:
+        type: str
+        required: true
+        description: The IPv6 reverse zone that the BIND9 server is authoritative for.
+      bind9_root_domain:
+        type: str
+        required: true
+        description: The root domain for all DNS zones
+      bind9_server:
+        type: str
+        required: true
+        description: The name and zone of the BIND9 server, without the top level domain.
+      bind9_zone:
+        type: str
+        required: true
+        description: The DNS zone in which the BIND9 server is located
+      bind9_zones:
+        type: list
+        elements: dict
+        required: true
+        description: The zones managed by the BIND9 server
+        options:
+          hosts:
+            type: list
+            elements: dict
+            required: true
+            description: A description of the hosts in the zone
+            options:
+              aliases:
+                type: list
+                elements: str
+                description: A list of aliases for the host that will be added to the root domain.
+              ethernet:
+                type: dict
+                required: false
+                description: Details about the host's ethernet connection
+                options:
+                  ipv6_interface:
+                    type: str
+                    required: false
+                    description:
+                      - The interface portion of this devices IPv6 address.
+                      - The special value `none` can be used to indicate that the interface does not support IPv6.
+                      - The special value `unknown` can be used to indicate that the interface supports IPv6, but it's unknown how the interface portion is assigned.
+                      - If this value is not specified, the it's assumed that the interface uses a link local IPv6 address.
+                  mac:
+                    type: str
+                    required: true
+                    description: The MAC address of the host's ethernet interface
+              ipv4_offset:
+                type: int
+                required: true
+                description: The offset of the host's IPv4 address in the subnet
+              name:
+                type: str
+                required: true
+                description: The name of the host
+              wifi:
+                type: dict
+                required: false
+                description: Details about the host's wifi connection
+                options:
+                  ipv6_interface:
+                    type: str
+                    required: false
+                    description:
+                      - The interface portion of this devices IPv6 address.
+                      - The special value `none` can be used to indicate that the interface does not support IPv6.
+                      - The special value `unknown` can be used to indicate that the interface supports IPv6, but it's unknown how the interface portion is assigned.
+                      - If this value is not specified, the it's assumed that the interface uses a link local IPv6 address.
+                  mac:
+                    type: str
+                    required: true
+                    description: The MAC address of the host's wifi interface
+          ipv4_subnet:
+            type: str
+            required: true
+            description: IPv4 subnet for this zone in CIDR notation
+          ipv6_prefix:
+            type: str
+            required: false
+            description: IPv6 prefix for this zone in CIDR notation
+          name:
+            type: str
+            required: true
+            description: The name of the zone

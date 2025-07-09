@@ -1,0 +1,131 @@
+- name: Enable apt sources
+  apt_repository:
+    repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
+    state: present
+    update_cache: false
+  loop:
+    - uri: http://deb.debian.org/debian
+      suite: "{{ ansible_distribution_release }}"
+      components: main contrib
+    - uri: http://deb.debian.org/debian
+      suite: "{{ ansible_distribution_release }}-updates"
+      components: main contrib
+    - uri: http://security.debian.org/debian-security
+      suite: "{{ ansible_distribution_release }}-security"
+      components: main contrib
+    - uri: http://download.proxmox.com/debian/pve
+      suite: "{{ ansible_distribution_release }}"
+      components: pve-no-subscription
+
+- name: Disable pve-enterprise sources
+  apt_repository:
+      repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
+      state: absent
+      update_cache: false
+  loop:
+      - uri: https://enterprise.proxmox.com/debian/pve
+        suite: "{{ ansible_distribution_release }}"
+        components: pve-enterprise
+      - uri: https://enterprise.proxmox.com/debian/ceph-quincy
+        suite: "{{ ansible_distribution_release }}"
+        components: enterprise
+      - uri: https://enterprise.proxmox.com/debian/ceph-reef
+        suite: "{{ ansible_distribution_release }}"
+        components: enterprise
+      - uri: http://download.proxmox.com/debian/ceph-quincy
+        suite: "{{ ansible_distribution_release }}"
+        components: no-subscription
+      - uri: http://download.proxmox.com/debian/ceph-reef
+        suite: "{{ ansible_distribution_release }}"
+        components: no-subscription
+      - uri: http://download.proxmox.com/debian/pve
+        suite: "{{ ansible_distribution_release }}"
+        components: pvetest
+
+- name: Disable legacy sources
+  apt_repository:
+      repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
+      state: absent
+      update_cache: false
+  loop:
+      - uri: http://ftp.ca.debian.org/debian
+        suite: "{{ ansible_distribution_release }}"
+        components: main contrib
+      - uri: http://ftp.ca.debian.org/debian
+        suite: "{{ ansible_distribution_release }}-updates"
+        components: main contrib
+      - uri: http://security.debian.org
+        suite: "{{ ansible_distribution_release }}-security"
+        components: main contrib
+
+- name: Disable free firmware warnings
+  copy:
+    src: apt.conf
+    dest: /etc/apt/apt.conf.d/{{ proxmox_project }}-apt.conf
+
+- name: Disable High Availability
+  service:
+    name: "{{ item }}"
+    enabled: false
+    state: stopped
+  loop:
+    - pve-ha-lrm
+    - pve-ha-crm
+    - corosync
+
+- name: Install packages
+  apt:
+    name:
+      - lm-sensors
+      - openssh-server
+      - pip
+      - virtualenv
+    update_cache: true
+    cache_valid_time: "{{ proxmox_apt_cache_valid_time }}"
+
+- name: Upgrade packages
+  apt:
+    upgrade: dist
+
+- name: Disable subscription warning
+  replace:
+    path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
+    regexp: '( ?|^\s{1,}success: function[a-z()\{, ]+)((?:\n.*){16})(\s+orig_cmd.+\n)\s+}\n'
+    replace: \1\3
+    backup: true
+
+- name: Install python modules
+  pip:
+    name:
+      - proxmoxer
+      - requests
+    virtualenv: "{{ proxmox_virtualenv }}"
+
+- name: Create directory for VM images
+  file:
+    path: "{{ proxmox_image_directory }}"
+    state: directory
+
+- name: Configure local storage
+  copy:
+    src: storage.cfg
+    dest: /etc/pve/storage.cfg
+    backup: true
+
+- name: Enable the cluster firewall
+  template:
+    src: cluster.fw.j2
+    dest: /etc/pve/firewall/cluster.fw
+    backup: true
+
+- name: Enable the node firewall
+  copy:
+    src: host.fw
+    dest: /etc/pve/nodes/{{ inventory_hostname }}/host.fw
+    backup: true
+
+- name: Enable webauthn
+  template:
+    src: datacenter.cfg.j2
+    dest: /etc/pve/datacenter.cfg
+    backup: true

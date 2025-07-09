@@ -1,0 +1,6 @@
+{%- import 'db/macros.j2' as macros -%}
+{%- set records = [] -%}
+{{- macros.append_records_for_zone(records, zone, bind9_zone, bind9_root_domain) }}
+{%- set zone_name = zone.name + '.' + bind9_root_domain -%}
+{%- set record_selector = { 'field': 'type', 'test': 'in', 'value': ['A', 'AAAA'] } -%}
+{{ macros.print_file(zone_name, bind9_hostname, bind9_root_domain, records, record_selector, zone_serial_number, bind9_root_domain) }}

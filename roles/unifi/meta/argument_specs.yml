@@ -1,0 +1,19 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure UniFi Network Controller
+    description:
+      - Creates dedicated unifi user and group for the service
+      - Installs UniFi Network Controller from Ubiquiti repository
+      - Configures APT repository with proper GPG key verification
+      - Sets up specific UniFi package versions for consistent deployments
+    author: Pumbaa's Dad
+    options:
+      unifi_group_id:
+        type: int
+        required: true
+        description: Group ID for the unifi group
+      unifi_user_id:
+        type: int
+        required: true
+        description: User ID for the unifi user account

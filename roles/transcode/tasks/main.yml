@@ -1,4 +1,0 @@
-- name: Load Transcode Configuration
-  set_fact:
-    __transcode_src_volume: "{{ transcode_src_volume }}"
-    __transcode_media_mountpoint: "{{ transcode_media_mountpoint }}"

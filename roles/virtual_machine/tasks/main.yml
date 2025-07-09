@@ -1,0 +1,2 @@
+- include_tasks:
+    file: "{{ virtual_machine_type }}.yml"

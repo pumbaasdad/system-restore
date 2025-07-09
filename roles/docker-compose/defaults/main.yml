@@ -1,1 +1,0 @@
-docker_compose_virtual_env: "{{ docker_compose_dir }}/.venv/docker"

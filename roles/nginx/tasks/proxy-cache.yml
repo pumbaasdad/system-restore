@@ -1,0 +1,12 @@
+- become: true
+  block:
+    - name: Create cache directory
+      file:
+        dest: "{{ nginx_cache_path }}"
+        state: directory
+
+    - name: Install site configuration
+      template:
+        src: cache.conf.j2
+        dest: "/etc/nginx/site-confs/cache.conf"
+      notify: Reload nginx

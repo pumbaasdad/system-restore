@@ -1,0 +1,72 @@
+hypervisors:
+  hosts:
+    pve:
+ubuntu_vms:
+  hosts:
+    media:
+docker_hosts:
+  hosts:
+    media:
+snowflake_vms:
+  hosts:
+    home-automation:
+ubuntu_lxcs:
+  hosts:
+    network-management:
+    reverse-proxy:
+    dns:
+    dhcp:
+    http-firewall:
+    proxy-cache:
+    tunnel:
+storage:
+  hosts:
+    nas:
+
+vms:
+  children:
+    ubuntu_vms:
+    snowflake_vms:
+
+regular_priority_lxcs:
+  hosts:
+    network-management:
+    reverse-proxy:
+    dns:
+    http-firewall:
+    proxy-cache:
+    tunnel:
+
+reverse_proxies:
+  hosts:
+    reverse-proxy:
+    http-firewall:
+
+lxcs:
+  children:
+    ubuntu_lxcs:
+
+ubuntus:
+  children:
+    ubuntu_vms:
+    ubuntu_lxcs:
+
+debians:
+  children:
+    hypervisors:
+    ubuntus:
+
+virtualized:
+  children:
+    vms:
+    lxcs:
+
+linuxes:
+  children:
+    debians:
+
+ssh_servers:
+  children:
+    hypervisors:
+    ubuntu_vms:
+    lxcs:

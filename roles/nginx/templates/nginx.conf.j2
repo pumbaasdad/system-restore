@@ -1,0 +1,42 @@
+user www-data;
+worker_processes auto;
+pid /run/nginx.pid;
+include /etc/nginx/modules-enabled/*.conf;
+include /etc/nginx/conf.d/*.conf;
+pcre_jit on;
+
+events {
+    worker_connections 768;
+}
+
+http {
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    resolver {{ nginx_resolver }} valid=30s;
+
+    server_tokens off;
+    client_max_body_size 0;
+    sendfile on;
+    tcp_nopush on;
+    gzip_vary on;
+
+    map $http_upgrade $connection_upgrade {
+        default upgrade;
+        '' close;
+    }
+
+    client_body_temp_path /tmp/nginx 1 2;
+    proxy_temp_path /tmp/nginx-proxy;
+    fastcgi_temp_path /tmp/nginx-fastcgi;
+    uwsgi_temp_path /tmp/nginx-uwsgi;
+    scgi_temp_path /tmp/nginx-scgi;
+
+    proxy_cache_path /tmp/nginx-proxy-cache keys_zone=lsio-proxy:10m;
+    fastcgi_cache_path /tmp/nginx-fcgi-cache keys_zone=lsio-fcgi:10m;
+    scgi_cache_path /tmp/nginx-scgi-cache keys_zone=lsio-scgi:10m;
+    uwsgi_cache_path /tmp/nginx-uwsgi-cache keys_zone=lsio-uwsgi:10m;
+
+    include /etc/nginx/http.d/*.conf;
+    include /etc/nginx/site-confs/*.conf;
+}

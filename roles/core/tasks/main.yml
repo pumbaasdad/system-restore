@@ -1,0 +1,40 @@
+- include_vars:
+    file: "{{ ansible_distribution | lower }}.yml"
+
+- include_tasks:
+    file: "{{ ansible_distribution_file_variety | lower }}.yml"
+
+- vars:
+    package_config: "{{ core_fish_packages }}"
+  include_role:
+    name: package
+
+- become: true
+  block:
+    - name: Set vim as default editor
+      become: true
+      alternatives:
+        name: editor
+        path: /usr/bin/vim.basic
+
+    - name: Set fish as default shell
+      become: true
+      user:
+        name: "{{ core_user }}"
+        shell: /usr/bin/fish
+
+- name: Install fish configuration files
+  copy:
+    src: fish/
+    dest: "{{ ansible_env.HOME }}/.config/fish"
+
+- name: Create htop configuration directory
+  file:
+    dest: "{{ ansible_env.HOME }}/.config/htop"
+    state: directory
+
+- name: Initialize htop configuration
+  copy:
+    src: htoprc
+    dest: "{{ ansible_env.HOME }}/.config/htop/htoprc"
+    force: false

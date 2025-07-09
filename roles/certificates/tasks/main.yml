@@ -1,3 +1,0 @@
-- name: Load Certificate Configuration
-  set_fact:
-    __certificates_subdomains: "{{ certificates_subdomains }}"

@@ -1,6 +1,0 @@
-docker_compose_role:
-  pip_modules:
-    environment: "{{ docker_compose_virtual_env }}"
-    modules:
-    - docker
-    - docker-composer-v2

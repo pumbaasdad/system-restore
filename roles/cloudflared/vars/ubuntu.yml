@@ -1,0 +1,11 @@
+cloudflared_packages:
+  apt:
+    name: cloudflared
+    key: https://pkg.cloudflare.com/cloudflare-main.gpg
+    repository: https://pkg.cloudflare.com/cloudflared
+    distribution: noble
+    arch: amd64
+    components:
+      - main
+    packages:
+      cloudflared: 2025.6.1

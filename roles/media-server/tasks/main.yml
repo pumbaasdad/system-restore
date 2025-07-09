@@ -1,3 +1,0 @@
-- name: Load Media Server Configuration
-  set_fact:
-    __media_server_media_mountpoint: "{{ media_server_media_mountpoint }}"

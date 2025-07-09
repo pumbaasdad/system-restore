@@ -1,0 +1,22 @@
+- name: Create user cloud-init file
+  delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
+  vars:
+    virtual_machine_user: "{{ hostvars[inventory_hostname].virtual_machine_user }}"
+  template:
+    src: user.j2
+    dest: "/var/lib/vz/snippets/{{ virtual_machine_id }}.yml"
+
+- vars:
+    virtual_machine_static_ip_config: "{{ virtual_machine_ip_address }}/{{ virtual_machine_subnet_size }},gw={{ virtual_machine_gateway }}"
+    virtual_machine_boot_order: scsi0;ide2
+    virtual_machine_serial:
+      serial0: 'socket'
+    virtual_machine_vga: serial0
+    virtual_machine_ide:
+      ide2: 'local-zfs:cloudinit'
+    virtual_machine_ciupgrade: true
+    virtual_machine_cicustom: user=local:snippets/{{ virtual_machine_id }}.yml
+    virtual_machine_ipconfig:
+      ipconfig0: "ip={{ virtual_machine_static_ip | ternary(virtual_machine_static_ip_config, 'dhcp') }} "
+  include_tasks:
+    file: common.yml

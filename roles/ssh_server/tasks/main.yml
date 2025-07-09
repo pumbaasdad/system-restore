@@ -1,0 +1,7 @@
+- name: Require SSH key
+  become: true
+  copy:
+    src: sshd_conf
+    dest: /etc/ssh/sshd_config.d/99-{{ ssh_server_project }}-settings.conf
+  notify:
+    - Restart sshd

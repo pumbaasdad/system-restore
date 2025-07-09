@@ -1,0 +1,12 @@
+agree-tos=true
+server=https://acme-v02.api.letsencrypt.org/directory
+domains={{ certbot_domains | join(',') }}
+email={{ certbot_email }}
+no-eff-email=true
+register-unsafely-without-email=false
+preferred-challenges=dns
+authenticator=dns-cloudflare
+dns-cloudflare-credentials=/etc/letsencrypt/cloudflare.ini
+dns-cloudflare-propagation-seconds=30
+cert-name={{ certbot_cert_name }}
+renew-by-default=true

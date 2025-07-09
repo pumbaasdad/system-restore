@@ -1,0 +1,69 @@
+services:
+  handbrake:
+    container_name: handbrake
+    image: jlesage/handbrake:v25.02.3
+    environment:
+      - TZ={{ handbrake_timezone }}
+      - USER_ID={{ handbrake_uid }}
+      - GROUP_ID={{ handbrake_gid }}
+      - KEEP_APP_RUNNING=1
+      - AUTOMATED_CONVERSION_PRESET=General/HQ 1080p30
+      - AUTOMATED_CONVERSION_KEEP_SOURCE=0
+      - AUTOMATED_CONVERSION_OUTPUT_DIR=/media/{{ handbrake_nfs_output_path }}
+      - AUTOMATED_CONVERSION_OUTPUT_SUBDIR=SAME_AS_SRC
+      - AUTOMATED_CONVERSION_SOURCE_STABLE_TIME=30
+      - AUTOMATED_CONVERSION_CHECK_INTERVAL=60
+      - AUTOMATED_CONVERSION_USE_TRASH=1
+      - AUTOMATED_CONVERSION_OUTPUT_DIR_2=/media/{{ handbrake_nfs_dvr_tv_output_path }}
+      - AUTOMATED_CONVERSION_PRESET_2=Custom/DVR
+      - AUTOMATED_CONVERSION_VIDEO_FILE_EXTENSIONS_2={{ handbrake_dvr_extensions }}
+      - AUTOMATED_CONVERSION_OUTPUT_DIR_3=/media/{{ handbrake_nfs_dvr_movies_output_path }}
+      - AUTOMATED_CONVERSION_PRESET_3=Custom/DVR
+      - AUTOMATED_CONVERSION_VIDEO_FILE_EXTENSIONS_3={{ handbrake_dvr_extensions }}
+    ports:
+      - 5800:5800
+    restart: always
+    volumes:
+      - config:/config
+      - media:/media
+      - recycle:/trash:nocopy
+      - watch:/watch
+      - watch2:/watch2
+      - watch3:/watch3
+volumes:
+  config:
+    driver: local
+    driver_opts:
+      device: /opt/epcot/handbrake/config
+      o: bind
+      type: none
+  media:
+    driver: local
+    driver_opts:
+      device: :{{ handbrake_nfs_mountpoint }}
+      o: addr={{ handbrake_nfs_address }},rw,nfsvers=4,async
+      type: nfs
+  recycle:
+    driver: local
+    driver_opts:
+      device: :{{ handbrake_nfs_mountpoint }}/{{ handbrake_nfs_trash_path }}
+      o: addr={{ handbrake_nfs_address }},rw,nfsvers=4,async
+      type: nfs
+  watch:
+    driver: local
+    driver_opts:
+      device: :{{ handbrake_nfs_mountpoint }}/{{ handbrake_nfs_watch_path }}
+      o: addr={{ handbrake_nfs_address }},rw,nfsvers=4,async
+      type: nfs
+  watch2:
+    driver: local
+    driver_opts:
+      device: :{{ handbrake_nfs_mountpoint }}/{{ handbrake_nfs_dvr_tv_watch_path }}
+      o: addr={{ handbrake_nfs_address }},rw,nfsvers=4,async
+      type: nfs
+  watch3:
+    driver: local
+    driver_opts:
+      device: :{{ handbrake_nfs_mountpoint }}/{{ handbrake_nfs_dvr_movies_watch_path }}
+      o: addr={{ handbrake_nfs_address }},rw,nfsvers=4,async
+      type: nfs

@@ -1,0 +1,70 @@
+---
+argument_specs:
+  main:
+    short_description: Configure handbrake video transcoding service
+    description:
+      - Installs and configures handbrake as a Docker container
+      - Sets up automated video conversion with NFS storage
+      - Configures multiple watch directories for different content types
+    author: Pumbaa's Dad
+    options:
+      handbrake_directory:
+        type: str
+        required: true
+        description: Directory where handbrake configuration and docker compose file will be stored
+      handbrake_dvr_extensions:
+        type: str
+        required: true
+        description: Comma-separated list of video file extensions for DVR content
+      handbrake_gid:
+        type: int
+        required: true
+        description: Group ID that will be used to run the handbrake process
+      handbrake_nfs_address:
+        type: str
+        required: true
+        description: IP address of the NFS server that will be used to read and write video files
+      handbrake_nfs_dvr_movies_output_path:
+        type: str
+        required: true
+        description: Path on NFS server where transcodes of DVR movies will be stored
+      handbrake_nfs_dvr_movies_watch_path:
+        type: str
+        required: true
+        description: Path on NFS server to watch for new DVR recordings of movies
+      handbrake_nfs_dvr_tv_output_path:
+        type: str
+        required: true
+        description: Path on NFS server where transcodes of DVR TV shows will be stored
+      handbrake_nfs_dvr_tv_watch_path:
+        type: str
+        required: true
+        description: Path on NFS server to watch for new DVR recordings of TV shows
+      handbrake_nfs_mountpoint:
+        type: str
+        required: true
+        description: Base path on the NFS server for media storage, all handbrake_nfs_*_path parameters are relative to this
+      handbrake_nfs_output_path:
+        type: str
+        required: true
+        description: Path on NFS server where transcodes from handbrake_nfs_watch_path will be stored
+      handbrake_nfs_trash_path:
+        type: str
+        required: true
+        description: Path on NFS server for trash/recycle bin
+      handbrake_nfs_watch_path:
+        type: str
+        required: true
+        description: Path on NFS server to watch for non-DVR transcodes
+      handbrake_timezone:
+        type: str
+        required: true
+        description: Timezone for the HandBrake container
+      handbrake_uid:
+        type: int
+        required: true
+        description: User ID that will be used to run the handbrake process
+      handbrake_user:
+        type: str
+        required: true
+        description: User that owns the handbrake configuration files

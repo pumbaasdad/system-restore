@@ -1,0 +1,36 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure Proxmox VE
+    description:
+      - Configures APT repositories for Proxmox VE installation
+      - Sets up Proxmox datacenter configuration with WebAuthn
+      - Configures cluster firewall settings
+      - Installs Proxmox packages and dependencies
+      - Creates virtual environment and image directory structure
+    author: Pumbaa's Dad
+    options:
+      proxmox_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.
+      proxmox_domain:
+        type: str
+        required: true
+        description: Domain name for Proxmox WebAuthn configuration
+      proxmox_image_directory:
+        type: str
+        required: true
+        description: Directory path for storing Proxmox VM/container images
+      proxmox_local_network:
+        type: str
+        required: true
+        description: Local network CIDR for cluster firewall configuration
+      proxmox_project:
+        type: str
+        required: true
+        description: Name added to files associated with this project.
+      proxmox_virtualenv:
+        type: str
+        required: true
+        description: Path to Python virtual environment for Proxmox tools

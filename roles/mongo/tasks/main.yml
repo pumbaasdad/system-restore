@@ -1,0 +1,7 @@
+- include_vars:
+    file: "{{ ansible_distribution | lower }}_{{ mongo_version | lower }}.yml"
+
+- vars:
+    package_config: "{{ mongo_packages }}"
+  include_role:
+    name: package

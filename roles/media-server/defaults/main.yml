@@ -1,4 +1,0 @@
-media_server_dir: "{{ docker_compose_dir }}/plex"
-media_server_config_volume: plex_config
-media_server_media_volume: media
-media_server_service_name: plex

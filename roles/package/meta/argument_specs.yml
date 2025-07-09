@@ -1,0 +1,64 @@
+---
+argument_specs:
+  main:
+    short_description: Install packages from custom repositories
+    description:
+      - Installs packages with specific versions
+      - Holds package versions to prevent automatic updates
+      - Handles repository configuration changes gracefully
+    author: Pumbaa's Dad
+    options:
+      package_apt_cache_valid_time:
+        type: int
+        required: false
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again
+      package_config:
+        type: dict
+        required: true
+        description: A description of the packages to be installed.
+        options:
+          apt:
+            type: dict
+            required: false
+            description: A description of the apt packages to be installed.
+            options:
+              arch:
+                type: str
+                required: true
+                description: The architecture of the packages to be installed
+              components:
+                type: list
+                elements: str
+                required: true
+                description: The components of the apt repository to be used
+              distribution:
+                type: str
+                required: true
+                description: The distribution of the apt repository to be used
+              key:
+                type: str
+                required: true
+                description: The GPG key URL for the apt repository
+              name:
+                type: str
+                required: true
+                description: The name of the apt repository
+              packages:
+                type: dict
+                required: true
+                description: A dictionary of package names and their versions to be installed.  The key is the package name and the value is the version to be installed.
+              repository:
+                type: str
+                required: true
+                description: The URL of the apt repository to be used
+      package_http_proxy:
+        type: str
+        required: false
+        default: ""
+        description: The HTTP proxy to use for package management operations
+      package_allow_releaseinfo_change:
+        type: list
+        elements: str
+        required: false
+        default: []
+        description: A list of apt release info changes that will be allowed

@@ -1,0 +1,36 @@
+- become: true
+  block:
+    - name: Add {{ package_config.apt.name }} repository
+      environment:
+        http_proxy: "{{ package_http_proxy }}"
+      vars:
+        https_replacement: "{{ (package_http_proxy == '') | ternary('https://', 'http://') }}"
+      deb822_repository:
+        name: "{{ package_config.apt.name }}"
+        signed_by: "{{ package_config.apt.key | replace('https://', https_replacement) }}"
+        uris: "{{ package_config.apt.repository | replace('https://', https_replacement) }}"
+        suites: "{{ [package_config.apt.distribution] }}"
+        components: "{{ package_config.apt.components }}"
+        architectures: "{{ [package_config.apt.arch] }}"
+        enabled: "{{ package_allow_releaseinfo_change | length == 0 }}"
+      register: package_apt_add_repo
+
+    - name: Add {{ package_config.apt.name }} repository allowing releaseinfo change
+      template:
+        src: deb822.sources.j2
+        dest: "/etc/apt/sources.list.d/{{ package_config.apt.name }}.allow_releaseinfo_change.sources"
+      register: package_apt_allow_releaseinfo_change
+      when: package_allow_releaseinfo_change | length > 0
+
+    - name: Install {{ package_config.apt.name }} packages
+      apt:
+        name : "{{ package_config.apt.packages.keys() | zip(package_config.apt.packages.values()) | map('join', '=') | list }}"
+        allow_change_held_packages: true
+        update_cache: true
+        cache_valid_time: "{{ (package_apt_add_repo.changed or package_apt_allow_releaseinfo_change.changed) | ternary(0, package_apt_cache_valid_time) }}"
+
+    - name: Hold {{ package_config.apt.name }} package versions
+      dpkg_selections:
+        name: "{{ item }}"
+        selection: hold
+      loop: "{{ package_config.apt.packages.keys() | list }}"

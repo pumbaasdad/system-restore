@@ -1,0 +1,42 @@
+- vars:
+    local_download_name: "{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_image_url | basename }}"
+    virtual_machine_image: "{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_image_url | basename | splitext | first }}"
+  block:
+    - delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
+      block:
+        - name: Check if the image exists
+          stat:
+            path: "{{ virtual_machine_image }}"
+          register: image
+
+        - name: Get the image
+          get_url:
+            url: "{{ virtual_machine_image_url }}"
+            dest: "{{ local_download_name }}"
+          when: not image.stat.exists
+          register: download
+
+        - name: Decompress the image
+          community.general.decompress:
+            src: "{{ local_download_name }}"
+            dest: "{{ virtual_machine_image }}"
+            format: "{{ local_download_name | splitext | last | replace('.', '') }}"
+          when: download.changed
+
+        - name: Remove the image
+          file:
+            path: "{{ local_download_name }}"
+            state: absent
+
+    - vars:
+        virtual_machine_boot_order: scsi0
+        virtual_machine_scsi_options: cache=writethrough,discard=on,ssd=1
+        virtual_machine_efidisk:
+          efitype: 4m
+          format: raw
+          pre_enrolled_keys: false
+          storage: local-zfs
+        virtual_machine_bios: ovmf
+        virtual_machine_ostype: l26
+      include_tasks:
+        file: common.yml

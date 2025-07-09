@@ -1,0 +1,5 @@
+- name: Restart cloudflared
+  become: true
+  service:
+    name: cloudflared
+    state: restarted

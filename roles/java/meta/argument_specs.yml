@@ -1,0 +1,16 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure Java
+    description:
+      - Installs Java Development Kit (JDK) or Java Runtime Environment (JRE)
+      - Configures Java environment variables
+      - Supports multiple Java distributions and versions
+    author: Pumbaa's Dad
+    options:
+      java_distribution:
+        type: str
+        required: true
+        description: Java distribution to install
+        choices:
+          - adoptium

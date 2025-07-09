@@ -1,0 +1,1 @@
+container_image: ubuntu-{{ container_ubuntu_version }}-standard_{{ container_ubuntu_version }}-{{ container_ubuntu_patch }}_amd64.tar.zst

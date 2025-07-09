@@ -1,0 +1,60 @@
+#!/bin/bash
+
+DEPENDENCY_HOST="{{ container_dependency_address }}"
+CHECK_INTERVAL=1   # Check interval in seconds
+TIMEOUT=3          # Ping timeout in seconds
+
+# Logging function
+log_message() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [HOOK] $1" | logger -t "proxmox-hook"
+    echo "$(date '+%Y-%m-%d %H:%M:%S') [HOOK] $1"
+}
+
+# Function to check if host is reachable
+check_host() {
+    ping -c 1 -W $TIMEOUT "$DEPENDENCY_HOST" >/dev/null 2>&1
+    return $?
+}
+
+# Function to wait for host to be available
+wait_for_host() {
+    log_message "Checking if dependency host $DEPENDENCY_HOST is reachable..."
+
+    while true; do
+        if check_host; then
+            log_message "Dependency host $DEPENDENCY_HOST is reachable. Proceeding with startup."
+            return 0
+        fi
+
+        log_message "Dependency host $DEPENDENCY_HOST not reachable. Waiting $CHECK_INTERVAL seconds... (${elapsed}s/${MAX_WAIT_TIME}s elapsed)"
+        sleep $CHECK_INTERVAL
+    done
+}
+
+# Main hook logic
+case "$1" in
+    pre-start)
+        log_message "Pre-start hook triggered for $2 (VMID: $3)"
+
+        wait_for_host;
+
+        log_message "Dependency check passed for $2 (VMID: $3)"
+        exit 0
+        ;;
+    post-start)
+        log_message "Post-start hook: $2 (VMID: $3) started successfully"
+        exit 0
+        ;;
+    pre-stop)
+        log_message "Pre-stop hook: $2 (VMID: $3) stopping"
+        exit 0
+        ;;
+    post-stop)
+        log_message "Post-stop hook: $2 (VMID: $3) stopped"
+        exit 0
+        ;;
+    *)
+        log_message "Unknown hook phase: $1"
+        exit 0
+        ;;
+esac

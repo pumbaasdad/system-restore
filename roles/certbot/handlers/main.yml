@@ -1,0 +1,6 @@
+- name: Reload webserver
+  become: true
+  when: certbot_webserver == 'nginx'
+  service:
+    name: "{{ certbot_webserver }}"
+    state: reloaded

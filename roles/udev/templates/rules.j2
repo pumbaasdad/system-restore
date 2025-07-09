@@ -1,7 +1,0 @@
-{%- for device in udev_devices %}
-SUBSYSTEM=="{{ device.subsystem }}",
-{%- for attr in device.attrs %}
- ATTRS{ {{- attr -}} }=="{{device['attrs'][attr]}}",
-{%- endfor %}
- SYMLINK+="{{ device.symlink }}"
-{% endfor %}

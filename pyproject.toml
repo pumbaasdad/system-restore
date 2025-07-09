@@ -1,21 +1,14 @@
-[tool.poetry]
-name = "system-restore"
+[project]
+name = "system-restore-next"
 version = "0.1.0"
-description = ""
-authors = ["Pumbaa's Dad <32616257+pumbaasdad@users.noreply.github.com>"]
-package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.10"
-ansible = "^10.7.0"
-dnspython = "^2.7.0"
-jmespath = "^1.0.1"
-netaddr = "^1.3.0"
-passlib = "^1.7.4"
-
-[tool.poetry.dev-dependencies]
-poetry = "^1.8.5"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+description = "Playbook for regnerating system configuration"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "ansible>=11.5.0",
+    "dnspython>=2.7.0",
+    "netaddr>=1.3.0",
+    "passlib>=1.7.4",
+    "proxmoxer>=2.2.0",
+    "requests>=2.32.3",
+]

@@ -1,5 +1,22 @@
-network.yml
-secrets.yml
-*.retry
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Development
 .idea
-playbook.test.yml
+coverage/
+node_modules/
+
+# Private Settings
+group_vars/
+host_vars/
+
+# Ansible vault
+.ansible-lastpass*

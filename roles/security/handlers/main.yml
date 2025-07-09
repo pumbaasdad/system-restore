@@ -1,6 +1,0 @@
-- name: Restart sshd
-  become: yes
-  service:
-    name: sshd
-    state: restarted
-  loop: "{{ all_changed_files | selectattr('dest', 'match', '/etc/ssh') | selectattr('changed', 'equalto', true) | map(attribute='item') }}"

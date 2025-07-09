@@ -1,253 +1,114 @@
-- hosts: all
+- name: Find reverse proxy subdomains
+  gather_facts: false
+  hosts: reverse_proxies
   tasks:
-    - name: Include secrets
-      include_vars: "{{ path }}"
-      vars:
-        params:
-          files: "{{ secrets_files }}"
-          paths: secrets
-          skip: true
-        path: "{{ lookup('first_found', params) }}"
+    - set_fact:
+        reverse_proxies_subdomains: "{{ reverse_proxies_lazy_subdomains }}"
 
-    - name: Load secrets
-      set_fact:
-        secrets: "{{ secrets_dictionary }}"
-        network: "{{ secret_network.network }}"
-        users: "{{ secret_users.users }}"
+- name: Setup hypervisors
+  hosts: hypervisors
+  roles:
+    - proxmox
+    - yubikey
 
-    - name: Set become password
-      set_fact:
-        ansible_become_password: "{{ secrets[ansible_env.USER + '_password'] }}"
+- name: Setup DHCP Container
+  hosts: dhcp
+  gather_facts: false
+  roles:
+    - container
 
-    - name: Load roles without tasks
-      block:
-        - import_role:
-            name: dhcp
+- name: Setup DHCP Server
+  hosts: dhcp
+  roles:
+    - kea
 
-        - import_role:
-            name: dhcp-relay
-          vars:
-            dhcp_relay_dhcp_server_ip: "{{dhcp_role.provides.dhcp_server_ip }}"
+- name: Setup Containers
+  hosts: regular_priority_lxcs
+  gather_facts: false
+  roles:
+    - container
 
-        - import_role:
-            name: dns
-          vars:
-            dns_server: "{{ network_hosts[inventory_hostname].name }}"
-            dns_zone: "{{ network_hosts[inventory_hostname].zone }}"
+- name: Setup VMs
+  hosts: vms
+  gather_facts: false
+  roles:
+    - virtual_machine
 
-        - import_role:
-            name: home-automation
-          vars:
-            home_automation_reverse_proxy_ip: "{{ reverse_proxy_docker_ip_address }}"
+- name: Setup DNS Server
+  hosts: dns
+  roles:
+    - bind9
 
-        - import_role:
-            name: media-server
-          vars:
-            media_server_media_mountpoint: "{{ media_mountpoint }}"
+- name: Setup Proxy Cache
+  hosts: proxy-cache
+  roles:
+    - nginx
 
-        - import_role:
-            name: unifi
+- name: Setup Linux Systems
+  hosts: linuxes
+  roles:
+    - core
 
-        - import_role:
-            name: docker
+- name: Setup SSH Servers
+  hosts: ssh_servers
+  roles:
+    - ssh_server
 
-        - import_role:
-            name: media-rip
+- name: Setup Docker Hosts
+  hosts: docker_hosts
+  roles:
+    - docker_host
 
-        - import_role:
-            name: transcode
-          vars:
-            transcode_src_volume: "{{ media_rip_role.provides.output_volume }}"
-            transcode_media_mountpoint: "{{ media_mountpoint }}"
+- name: Setup Media Server
+  hosts: media
+  roles:
+    - handbrake
+    - plex
 
-        - import_role:
-            name: certificates
-          vars:
-            certificates_subdomains: "{{ subdomains }}"
+- name: Setup Network Management
+  hosts: network-management
+  roles:
+    - unifi
 
-        - import_role:
-            name: reverse-proxy
-          vars:
-            reverse_proxy_configs: "{{ all_reverse_proxy_configs }}"
-            reverse_proxy_certificate_volume: "{{ certificates_role.provides.certificate_volume }}"
-            reverse_proxy_networks: "{{ all_reverse_proxy_networks }}"
-            reverse_proxy_ip: "{{ reverse_proxy_docker_ip_address }}"
+- name: Setup Reverse Proxy
+  hosts: reverse-proxy
+  roles:
+    - certbot
+    - nginx
 
-        - import_role:
-            name: tunnel
-          vars:
-            tunnel_internal_network: "{{ reverse_proxy_role.provides.external_network }}"
+- name: Setup HTTP Firewall
+  hosts: http-firewall
+  roles:
+    - nginx
 
-        - import_role:
-            name: fail2ban
-          vars:
-            fail2ban_jails: "{{ intrusion_jails }}"
-            fail2ban_filters: "{{ intrusion_filters }}"
+- name: Setup cloudflare tunnel
+  hosts: tunnel
+  roles:
+    - cloudflared
 
-        - import_role:
-            name: backup
-          vars:
-            backup_services: "{{ backed_up_services }}"
-            backup_volumes: "{{ backed_up_volumes }}"
+- name: Cleanup Docker Hosts
+  hosts: docker_hosts
+  tasks:
+    - include_role:
+        name: docker_host
+        tasks_from: prune.yml
 
-    - name: As root
-      become: yes
-      block:
-        - name: Create users
-          vars:
-            password_key: "{{ item + '_password' }}"
-            password_defined: "{{ password_key in secrets }}"
-            salt: "{{ users | selectattr('name', 'equalto', item) | map(attribute='salt') | first | default('') }}"
-            hashed_password: "{{ secrets[password_key] | default('') | password_hash('sha512', salt) }}"
-            password: "{{ password_defined | ternary(hashed_password, omit) }}"
-          user:
-            name: "{{ item }}"
-            password: "{{ password }}"
-          loop: "{{ all_users }}"
-          register: system_users
+- name: Cleanup Linux Systems
+  hosts: linuxes
+  tasks:
+    - include_role:
+        name: core
+        tasks_from: prune.yml
 
-        - name: Create groups
-          group:
-            name: "{{ item }}"
-            state: present
-          loop: "{{ user_group_names }}"
-          register: system_groups
-
-    - import_role:
-        name: docker-config
-      vars:
-        docker_services: "{{ all_docker_services }}"
-        docker_local_volumes: "{{ local_docker_volumes }}"
-        docker_nas_volumes: "{{ nas_docker_volumes }}"
-        docker_nas_ip: "{{ nas_ip }}"
-        docker_extra_networks: "{{ extra_docker_networks }}"
-        docker_config_puid: "{{ (system_users.results | selectattr('name', 'equalto', docker_role.provides.docker_user) | first)['uid'] }}"
-        docker_config_pgid: "{{ (system_groups.results | selectattr('name', 'equalto', docker_role.provides.docker_group) | first)['gid'] }}"
-
-    - name: As root
-      become: yes
-      block:
-        - name: Add users to groups
-          user:
-            name: "{{ item.1 }}"
-            groups: "{{ item.0 }}"
-            append: yes
-          loop: "{{ unique_user_group_mappings }}"
-
-        - import_role:
-            name: security
-          vars:
-            security_users: "{{ usernames }}"
-            security_user_details: "{{ system_users.results }}"
-
-        - import_role:
-            name: shell
-          vars:
-            shell_users: "{{ usernames }}"
-            shell_user_details: "{{ system_users.results }}"
-
-        - name: Add apt keys
-          apt_key:
-            url: "{{ item.url }}"
-          with_items: "{{ apt_keys }}"
-
-        - name: Add PPAs
-          apt_repository:
-            repo: "ppa:{{ item.ppa }}"
-            codename: "{{ item.codename | default(ansible_distribution_release) }}"
-          with_items: "{{ apt_ppas }}"
-
-        - name: Add deb repos
-          apt_repository:
-            repo: "deb [arch=amd64] {{ item.url }} {{ item.codename | default(ansible_distribution_release) }} {{ item.channel | default('stable') }}"
-          with_items: "{{ deb_repos }}"
-
-        - name: Install packages
-          apt:
-            name: "{{ packages }}"
-            state: present
-            update_cache: true
-
-        - name: Upgrade packages
-          apt:
-            upgrade: "yes"
-
-        - name: Disable services
-          service:
-            name: "{{ item }}"
-            enabled: no
-          loop: "{{ disabled_services }}"
-
-        - import_role:
-            name: udev
-          vars:
-            udev_devices: "{{ all_udev_devices }}"
-
-        - import_role:
-            name: iptables
-          vars:
-            iptables_rules: "{{ iptable_rules }}"
-
-        - name: Create files and directories
-          file:
-            path: "{{ item.path }}"
-            state: directory
-            owner: "{{ item.owner | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
-            group: "{{ item.group | default(item.path.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_group, omit)) }}"
-            mode: "{{ item.mode | default(item.path.startswith(docker_compose_dir) | ternary('0775', omit)) }}"
-          loop: "{{ directories }}"
-
-        - name: Install configuration files
-          vars:
-            file_vars: "{{ item.vars | default(omit) }}"
-          template:
-            src: "{{ item.src }}"
-            dest: "{{ item.dest }}"
-            force: "{{ item.force | default(omit) }}"
-            owner: "{{ item.owner | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_user, omit)) }}"
-            group: "{{ item.group | default(item.dest.startswith(docker_compose_dir) | ternary(docker_role.provides.docker_group, omit)) }}"
-            mode: "{{ item.mode | default(item.dest.startswith(docker_compose_dir) | ternary('0664', omit)) }}"
-            backup: "{{ item.backup | default(omit) }}"
-          loop: "{{ files }}"
-          loop_control:
-            label: "{{ item.label | default(item) }}"
-          register: changed_files
-          notify: "{{ item.notify | default(omit) }}"
-
-        - name: Update pip
-          pip:
-            name: pip
-            state: latest
-            virtualenv: "{{ item }}"
-          loop: "{{ virtual_environments }}"
-
-        - name: Install python modules
-          pip:
-            name: "{{ pip_modules | selectattr('environment', 'equalto', item) | map(attribute='modules') | flatten | unique }}"
-            state: latest
-            virtualenv: "{{ item }}"
-          loop: "{{ virtual_environments }}"
-
-    - name: Flush handlers
-      meta: flush_handlers
-
-    - import_role:
-        name: docker-compose
-      vars:
-        docker_services: "{{ all_docker_services }}"
-        docker_services_with_config: "{{ all_docker_services_with_config }}"
-        docker_compose_user: "{{ docker_role.provides.docker_user }}"
-
-    - name: As root
-      become: yes
-      block:
-        - name: Start services on boot
-          service:
-            name: "{{ item }}"
-            enabled: true
-            state: started
-          with_items: "{{ services }}"
-
-        - name: Remove unused packages
-          apt:
-            autoremove: yes
+- name: Copy secrets
+  gather_facts: false
+  hosts:
+    - nas
+  tasks:
+    - synchronize:
+        src: "{{ item }}"
+        dest: "{{ ansible_ssh_host}}:{{ nas_backup_vault_path }}"
+        delete: true
+      loop:
+        - host_vars
+        - group_vars

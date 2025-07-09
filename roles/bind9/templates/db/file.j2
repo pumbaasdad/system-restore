@@ -1,0 +1,7 @@
+{{ print_soa(zone_name, dns_hostname, dns_root_domain, (serial_number)) }}
+{{ print_origin(origin, origin_root_domain | default('')) }}
+{{ print_ttl(1, 'hour') }}
+{{ print_records(records, max_pad) }}
+{%- for origin, records in grouped_records[1:] -%}
+    {{- print_origin_and_records(origin, records, origin_root_domain | default(''), max_pad) }}
+{%- endfor -%}

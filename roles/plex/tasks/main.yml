@@ -1,0 +1,32 @@
+- become_user: "{{ plex_user }}"
+  become: true
+  block:
+    - name: Install plex configuration
+      copy:
+        src: config/
+        dest: "{{ plex_directory }}/config"
+        directory_mode: 0775
+        backup: true
+
+    - name: Create plex Scripts directory
+      file:
+        dest: "{{ plex_directory }}/config/Library/Application Support/Plex Media Server/Scripts"
+        state: directory
+        mode: 0755
+
+    - name: Install DVR post processing script
+      template:
+        src: dvr.sh.j2
+        dest: "{{ plex_directory }}/config/Library/Application Support/Plex Media Server/Scripts/dvr.sh"
+        mode: 0754
+
+    - name: Install compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: "{{ plex_directory }}/docker-compose.yml"
+
+    - name: Start plex
+      community.docker.docker_compose_v2:
+        project_src: "{{ plex_directory }}"
+        state: present
+        remove_orphans: true

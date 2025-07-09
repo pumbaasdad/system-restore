@@ -1,0 +1,47 @@
+---
+argument_specs:
+  main:
+    short_description: Installs and configures Docker on a host system
+    description:
+      - This role installs Docker CE and associated components
+      - Creates a Docker user and group
+      - Configures the current user to be in the Docker group
+      - Sets up Docker services to start on boot
+      - Creates a project directory for Docker applications
+    author: Pumbaa's Dad
+    options:
+      docker_host_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again
+      docker_host_gid:
+        type: int
+        required: true
+        description: Group ID for the Docker group
+      docker_host_group:
+        type: str
+        required: true
+        description: Group name for Docker
+      docker_host_project_directory:
+        type: str
+        required: true
+        description: Directory path where Docker project files should be installed
+      docker_host_uid:
+        type: int
+        required: true
+        description: User ID for the Docker system user
+      docker_host_user:
+        type: str
+        required: true
+        description: Username for the Docker system user
+  prune:
+    short_description: Prunes unused Docker resources
+    description:
+      - This role prunes unused Docker resources such as images, containers, networks, and volumes
+      - It helps to free up disk space by removing resources that are no longer in use
+    author: Pumbaa's Dad
+    options:
+      docker_host_user:
+        type: str
+        required: true
+        description: Username for the Docker system user

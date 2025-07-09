@@ -1,0 +1,11 @@
+server {
+{% if nginx_use_https %}
+        listen 443 ssl default_server;
+        include /etc/nginx/ssl.conf;
+{% else %}
+        listen 80 default_server;
+{% endif %}
+        server_name _;
+        client_max_body_size 0;
+        return 444;
+}

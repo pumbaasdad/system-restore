@@ -1,8 +1,0 @@
-- name: Load reverse proxy certificates
-  set_fact:
-    __reverse_proxy_certificate_volume: "{{ reverse_proxy_certificate_volume }}"
-
-- name: Load reverse proxy configuration
-  set_fact:
-    __reverse_proxy_configs: "{{ reverse_proxy_configs }}"
-    __reverse_proxy_ip: "{{ reverse_proxy_ip }}"

@@ -1,0 +1,4 @@
+- name: Remove unused packages
+  become: true
+  apt:
+    autoremove: yes

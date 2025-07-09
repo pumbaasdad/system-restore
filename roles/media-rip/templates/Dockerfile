@@ -1,6 +1,0 @@
-FROM jlesage/makemkv:v24.12.1
-
-ARG PUID
-ARG PGID
-
-ENV USER_ID=$PUID GROUP_ID=$PGID

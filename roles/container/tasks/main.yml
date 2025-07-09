@@ -1,0 +1,182 @@
+- include_vars:
+    file: "{{ container_type }}.yml"
+
+- name: Get the image
+  proxmox_template:
+    node: "{{ container_proxmox_node }}"
+    api_user: "{{ container_proxmox_api_user }}"
+    api_token_id: "{{ container_proxmox_api_token_id }}"
+    api_token_secret: "{{ container_proxmox_api_token_secret }}"
+    api_host: "{{ container_proxmox_host }}"
+    url: http://download.proxmox.com/images/system/{{ container_image }}
+    force: false
+    storage: local
+  delegate_to: localhost
+
+- delegate_to: "{{ container_proxmox_inventory_name }}"
+  block:
+    - name: Create bindmount mount points
+      file:
+        path: "/mnt/bindmounts/{{ item.name }}"
+        owner: "{{ item.uid }}"
+        group: "{{ item.gid }}"
+        state: directory
+      loop: "{{ container_bindmounts }}"
+
+    - name: Mount the NFS volume
+      mount:
+        src: "{{ item.nfs_share }}"
+        path: "/mnt/bindmounts/{{ item.name }}"
+        state: mounted
+        fstype: nfs
+        opts: x-systemd.automount,nofail
+      loop: "{{ container_bindmounts }}"
+
+    - name: Set subusers
+      lineinfile:
+        path: /etc/subuid
+        line: root:{{ item.uid }}:1
+      loop: "{{ container_bindmounts }}"
+
+    - name: Set subgroups
+      lineinfile:
+        path: /etc/subgid
+        line: root:{{ item.gid }}:1
+      loop: "{{ container_bindmounts }}"
+
+    - name: Install hookscript
+      template:
+        src: "{{ container_hookscript }}.j2"
+        dest: /var/lib/vz/snippets/{{ container_id }}{{ container_hookscript | splitext | last }}
+        mode: '0755'
+      when: container_hookscript is defined
+
+- vars:
+    proxmox_firewall_proxmox_inventory_name: "{{ container_proxmox_inventory_name }}"
+    proxmox_firewall_id: "{{ container_id }}"
+    proxmox_firewall_enabled: "{{ container_firewall_enabled }}"
+    proxmox_firewall_policy_out: "{{ container_firewall_policy_out }}"
+    proxmox_firewall_policy_in: "{{ container_firewall_policy_in }}"
+    proxmox_firewall_ipsets: "{{ container_firewall_ipsets }}"
+    proxmox_firewall_rules: "{{ container_firewall_rules }}"
+  include_role:
+    name: proxmox_firewall
+
+- name: Create container
+  delegate_to: localhost
+  vars:
+    ip_config: "{{ container_static_ip | ternary(container_ip_address + '/' + container_subnet_size, 'dhcp') }}"
+  proxmox:
+    vmid: "{{ container_id }}"
+    node: "{{ container_proxmox_node }}"
+    api_user: "{{ container_proxmox_api_user }}"
+    api_token_id: "{{ container_proxmox_api_token_id }}"
+    api_token_secret: "{{ container_proxmox_api_token_secret }}"
+    api_host: "{{ container_proxmox_host }}"
+    hostname: "{{ container_name }}"
+    cores: "{{ container_cores }}"
+    memory: "{{ container_memory }}"
+    nameserver: "{{ container_nameserver }}"
+    onboot: true
+    ostype: "{{ container_type }}"
+    pubkey: "{{ container_ssh_key }}"
+    searchdomain: "{{ container_search_domain }}"
+    timezone: host
+    ostemplate: local:vztmpl/{{ container_image }}
+    hookscript: "{{ container_hookscript is defined | ternary('local:snippets:/' + container_hookscript_local_name, omit) }}"
+    disk_volume:
+      size: "{{ container_disk_size }}"
+      storage: local-zfs
+    netif:
+      net0: "name=eth0,bridge=vmbr0,ip={{ ip_config }},gw={{ container_gateway }},hwaddr={{ container_mac_address }},type=veth,firewall={{ container_firewall_enabled | ternary(1, 0) }}"
+  register: container_create
+
+- vars:
+    line: "mp{{ ansible_loop.index0 }}: /mnt/bindmounts/{{ item.name }},mp={{ item.mountpoint }}"
+  set_fact:
+    container_bindmount_config: "{{container_bindmount_config + [line] }}"
+  loop: "{{ container_bindmounts }}"
+  loop_control:
+    extended: true
+
+- vars:
+    before_guest_start_from: "{{ (ansible_loop.previtem | default(-1)) + 1 }}"
+    before_host_start_from: "{{ before_guest_start_from | int + 100000 }}"
+    before_count: "{{ item - before_guest_start_from | int }}"
+    before: "lxc.idmap: u {{ before_guest_start_from }} {{ before_host_start_from }} {{ before_count }}"
+    current: "lxc.idmap: u {{ item }} {{ item }} 1"
+    last_guest_start_from: "{{ item | int + 1 }}"
+    last_host_start_from: "{{ last_guest_start_from | int + 100000 }}"
+    last_count: "{{ 65535 - item }}"
+    end: "lxc.idmap: u {{ last_guest_start_from }} {{ last_host_start_from }} {{ last_count }}"
+  set_fact:
+    container_uid_map: "{{ container_uid_map + [before, current] + (ansible_loop.last | ternary([end], [])) }}"
+  loop: "{{ container_bindmounts | map(attribute='uid') | sort | list }}"
+  loop_control:
+    extended: true
+
+- vars:
+    before_guest_start_from: "{{ (ansible_loop.previtem | default(-1)) + 1 }}"
+    before_host_start_from: "{{ before_guest_start_from | int + 100000 }}"
+    before_count: "{{ item - before_guest_start_from | int }}"
+    before: "lxc.idmap: g {{ before_guest_start_from }} {{ before_host_start_from }} {{ before_count }}"
+    current: "lxc.idmap: g {{ item }} {{ item }} 1"
+    last_guest_start_from: "{{ item | int + 1 }}"
+    last_host_start_from: "{{ last_guest_start_from | int + 100000 }}"
+    last_count: "{{ 65535 - item }}"
+    end: "lxc.idmap: g {{ last_guest_start_from }} {{ last_host_start_from }} {{ last_count }}"
+  set_fact:
+    container_gid_map: "{{ container_gid_map + [before, current] + (ansible_loop.last | ternary([end], [])) }}"
+  loop: "{{ container_bindmounts | map(attribute='gid') | sort | list }}"
+  loop_control:
+    extended: true
+
+- delegate_to: "{{ container_proxmox_inventory_name }}"
+  lineinfile:
+    line: "{{ item }}"
+    path: /etc/pve/lxc/{{ container_id }}.conf
+  loop: "{{ container_bindmount_config + container_uid_map + container_gid_map }}"
+  when: container_bindmounts | length > 0
+
+- name: Start the container
+  delegate_to: localhost
+  community.general.proxmox:
+    vmid: "{{ container_id }}"
+    node: "{{ container_proxmox_node }}"
+    api_user: "{{ container_proxmox_api_user }}"
+    api_token_id: "{{ container_proxmox_api_token_id }}"
+    api_token_secret: "{{ container_proxmox_api_token_secret }}"
+    api_host: "{{ container_proxmox_host }}"
+    state: started
+    timeout: 60
+
+- set_fact:
+    container_ssh_user: "{{ ansible_ssh_user }}"
+
+- vars:
+    ansible_ssh_user: "{{ container_create.changed | ternary('root', container_ssh_user) }}"
+  block:
+    - name: Wait for Container to start
+      wait_for_connection:
+        sleep: 5
+        timeout: 300
+
+    - become: true
+      block:
+        - name: Create unprivileged user
+          user:
+            name: "{{ primary_user_name }}"
+            password: "{{ ansible_become_password | password_hash(rounds=4096, salt=password_salt) }}"
+            groups:
+              - sudo
+
+        - name: Add authorized keys
+          authorized_key:
+            user: "{{ primary_user_name }}"
+            key: "{{ ssh_public_key }}"
+
+        - name: Remove root authorized keys
+          authorized_key:
+            user: root
+            key: "{{ ssh_public_key }}"
+            state: absent

@@ -1,0 +1,252 @@
+---
+argument_specs:
+  main:
+    short_description: Create and configure Proxmox virtual machines
+    description: >
+      This role creates and configures virtual machines on Proxmox VE with support
+      for different VM types including Ubuntu cloud images, custom images, and cloud-init.
+    author: Pumbaa's Dad
+    options:
+      virtual_machine_cores:
+        description: Number of CPU cores for the virtual machine
+        type: int
+        required: true
+      virtual_machine_dependency_address:
+        description: IP address of host to wait for during startup
+        type: str
+        required: false
+      virtual_machine_disk_size:
+        description: Disk size for the virtual machine
+        type: str
+        required: true
+      virtual_machine_firewall_enabled:
+        type: bool
+        required: false
+        default: false
+        description: Whether to enable firewall for the virtual machine
+      virtual_machine_firewall_ipsets:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description: List of IP sets to configure in the firewall
+        options:
+          ips:
+            type: list
+            elements: str
+            required: true
+            description: List of IP addresses to include in the IP set
+          name:
+            type: str
+            required: true
+            description: Name of the IP set
+      virtual_machine_firewall_policy_in:
+        type: str
+        required: false
+        description: Default policy for incoming connections
+        choices:
+          - ACCEPT
+          - DROP
+          - REJECT
+      virtual_machine_firewall_policy_out:
+        type: str
+        required: false
+        description: Default policy for outgoing connections
+        choices:
+          - ACCEPT
+          - DROP
+          - REJECT
+      virtual_machine_firewall_rules:
+        type: dict
+        required: false
+        default: {}
+        description: Rules to configure in the firewall
+        options:
+          in:
+            type: list
+            elements: dict
+            required: false
+            default: []
+            description: List of incoming firewall rules
+            options:
+              action:
+                type: str
+                required: true
+                description: Action for the rule
+                choices:
+                  - ACCEPT
+                  - DROP
+                  - REJECT
+              destination:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              destination_port:
+                type: int
+                required: false
+                description: Destination port for the rule
+              macro:
+                type: str
+                required: false
+                description: Macro to use for the rule (e.g., SSH, HTTP)
+              protocol:
+                type: str
+                required: false
+                description: Protocol for the rule (e.g., tcp, udp)
+              source:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              source_port:
+                type: int
+                required: false
+                description: Source port for the rule
+          out:
+            type: list
+            elements: dict
+            required: false
+            default: []
+            description: List of outgoing firewall rules
+            options:
+              action:
+                type: str
+                required: true
+                description: Action for the rule
+                choices:
+                  - ACCEPT
+                  - DROP
+                  - REJECT
+              destination:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              destination_port:
+                type: int
+                required: false
+                description: Destination port for the rule
+              macro:
+                type: str
+                required: false
+                description: Macro to use for the rule (e.g., SSH, HTTP)
+              protocol:
+                type: str
+                required: false
+                description: Protocol for the rule (e.g., tcp, udp)
+              source:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              source_port:
+                type: int
+                required: false
+                description: Source port for the rule
+      virtual_machine_gateway:
+        description: Gateway IP address for static IP configuration
+        type: str
+        required: true
+      virtual_machine_hookscript:
+        description: Name of the template to use as a hookscript
+        type: str
+        required: false
+        choices:
+          - wait_for_startup.sh
+      virtual_machine_hotplug:
+        description: Hotplug configuration for the virtual machine
+        type: str
+        required: true
+      virtual_machine_id:
+        description: Unique identifier for the virtual machine
+        type: int
+        required: true
+      virtual_machine_image_url:
+        description: URL to download custom VM image from
+        type: str
+        required: false
+      virtual_machine_ip_address:
+        description: IP address for the virtual machine
+        type: str
+        required: true
+      virtual_machine_mac_address:
+        description: MAC address for the virtual machine network interface
+        type: str
+        required: true
+      virtual_machine_memory:
+        description: Memory size in MB for the virtual machine
+        type: int
+        required: true
+      virtual_machine_minimum_memory:
+        description: Minimum memory size in MB (balloon memory)
+        type: int
+        required: true
+      virtual_machine_name:
+        description: Name of the virtual machine
+        type: str
+        required: true
+      virtual_machine_nameservers:
+        description: DNS nameservers for the virtual machine
+        type: list
+        elements: str
+        required: true
+      virtual_machine_proxmox_api_token_id:
+        description: Proxmox API token ID for authentication
+        type: str
+        required: true
+      virtual_machine_proxmox_api_token_secret:
+        description: Proxmox API token secret for authentication
+        type: str
+        required: true
+      virtual_machine_proxmox_api_user:
+        description: Proxmox API user for authentication
+        type: str
+        required: true
+      virtual_machine_proxmox_host:
+        description: Proxmox host IP address or hostname
+        type: str
+        required: true
+      virtual_machine_proxmox_image_directory:
+        description: Directory path on Proxmox host for storing images
+        type: str
+        required: true
+      virtual_machine_proxmox_inventory_name:
+        description: Inventory name of the Proxmox host
+        type: str
+        required: true
+      virtual_machine_proxmox_node:
+        description: Proxmox node name where the VM will be created
+        type: str
+        required: true
+      virtual_machine_search_domain:
+        description: DNS search domain for the virtual machine
+        type: str
+        required: true
+      virtual_machine_ssh_key:
+        description: SSH public key for user authentication
+        type: str
+        required: true
+      virtual_machine_static_ip:
+        description: Use static IP configuration instead of DHCP
+        type: bool
+        required: true
+      virtual_machine_subnet_size:
+        description: Subnet size for static IP configuration
+        type: int
+        required: true
+      virtual_machine_type:
+        description: Type of virtual machine to create
+        type: str
+        required: true
+        choices:
+          - custom
+          - ubuntu
+      virtual_machine_ubuntu_codename:
+        description: Ubuntu codename for the virtual machine
+        type: str
+        required: false
+      virtual_machine_usb_devices:
+        description: USB device configuration
+        type: dict
+        required: false
+      virtual_machine_user:
+        description: Username for the virtual machine user account
+        type: str
+        required: true

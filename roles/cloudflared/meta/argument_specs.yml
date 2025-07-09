@@ -1,0 +1,53 @@
+---
+argument_specs:
+  main:
+    short_description: Installs and configures Cloudflare Tunnel (cloudflared)
+    description:
+      - This role installs and configures the Cloudflare Tunnel client (cloudflared)
+      - Sets up a system user to run the cloudflared service
+      - Configures tunnel credentials and ingress rules
+      - Creates and enables the systemd service
+      - cloudflared_certificate, cloudflared_tunnel_account_tag, cloudflared_tunnel_id and cloudflared_tunnel_secret must be generated manually by following the instructions at https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/do-more-with-tunnels/local-management/create-local-tunnel/
+    author: Pumbaa's Dad
+    options:
+      cloudflared_certificate:
+        type: str
+        required: true
+        description: Cloudflare origin certificate in PEM format
+      cloudflared_tunnel_account_tag:
+        type: str
+        required: true
+        description: Cloudflare account tag associated with the tunnel
+      cloudflared_tunnel_id:
+        type: str
+        required: true
+        description: UUID of the Cloudflare tunnel
+      cloudflared_tunnel_public_dns:
+        type: str
+        required: true
+        description:
+          - Public DNS hostname used to access the tunnel.
+          - The DNS server must be configured manually.
+      cloudflared_tunnel_secret:
+        type: str
+        required: true
+        description: Secret used for tunnel authentication
+      cloudflared_user:
+        type: str
+        required: true
+        description: System user that runs the cloudflared service
+      cloudflared_tunnel_ingress:
+        type: list
+        elements: dict
+        required: true
+        description: List of ingress rules for routing traffic through the tunnel
+        options:
+          path:
+            type: str
+            required: true
+            description: The path which will be routed to the service
+          service:
+            type: str
+            required: true
+            description: Fully qualified domain name of the internal service to which traffic will be routed
+

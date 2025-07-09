@@ -1,0 +1,11 @@
+tunnel: {{ cloudflared_tunnel_id }}
+credentials-file: /home/{{ cloudflared_user }}/.cloudflared/{{ cloudflared_tunnel_id }}.json
+ingress:
+{% for ingress in cloudflared_tunnel_ingress %}
+  - hostname: {{ cloudflared_tunnel_public_dns }}
+    service: http://{{ ingress.service }}
+    path: {{ ingress.path }}
+    originRequest:
+      httpHostHeader: {{ ingress.service }}
+{% endfor %}
+  - service: http_status:404

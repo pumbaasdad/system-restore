@@ -1,0 +1,16 @@
+docker_host_packages:
+  apt:
+    name: docker
+    key: https://download.docker.com/linux/ubuntu/gpg
+    repository: https://download.docker.com/linux/ubuntu
+    distribution: noble
+    arch: amd64
+    components:
+      - stable
+    packages:
+      docker-buildx-plugin: 0.24.0-1~ubuntu.24.04~noble
+      docker-ce: 5:28.2.2-1~ubuntu.24.04~noble
+      docker-ce-cli: 5:28.2.2-1~ubuntu.24.04~noble
+      docker-compose-plugin: 2.36.2-1~ubuntu.24.04~noble
+      containerd.io: 1.7.27-1
+

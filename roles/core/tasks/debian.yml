@@ -1,0 +1,22 @@
+- become: true
+  block:
+    - name: Setup apt cache
+      template:
+        src: apt_proxies.j2
+        dest: /etc/apt/apt.conf.d/99{{ core_project_name }}
+
+    - name: Install common packages
+      apt:
+        name:
+          - gpg
+          - htop
+          - nfs-common
+          - python3-debian
+          - vim
+          - virtualenv
+        update_cache: true
+
+    - name: Upgrade packages
+      apt:
+        upgrade: dist
+        cache_valid_time: "{{ core_apt_cache_valid_time }}"

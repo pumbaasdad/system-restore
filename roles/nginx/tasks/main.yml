@@ -1,0 +1,22 @@
+- include_tasks:
+    file: "{{ ansible_distribution_file_variety | lower }}.yml"
+
+- include_tasks:
+    file: https.yml
+  when: nginx_use_https
+
+- become: true
+  block:
+    - name: Install nginx configuration
+      template:
+        src: nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+      notify: Reload nginx
+
+    - name: Create site-confs directory
+      file:
+        dest: /etc/nginx/site-confs
+        state: directory
+
+- include_tasks:
+    file: "{{ nginx_type }}.yml"

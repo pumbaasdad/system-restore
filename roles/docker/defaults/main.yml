@@ -1,5 +1,0 @@
-docker_address_pool_size: 24
-docker_address_pool_subnet: "{{ secrets['docker_address_pool_subnet'] | default('172.32.0.0/12') }}"
-
-docker_user_name: docker
-docker_group_name: docker

@@ -1,0 +1,82 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure Kea DHCP server
+    description:
+      - Installs Kea DHCP server package
+      - Configures DHCP4 service with subnet and pool settings
+      - Sets up static host reservations
+      - Configures DHCP options like DNS servers, domain, and gateway
+    author: Pumbaa's Dad
+    options:
+      kea_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again
+      kea_dhcp_subnet:
+        type: str
+        required: true
+        description: DHCP pool subnet range in CIDR notation to be used for dynamic IP allocation
+      kea_domain:
+        type: str
+        required: true
+        description: Domain name to provide to DHCP clients
+      kea_gateway:
+        type: str
+        required: true
+        description: Gateway IP address for DHCP clients
+      kea_nameservers:
+        type: list
+        elements: str
+        required: true
+        description: List of DNS server IP addresses to provide to DHCP clients
+      kea_subnet:
+        type: str
+        required: true
+        description: The subnet being managed by the Kea DHCP server in CIDR notation
+      kea_zones:
+        type: list
+        elements: dict
+        required: true
+        description: The zones managed by the Kea server
+        options:
+          hosts:
+            type: list
+            elements: dict
+            required: true
+            description: A description of the hosts in the zone
+            options:
+              ethernet:
+                type: dict
+                required: false
+                description: Details about the host's ethernet connection
+                options:
+                  mac:
+                    type: str
+                    required: true
+                    description: The MAC address of the host's ethernet interface
+              ipv4_offset:
+                type: int
+                required: true
+                description: The offset of the host's IPv4 address in the subnet
+              name:
+                type: str
+                required: true
+                description: The name of the host
+              wifi:
+                type: dict
+                required: false
+                description: Details about the host's wifi connection
+                options:
+                  mac:
+                    type: str
+                    required: true
+                    description: The MAC address of the host's wifi interface
+          ipv4_subnet:
+            type: str
+            required: true
+            description: IPv4 subnet for this zone in CIDR notation
+          name:
+            type: str
+            required: true
+            description: The name of the zone

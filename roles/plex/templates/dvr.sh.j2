@@ -1,0 +1,111 @@
+#!/bin/bash
+
+LOGFILE="/config/Library/Application Support/Plex Media Server/Logs/Plex DVR Post Processing.log"
+
+function log {
+  echo "$(date +"%b %d %H:%I:%S") $1" | tee -a "$LOGFILE"
+}
+
+function is_valid_show_duration {
+  DURATION=$(/lib/plexmediaserver/Plex\ Transcoder -i "$1" 2>&1 | grep Duration | tr -s ' ' | cut -d' ' -f3)
+
+  HOURS=$(echo "$DURATION" | awk -F: '{ print $1 }')
+  MINUTES=$(echo "$DURATION" | awk -F: '{ print $2 }')
+
+  if [[ $MINUTES -ge 25 && $MINUTES -le 37 || $MINUTES -ge 55 || $MINUTES -le 7 && $HOURS -gt 0 ]]; then
+    return 0
+  fi
+
+  log "Invalid duration: $DURATION for $1"
+
+  return 1
+}
+
+function is_someone_watching_live_tv {
+  FILENAME=$1
+
+  SHOW_AND_YEAR=$(echo "$FILENAME" | sed -r 's+^(.*) - (S[[:digit:]]*E[[:digit:]]*|[[:digit:]]{4}-([[:digit:]]{2}){2}( [[:digit:]]{2}){3}) - (.*)$+\1+')
+  SEASON_AND_EPISODE=$(echo "$FILENAME" | sed -r 's+^(.*) - (S[[:digit:]]*E[[:digit:]]*|[[:digit:]]{4}-([[:digit:]]{2}){2}( [[:digit:]]{2}){3}) - (.*)$+\2+')
+  TITLE=$(echo "$FILENAME" | sed -r 's+^(.*) - (S[[:digit:]]*E[[:digit:]]*|[[:digit:]]{4}-([[:digit:]]{2}){2}( [[:digit:]]{2}){3}) - (.*)$+\5+' | sed 's/\.[^.]*$//')
+
+  GRANDPARENT_TITLE=$(echo "$SHOW_AND_YEAR" | sed -r 's|^(.*) \(([[:digit:]]*)\)|\1|')
+  # TODO: Make this work when its a date instead of a season/episode - need to figure out how that's represented by the return value
+  EPISODE=$(echo "$SEASON_AND_EPISODE" | sed -r 's|S([[:digit:]]*)E([[:digit:]]*)|\2|' | awk '{ print 0 + $1 }')
+  SEASON=$(echo "$SEASON_AND_EPISODE" | sed -r 's|S([[:digit:]]*)E([[:digit:]]*)|\1|' | awk '{ print 0 + $1 }')
+  # Year appears to be the air date of the episode, not the year the show first aired
+  # YEAR=$(echo "$SHOW_AND_YEAR" | sed -r 's|^(.*) \(([[:digit:]]*)\)|\1|')
+
+  PLEX_TOKEN=$(grep -oP 'PlexOnlineToken="(.*?)"' "/config/Library/Application Support/Plex Media Server/Preferences.xml" | grep -o '".*"' | sed 's/"//g')
+
+  # TODO: Validate live="1" is true for watching live after the show has ended
+  SESSIONS=$(curl "http://localhost:32400/status/sessions?X-Plex-Token=$PLEX_TOKEN" | grep "^<Video" | grep 'live="1"' | grep 'type="episode"')
+
+  SESSIONS=$(echo "$SESSIONS" | grep grandparentTitle=\""$GRANDPARENT_TITLE"\")
+  SESSIONS=$(echo "$SESSIONS" | grep index=\""$EPISODE"\")
+  SESSIONS=$(echo "$SESSIONS" | grep parentIndex=\""$SEASON"\")
+  SESSIONS=$(echo "$SESSIONS" | grep title=\""$TITLE"\")
+
+  if [[ -z "$SESSIONS" ]]; then
+    return 1
+  fi
+
+  return 0
+}
+
+function is_someone_watching_live_movie {
+  # TODO: Implement this
+  return 1
+}
+
+function process_tv_show {
+  FILENAME=$(basename "$1")
+
+  if ! is_valid_show_duration "$1"; then
+    log "$FILENAME is incomplete.  Moving to /media/{{ plex_nfs_dvr_incomplete_transcode_path }}"
+    mv "$1" "/media/{{ plex_nfs_dvr_incomplete_transcode_path }}"
+
+    # TODO: Use curl to post to apprise.  There is a linuxserver apprise mod that may help this.
+    exit 2
+  fi
+
+  DESTINATION_DIRECTORY="/media/{{ plex_nfs_dvr_tv_transcode_path }}/$(echo "$FILENAME" | sed -r 's+^(.*) - (S([[:digit:]]*)E[[:digit:]]*|([[:digit:]]{4})(-[[:digit:]]{2}){2}( [[:digit:]]{2}){3}) - .*$+\1/Season \3\4/+')"
+  mkdir -p "$DESTINATION_DIRECTORY"
+
+  if ! is_someone_watching_live_tv "$FILENAME"; then
+    log "Moving $1 to $DESTINATION_DIRECTORY"
+    mv "$1" "$DESTINATION_DIRECTORY"
+  else
+    log "Copying $1 to $DESTINATION_DIRECTORY"
+    cp "$1" "$DESTINATION_DIRECTORY"
+  fi
+}
+
+function process_movie {
+  FILENAME=$(basename "$1")
+
+  DESTINATION_DIRECTORY="/media/{{ plex_nfs_dvr_movies_transcode_path }}/${FILENAME%.*}"
+  mkdir -p "$DESTINATION_DIRECTORY"
+
+  if ! is_someone_watching_live_movie "$FILENAME"; then
+    log "Moving $1 to $DESTINATION_DIRECTORY"
+    mv "$1" "$DESTINATION_DIRECTORY"
+  else
+    log "Copying $1 to $DESTINATION_DIRECTORY"
+    cp "$1" "$DESTINATION_DIRECTORY"
+  fi
+}
+
+case "$1" in
+  /media/{{ plex_nfs_dvr_movies_path | replace(" ", "\\ ") }}/*)
+    # This is a movie
+    process_movie "$1"
+    ;;
+  /media/{{ plex_nfs_dvr_tv_path | replace(" ", "\\ ") }}/*)
+    # This is a TV show
+    process_tv_show "$1"
+    ;;
+  *)
+    log "Unexpected recording: $1"
+    exit 1
+    ;;
+esac

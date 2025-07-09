@@ -1,0 +1,255 @@
+---
+argument_specs:
+  main:
+    short_description: Creates and configures a Proxmox LXC container
+    description:
+      - This role creates a Proxmox LXC container with specified configuration
+      - Configures network, storage, resources, and firewall settings
+      - Supports bindmounts for sharing directories with the host
+      - Can set up startup dependencies via hookscripts
+    author: Pumbaa's Dad
+    options:
+      container_bindmounts:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description: List of bind mounts to set up
+        options:
+          gid:
+            type: int
+            required: true
+            description: GID to assign to the mount point
+          mountpoint:
+            type: str
+            required: true
+            description: Path inside container where the mount should be available
+          name:
+            type: str
+            required: true
+            description: Name of the bindmount
+          nfs_share:
+            type: str
+            required: true
+            description: NFS share to mount on the host
+          uid:
+            type: int
+            required: true
+            description: UID to assign to the mount point
+      container_cores:
+        type: int
+        required: true
+        description: Number of CPU cores for the container
+      container_dependency_address:
+        type: str
+        required: false
+        description: IP address that must be available before this container starts
+      container_disk_size:
+        type: str
+        required: true
+        description: Size of the disk allocate to the container with unit (e.g., 8G)
+      container_firewall_enabled:
+        type: bool
+        required: false
+        default: false
+        description: Whether to enable firewall for the container
+      container_firewall_ipsets:
+        type: list
+        elements: dict
+        required: false
+        default: []
+        description: List of IP sets to configure in the firewall
+        options:
+          ips:
+            type: list
+            elements: str
+            required: true
+            description: List of IP addresses to include in the IP set
+          name:
+            type: str
+            required: true
+            description: Name of the IP set
+      container_firewall_policy_in:
+        type: str
+        required: false
+        description: Default policy for incoming connections
+        choices:
+          - ACCEPT
+          - DROP
+          - REJECT
+      container_firewall_policy_out:
+        type: str
+        required: false
+        description: Default policy for outgoing connections
+        choices:
+          - ACCEPT
+          - DROP
+          - REJECT
+      container_firewall_rules:
+        type: dict
+        required: false
+        default: {}
+        description: Rules to configure in the firewall
+        options:
+          in:
+            type: list
+            elements: dict
+            required: false
+            default: []
+            description: List of incoming firewall rules
+            options:
+              action:
+                type: str
+                required: true
+                description: Action for the rule
+                choices:
+                  - ACCEPT
+                  - DROP
+                  - REJECT
+              destination:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              destination_port:
+                type: int
+                required: false
+                description: Destination port for the rule
+              macro:
+                type: str
+                required: false
+                description: Macro to use for the rule (e.g., SSH, HTTP)
+              protocol:
+                type: str
+                required: false
+                description: Protocol for the rule (e.g., tcp, udp)
+              source:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              source_port:
+                type: int
+                required: false
+                description: Source port for the rule
+          out:
+            type: list
+            elements: dict
+            required: false
+            default: []
+            description: List of outgoing firewall rules
+            options:
+              action:
+                type: str
+                required: true
+                description: Action for the rule
+                choices:
+                  - ACCEPT
+                  - DROP
+                  - REJECT
+              destination:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              destination_port:
+                type: int
+                required: false
+                description: Destination port for the rule
+              macro:
+                type: str
+                required: false
+                description: Macro to use for the rule (e.g., SSH, HTTP)
+              protocol:
+                type: str
+                required: false
+                description: Protocol for the rule (e.g., tcp, udp)
+              source:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              source_port:
+                type: int
+                required: false
+                description: Source port for the rule
+      container_gateway:
+        type: str
+        required: true
+        description: Gateway IP address for the container
+      container_hookscript:
+        type: str
+        required: false
+        description: Name of the hookscript template to use for the container (without j2 extension)
+      container_hookscript_local_name:
+        type: str
+        required: false
+        default: <container_id>.<extension of container_hookscript>
+        description: Local name of the hookscript file to use for the container
+      container_id:
+        type: int
+        required: true
+        description: VMID of the container in Proxmox
+      container_ip_address:
+        type: str
+        required: false
+        description: Static IP address for the container
+      container_mac_address:
+        type: str
+        required: true
+        description: MAC address for the container network interface
+      container_memory:
+        type: int
+        required: true
+        description: Memory in MB for the container
+      container_name:
+        type: str
+        required: true
+        description: Name of the container
+      container_nameserver:
+        type: str
+        required: false
+        description: DNS server IP address
+      container_proxmox_api_token_id:
+        type: str
+        required: true
+        description: ID of token used to authenticate with the Proxmox API
+      container_proxmox_api_token_secret:
+        type: str
+        required: true
+        description: Secret associated with container_proxmox_api_token_id
+      container_proxmox_api_user:
+        type: str
+        required: true
+        description: Username that will be used to interact with the proxmox API
+      container_proxmox_host:
+        type: str
+        required: true
+        description: Hostname or IP address of the Proxmox API
+      container_proxmox_inventory_name:
+        type: str
+        required: true
+        description: Ansible inventory name of the Proxmox host
+      container_proxmox_node:
+        type: str
+        required: true
+        description: Proxmox node where the container will be created
+      container_search_domain:
+        type: str
+        required: true
+        description: DNS search domain used by the container
+      container_ssh_key:
+        type: str
+        required: true
+        description: SSH public key used to connect to the container
+      container_static_ip:
+        type: bool
+        required: false
+        default: false
+        description: Whether to configure the container with a static IP address
+      container_subnet_size:
+        type: str
+        required: false
+        description: Subnet mask size (CIDR notation without slash, e.g., 24)
+      container_type:
+        type: str
+        required: true
+        description: Type of container OS
+        choices:
+          - ubuntu

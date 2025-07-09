@@ -1,0 +1,7 @@
+- include_vars:
+    file: "{{ ansible_distribution | lower }}_{{ java_distribution | lower }}.yml"
+
+- vars:
+    package_config: "{{ java_packages }}"
+  include_role:
+    name: package

@@ -1,3 +1,0 @@
-TZ: America/Toronto
-docker_primary_network: docker1
-docker_primary_subnet: "{{ secrets['docker_primary_subnet'] | default('172.32.2.0/24') }}"

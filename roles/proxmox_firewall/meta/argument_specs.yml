@@ -1,0 +1,135 @@
+---
+argument_specs:
+  main:
+    short_description: Configure Proxmox firewall rules
+    description: >
+      This role configures firewall rules for Proxmox virtual machines or containers
+      by creating and managing firewall configuration files.
+    author: Pumbaa's Dad
+    options:
+      proxmox_firewall_enabled:
+        description: Enable or disable the firewall
+        type: bool
+        required: true
+      proxmox_firewall_id:
+        description: The ID of the virtual machine or container for firewall configuration
+        type: int
+        required: true
+      proxmox_firewall_ipsets:
+        description: List of IP sets to configure
+        type: list
+        elements: dict
+        required: true
+        options:
+          name:
+            description: Name of the IP set
+            type: str
+            required: true
+          ips:
+            description: List of IP addresses or CIDR blocks in the IP set
+            type: list
+            elements: str
+            required: true
+      proxmox_firewall_policy_in:
+        description: Default policy for inbound traffic
+        type: str
+        required: true
+        choices:
+          - ACCEPT
+          - REJECT
+          - DROP
+      proxmox_firewall_policy_out:
+        description: Default policy for outbound traffic
+        type: str
+        required: true
+        choices:
+          - ACCEPT
+          - REJECT
+          - DROP
+      proxmox_firewall_proxmox_inventory_name:
+        description: Inventory name of the Proxmox host
+        type: str
+        required: true
+      proxmox_firewall_rules:
+        type: dict
+        required: true
+        description: Rules to configure in the firewall
+        options:
+          in:
+            type: list
+            elements: dict
+            required: false
+            default: []
+            description: List of incoming firewall rules
+            options:
+              action:
+                type: str
+                required: true
+                description: Action for the rule
+                choices:
+                  - ACCEPT
+                  - DROP
+                  - REJECT
+              destination:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              destination_port:
+                type: int
+                required: false
+                description: Destination port for the rule
+              macro:
+                type: str
+                required: false
+                description: Macro to use for the rule (e.g., SSH, HTTP)
+              protocol:
+                type: str
+                required: false
+                description: Protocol for the rule (e.g., tcp, udp)
+              source:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              source_port:
+                type: int
+                required: false
+                description: Source port for the rule
+          out:
+            type: list
+            elements: dict
+            required: false
+            default: []
+            description: List of outgoing firewall rules
+            options:
+              action:
+                type: str
+                required: true
+                description: Action for the rule
+                choices:
+                  - ACCEPT
+                  - DROP
+                  - REJECT
+              destination:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              destination_port:
+                type: int
+                required: false
+                description: Destination port for the rule
+              macro:
+                type: str
+                required: false
+                description: Macro to use for the rule (e.g., SSH, HTTP)
+              protocol:
+                type: str
+                required: false
+                description: Protocol for the rule (e.g., tcp, udp)
+              source:
+                type: str
+                required: false
+                description: Source IP address, CIDR or IP Set for the rule
+              source_port:
+                type: int
+                required: false
+                description: Source port for the rule

@@ -1,0 +1,18 @@
+mongo_packages:
+  apt:
+    name: mongo
+    key: https://www.mongodb.org/static/pgp/server-8.0.asc
+    repository: https://repo.mongodb.org/apt/ubuntu
+    distribution: noble/mongodb-org/8.0
+    arch: amd64
+    components:
+      - multiverse
+    packages:
+      mongodb-org: 8.0.9
+      mongodb-org-database: 8.0.9
+      mongodb-org-server: 8.0.9
+      mongodb-mongosh: 2.5.1
+      mongodb-org-shell: 8.0.9
+      mongodb-org-mongos: 8.0.9
+      mongodb-org-tools: 8.0.9
+      mongodb-org-database-tools-extra: 8.0.9

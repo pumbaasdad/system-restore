@@ -1,0 +1,14 @@
+#cloud-config
+chpasswd:
+  expire: False
+package_upgrade: false
+hostname: {{ virtual_machine_name }}
+fqdn: {{ virtual_machine_name }}.{{ virtual_machine_search_domain }}
+manage_etc_hosts: true
+
+users:
+  - name: {{ virtual_machine_user }}
+    lock_passwd: false
+    ssh_authorized_keys:
+      - {{ virtual_machine_ssh_key }}
+    sudo: "ALL=(ALL:ALL) PASSWD:ALL, NOPASSWD: /usr/sbin/usermod"

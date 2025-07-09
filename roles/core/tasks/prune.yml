@@ -1,0 +1,2 @@
+- include_tasks:
+    file: "{{ ansible_distribution_file_variety | lower }}_prune.yml"

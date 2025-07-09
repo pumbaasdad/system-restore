@@ -1,4 +1,0 @@
-- name: Load Security Configuration
-  set_fact:
-    __security_users: "{{ security_users }}"
-    __security_user_details: "{{ security_user_details }}"

@@ -1,0 +1,14 @@
+---
+argument_specs:
+  main:
+    short_description: Configure SSH server security settings
+    description:
+      - Applies security configuration to SSH server
+      - Copies SSH daemon configuration file to enforce security policies
+      - Requires SSH key authentication and disables password authentication
+    author: Pumbaa's Dad
+    options:
+      ssh_server_project:
+        type: str
+        required: true
+        description: Project name used for SSH configuration file naming

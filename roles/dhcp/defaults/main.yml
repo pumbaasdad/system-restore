@@ -1,6 +1,0 @@
-dhcp_dir: "{{ docker_compose_dir }}/dhcp"
-dhcp_docker_network: dhcp0
-dhcp_docker_subnet: "{{ secrets['dhcp_docker_subnet'] | default('172.47.0.0/16') }}"
-dhcp_docker_ip: "{{ secrets['dhcp_docker_ip'] | default('172.47.0.2') }}"
-dhcp_volume: dhcp
-dhcp_service_name: dhcp

@@ -1,0 +1,15 @@
+---
+argument_specs:
+  main:
+    short_description: Configure YubiKey authentication for system login
+    description:
+      - Installs YubiKey PAM modules and configuration tools
+      - Creates Yubico configuration directory structure
+      - Configures PAM to require YubiKey for physical login authentication
+      - Enhances system security by requiring hardware authentication tokens
+    author: Pumbaa's Dad
+    options:
+      yubikey_apt_cache_valid_time:
+        type: int
+        required: true
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.

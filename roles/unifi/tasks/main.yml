@@ -1,0 +1,23 @@
+- become: true
+  block:
+    - name: Create the unifi group
+      group:
+        name: unifi
+        gid: "{{ unifi_group_id }}"
+
+    - name: Create the unifi user
+      user:
+        name: unifi
+        uid: "{{ unifi_user_id }}"
+        group: unifi
+        shell: /usr/sbin/nologin
+
+- include_vars:
+    file: "{{ ansible_distribution | lower }}.yml"
+
+- vars:
+    package_config: "{{ unifi_packages }}"
+    package_allow_releaseinfo_change:
+      - codename
+  include_role:
+    name: package

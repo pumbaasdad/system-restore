@@ -1,0 +1,4 @@
+{{ package_apt_add_repo.repo | replace('Enabled: no', 'Enabled: yes') }}
+{%- for change_type in package_allow_releaseinfo_change %}
+APT::Acquire::AllowReleaseInfoChange::{{ change_type | capitalize }}: true
+{% endfor %}

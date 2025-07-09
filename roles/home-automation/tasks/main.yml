@@ -1,3 +1,0 @@
-- name: Load Home Automation Configuration
-  set_fact:
-    __home_automation_reverse_proxy_ip: "{{ home_automation_reverse_proxy_ip }}"

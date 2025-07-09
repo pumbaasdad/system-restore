@@ -1,0 +1,8 @@
+- become: true
+  block:
+    - name: Install bind9
+      apt:
+        name:
+          - bind9
+        update_cache: true
+        cache_valid_time: "{{ bind9_apt_cache_valid_time }}"

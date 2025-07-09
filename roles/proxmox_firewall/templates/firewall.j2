@@ -1,0 +1,68 @@
+{%- macro print_options(enabled, policy_out, policy_in) -%}
+[OPTIONS]
+
+enable: {{ enabled }}
+dhcp: 1
+policy_out: {{ policy_out }}
+policy_in: {{ policy_in }}
+{%- endmacro -%}
+
+{%- macro print_ipsets(ipsets) -%}
+{% for ipset in ipsets %}
+
+[IPSET {{ ipset.name }}]
+
+{{ ipset.ips | join('\n') }}
+{% endfor %}
+{%- endmacro -%}
+
+{%- macro print_rule_source_port(rule) -%}
+  {%- if rule.source_port is defined %}
+ -sport {{ rule.source_port }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro print_rule_destination_port(rule) -%}
+  {%- if rule.destination_port is defined %}
+ -dport {{ rule.destination_port }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro print_rule_action(rule) -%}
+  {%- if rule.macro is defined -%}
+    {{ rule.macro }}({{ rule.action | upper }})
+  {%- elif rule.protocol is defined -%}
+    {{ rule.action | upper }} -p {{ rule.protocol | lower }}{{ print_rule_source_port(rule) }}{{ print_rule_destination_port(rule) }}
+  {%- else -%}
+    {{ rule.action | upper }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro print_rule_source(rule) -%}
+  {%- if rule.source is defined %}
+ -source {{ rule.source }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro print_rule_destination(rule) -%}
+  {%- if rule.destination is defined %}
+ -dest {{ rule.destination }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro print_rule(type, rule) -%}
+{{ type | upper }} {{ print_rule_action(rule) }}{{ print_rule_source(rule) }}{{ print_rule_destination(rule) }} -log nolog
+{%- endmacro -%}
+
+{%- macro print_rules(rules) -%}
+  {%- if rules | length > 0 -%}
+[RULES]
+  {%- endif %}
+
+
+{% for type in ['in', 'out'] %}
+{% for rule in rules[type] | default([]) %}
+{{ print_rule(type, rule) }}
+{% endfor %}
+{% endfor %}
+{%- endmacro -%}

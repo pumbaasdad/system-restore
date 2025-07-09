@@ -1,0 +1,7 @@
+- name: Install additional packages
+  become: true
+  apt:
+    name:
+      - acl
+    update_cache: true
+    cache_valid_time: "{{ docker_host_apt_cache_valid_time }}"

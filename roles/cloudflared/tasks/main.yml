@@ -1,0 +1,61 @@
+- include_tasks:
+    file: "{{ ansible_distribution_file_variety | lower }}.yml"
+
+- become: true
+  block:
+    - name: Create the cloudflared user
+      user:
+        name: "{{ cloudflared_user }}"
+        shell: /usr/sbin/nologin
+
+    - name: Create cloudflared directory
+      file:
+        dest: "/home/{{ cloudflared_user }}/.cloudflared"
+        owner: "{{ cloudflared_user }}"
+        group: "{{ cloudflared_user }}"
+        state: directory
+
+    - name: Install origin certificate
+      template:
+        src: cert.pem.j2
+        dest: /home/{{ cloudflared_user }}/.cloudflared/cert.pem
+        owner: "{{ cloudflared_user }}"
+        group: "{{ cloudflared_user }}"
+        mode: '0600'
+      notify: Restart cloudflared
+
+    - name: Install tunnel credentials
+      template:
+        src: tunnel-credentials.json.j2
+        dest: /home/{{ cloudflared_user }}/.cloudflared/{{ cloudflared_tunnel_id }}.json
+        owner: "{{ cloudflared_user }}"
+        group: "{{ cloudflared_user }}"
+        mode: '0400'
+      notify: Restart cloudflared
+
+    - name: Create cloudflared config directory
+      file:
+        dest: /etc/cloudflared
+        state: directory
+        owner: "{{ cloudflared_user }}"
+        group: "{{ cloudflared_user }}"
+
+    - name: Install tunnel configuration
+      template:
+        src: config.yml.j2
+        dest: /etc/cloudflared/config.yml
+        owner: "{{ cloudflared_user }}"
+        group: "{{ cloudflared_user }}"
+      notify: Restart cloudflared
+
+    - name: Install cloudflared service unit
+      template:
+        src: cloudflared.service.j2
+        dest: /etc/systemd/system/cloudflared.service
+        mode: '0644'
+      notify: Restart cloudflared
+
+    - name: Enable cloudflared service
+      systemd:
+        name: cloudflared
+        enabled: true

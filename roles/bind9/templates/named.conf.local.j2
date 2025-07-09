@@ -1,0 +1,41 @@
+{% for zone in bind9_zones %}
+{% set fwd_zone = zone.name + '.' + bind9_root_domain %}
+zone "{{ fwd_zone }}"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + fwd_zone }}";
+};
+
+{% set zone_octets = ((zone.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int -%}
+{%- set reverse_zone = (zone.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
+
+zone "{{ reverse_zone }}"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + reverse_zone[:-13] }}";
+};
+
+{% set reverse_zone = (zone.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets):] | select() | join('.') -%}
+
+zone "{{ reverse_zone }}"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + reverse_zone[:-13] }}";
+};
+{% endfor %}
+zone "{{ bind9_root_domain }}"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + bind9_root_domain }}";
+};
+
+zone "{{ bind9_reverse_ipv6_zone }}.ip6.arpa"
+{
+    type master;
+    notify no;
+    file "{{ '/etc/bind/db.' + bind9_reverse_ipv6_zone }}";
+};

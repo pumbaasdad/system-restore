@@ -1,0 +1,59 @@
+---
+argument_specs:
+  main:
+    short_description: Install and configure Plex Media Server
+    description:
+      - Installs Plex Media Server as a Docker container
+      - Configures Plex with NFS storage for media files
+      - Sets up DVR post-processing scripts for TV shows and movies
+      - Manages Plex configuration and scripts directory
+    author: Pumbaa's Dad
+    options:
+      plex_directory:
+        type: str
+        required: true
+        description: Directory where Plex configuration and docker compose file will be stored
+      plex_gid:
+        type: int
+        required: true
+        description: Group ID that will be used to run the Plex process
+      plex_nfs_address:
+        type: str
+        required: true
+        description: IP address of the NFS server that will be used to store the plex library
+      plex_nfs_dvr_incomplete_transcode_path:
+        type: str
+        required: true
+        description: Path on NFS server where DVR recordings that appear to be incomplete will be stored before transcoding
+      plex_nfs_dvr_movies_path:
+        type: str
+        required: true
+        description: Path on NFS server where Plex should store movie recordings
+      plex_nfs_dvr_movies_transcode_path:
+        type: str
+        required: true
+        description: Path on NFS server for transcoded movie files
+      plex_nfs_dvr_tv_path:
+        type: str
+        required: true
+        description: Path on NFS server where Plex should store TV recordings
+      plex_nfs_dvr_tv_transcode_path:
+        type: str
+        required: true
+        description: Path on NFS server for transcoded TV files
+      plex_nfs_mountpoint:
+        type: str
+        required: true
+        description: Base path on the NFS server for media storage, all plex_nfs_*_path parameters are relative to this
+      plex_timezone:
+        type: str
+        required: true
+        description: Timezone for the Plex container
+      plex_uid:
+        type: int
+        required: true
+        description: User ID that will be used to run the Plex process
+      plex_user:
+        type: str
+        required: true
+        description: User that owns the Plex configuration files

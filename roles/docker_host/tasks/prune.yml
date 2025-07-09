@@ -1,0 +1,24 @@
+- become_user: "{{ docker_host_user }}"
+  become: true
+  block:
+    - name: Prune docker containers
+      community.docker.docker_prune:
+        containers: yes
+        timeout: 300
+
+    - name: Prune docker images
+      community.docker.docker_prune:
+        images: yes
+        images_filters:
+          dangling: false
+        timeout: 300
+
+    - name: Prune docker networks
+      community.docker.docker_prune:
+        networks: yes
+        timeout: 300
+
+    - name: Prune docker volumes
+      community.docker.docker_prune:
+        volumes: yes
+        timeout: 300

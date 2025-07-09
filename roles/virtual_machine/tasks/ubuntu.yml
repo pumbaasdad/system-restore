@@ -1,0 +1,36 @@
+- vars:
+    local_image_name: /{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_ubuntu_codename }}.img
+  block:
+    - delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
+      block:
+        - name: Check if the image exists
+          stat:
+            path: "{{ local_image_name }}"
+          register: image
+
+        - name: Get the image
+          get_url:
+            url: https://cloud-images.ubuntu.com/{{ virtual_machine_ubuntu_codename }}/current/{{ virtual_machine_ubuntu_codename }}-server-cloudimg-amd64.img
+            dest: "{{ local_image_name }}"
+          when: not image.stat.exists
+
+    - vars:
+        virtual_machine_image: "{{ local_image_name }}"
+      include_tasks:
+        file: cloudimg.yml
+
+- name: Wait for VM to start
+  wait_for_connection:
+    sleep: 5
+    timeout: 300
+
+- name: Check password status
+  command:
+    cmd: passwd -S
+  register: password_status
+  changed_when: false
+
+- name: Set password
+  command:
+    cmd: sudo usermod -p {{ ansible_become_password | password_hash(rounds=4096, salt=password_salt) }} {{ ansible_ssh_user }}
+  when: (password_status.stdout_lines | first | split(' '))[1] != 'P'

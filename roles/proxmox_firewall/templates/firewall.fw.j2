@@ -1,0 +1,4 @@
+{%- import 'firewall.j2' as macros -%}
+{{ macros.print_options(proxmox_firewall_enabled | ternary(1, 0), proxmox_firewall_policy_out, proxmox_firewall_policy_in) }}
+{{ macros.print_ipsets(proxmox_firewall_ipsets) }}
+{{ macros.print_rules(proxmox_firewall_rules) }}

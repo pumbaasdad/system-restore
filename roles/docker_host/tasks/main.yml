@@ -1,0 +1,50 @@
+- become: true
+  block:
+    - name: Create the docker group
+      group:
+        name: "{{ docker_host_user }}"
+        gid: "{{ docker_host_gid }}"
+
+    - name: Create the docker user
+      user:
+        name: "{{ docker_host_user }}"
+        uid: "{{ docker_host_uid }}"
+        group: "{{ docker_host_group }}"
+        shell: /usr/sbin/nologin
+
+    - name: Add current user to the docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups:
+          - "{{ docker_host_group }}"
+        append: true
+
+- include_vars:
+    file: "{{ ansible_distribution | lower }}.yml"
+
+- vars:
+    package_config: "{{ docker_host_packages }}"
+  include_role:
+    name: package
+
+- include_tasks:
+    file: "{{ ansible_distribution_file_variety | lower }}.yml"
+
+- name: Start docker on boot
+  become: true
+  service:
+    name: "{{ item }}"
+    enabled: true
+    state: started
+  loop:
+    - docker
+    - containerd
+
+- name: Create the {{ docker_host_project_directory }} directory
+  become: true
+  file:
+    dest: "{{ docker_host_project_directory }}"
+    state: directory
+    owner: "{{ docker_host_user }}"
+    group: "{{ docker_host_group }}"
+    mode: 0775

@@ -1,0 +1,68 @@
+- name: Update root zone serial number
+  become: true
+  vars:
+    zone_serial_number: "{{ bind9_serial_numbers[bind9_root_domain] + 1 }}"
+  template:
+    src: db.root_zone.j2
+    dest: /etc/bind/db.{{ bind9_root_domain }}
+  notify: Reload named
+
+- name: Update IPv6 reverse zone serial numbers
+  become: true
+  vars:
+    reverse_zone: "{{ ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] }}"
+    zone_serial_number: "{{ bind9_serial_numbers[reverse_zone] + 1 }}"
+  template:
+    src: db.reverse_ipv6_link_local_zone.j2
+    dest: /etc/bind/db.{{ reverse_zone | replace('.ip6.arpa', '') }}
+  notify: Reload named
+
+- name: Update zone serial numbers
+  become: true
+  vars:
+    zone: "{{ item }}"
+    fqdn: "{{ zone.name }}.{{ bind9_root_domain }}"
+    zone_serial_number: "{{ bind9_serial_numbers[fqdn] + 1 }}"
+  template:
+    src: db.zone.j2
+    dest: /etc/bind/db.{{ fqdn }}
+  loop: "{{ bind9_zone_databases.results | selectattr('changed', 'eq', true) | map(attribute='item') }}"
+  loop_control:
+    label: "{{ zone.name }}"
+  notify: Reload named
+
+- name: Update reverse ethernet zone serial numbers
+  become: true
+  vars:
+    zone: "{{ item }}"
+    zone_octets: "{{ ((item.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int }}"
+    reverse_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+    zone_serial_number: "{{ bind9_serial_numbers[reverse_zone] + 1}}"
+  template:
+    src: db.reverse_ipv4_zone.j2
+    dest: /etc/bind/db.{{ reverse_zone | replace('.in-addr.arpa', '') }}
+  loop: "{{ bind9_reverse_ethernet_zone_databases.results | selectattr('changed', 'eq', true) | map(attribute='item') }}"
+  loop_control:
+    label: "{{ zone.name }}"
+  notify: Reload named
+
+- name: Update reverse wifi zone serial numbers
+  become: true
+  vars:
+    zone: "{{ item }}"
+    zone_octets: "{{ ((item.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int }}"
+    reverse_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+    zone_serial_number: "{{ bind9_serial_numbers[reverse_zone] + 1}}"
+  template:
+    src: db.reverse_ipv4_zone.j2
+    dest: /etc/bind/db.{{ reverse_zone | replace('.in-addr.arpa', '') }}
+  loop: "{{ bind9_reverse_wifi_zone_databases.results | selectattr('changed', 'eq', true) | map(attribute='item') }}"
+  loop_control:
+    label: "{{ zone.name }}"
+  notify: Reload named
+
+- name: Reload named
+  become: true
+  service:
+    name: named
+    state: reloaded

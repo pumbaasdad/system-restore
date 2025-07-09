@@ -1,0 +1,10 @@
+core_fish_packages:
+  apt:
+    name: fish
+    key: https://download.opensuse.org/repositories/shells:fish:release:4/Debian_12/Release.key
+    repository: http://download.opensuse.org/repositories/shells:/fish:/release:/4/Debian_12/
+    distribution: /
+    arch: amd64
+    components: []
+    packages:
+      fish: 4.0.2-2

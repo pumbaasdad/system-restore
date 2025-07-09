@@ -1,0 +1,4 @@
+- name: Reload kea
+  become: true
+  command:
+    cmd: service kea-dhcp4-server reload

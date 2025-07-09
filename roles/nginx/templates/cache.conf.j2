@@ -1,0 +1,98 @@
+# Cache configuration
+proxy_cache_path {{ nginx_cache_path }} levels={{ nginx_cache_levels }} keys_zone={{ nginx_cache_keys_zone_name }}:{{ nginx_cache_keys_zone_size }} max_size={{ nginx_cache_max_size }}
+                 inactive={{ nginx_cache_inactive_duration }} use_temp_path=off;
+
+server {
+    listen 80;
+    server_name _;
+
+    proxy_set_header Host $host;
+    proxy_ssl_name $host;
+    proxy_ssl_server_name on;
+
+    # Set cache key to include the full upstream URL
+    proxy_cache_key "$host$request_uri";
+
+    # Enable caching
+    proxy_cache {{ nginx_cache_keys_zone_name }};
+    proxy_cache_valid 200 206 {{ nginx_cache_200_cache_valid_duration }};
+    proxy_cache_valid 404 500 502 503 504 {{ nginx_cache_error_cache_valid_duration }};
+
+    # Cache lock to prevent cache stampede
+    proxy_cache_lock on;
+    proxy_cache_lock_timeout {{ nginx_cache_lock_timeout }};
+
+    # Handle range requests properly for large packages
+    proxy_set_header Range $http_range;
+    proxy_cache_methods GET HEAD;
+
+    # Connection settings
+    proxy_connect_timeout 30s;
+    proxy_send_timeout 30s;
+    proxy_read_timeout 30s;
+
+    # Buffer settings for better performance
+    proxy_buffering on;
+    proxy_buffer_size 4k;
+    proxy_buffers 8 4k;
+    proxy_busy_buffers_size 8k;
+
+    proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+    proxy_cache_background_update on;
+
+    # Add cache status headers for debugging
+    add_header X-Cache-Status $upstream_cache_status always;
+
+    # Nginx status for monitoring cache performance
+    location /nginx_status {
+        stub_status on;
+        access_log off;
+    }
+
+    # Cache purge endpoint (optional, for manual cache clearing)
+    location ~ ^/purge/([^/]+)/(.*)$ {
+        proxy_cache_purge {{ nginx_cache_keys_zone_name }} "$1$2";
+    }
+
+{% for location in nginx_cache_custom_locations %}
+    location {{ location.path }} {
+        proxy_intercept_errors on;
+
+{% for config in location.cache_valid | default([]) %}
+        proxy_cache_valid {{ config.codes | join(' ') }} {{ config.duration }};
+{% endfor %}
+
+        proxy_buffering {{ location.buffering | default('on') }};
+        proxy_request_buffering {{ location.request_buffering | default('on') }};
+
+        proxy_pass https://$host;
+
+        error_page 401 404 = @fallback_http_{{ location.name }};
+    }
+{% endfor %}
+
+    location / {
+        proxy_intercept_errors on;
+
+        proxy_pass https://$host;
+
+        error_page 401 404 = @fallback_http;
+    }
+
+{% for location in nginx_cache_custom_locations %}
+    location @fallback_http_{{ location.name }} {
+{% for config in location.cache_valid | default([]) %}
+        proxy_cache_valid {{ config.codes | join(' ') }} {{ config.duration }};
+{% endfor %}
+
+        proxy_buffering {{ location.buffering | default('on') }};
+        proxy_request_buffering {{ location.request_buffering | default('on') }};
+
+        proxy_pass http://$host;
+    }
+{% endfor %}
+
+    location @fallback_http {
+        proxy_pass http://$host;
+    }
+}

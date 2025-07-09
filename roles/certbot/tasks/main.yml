@@ -1,0 +1,67 @@
+- name: Get current user information
+  getent:
+    database: passwd
+    key: "{{ ansible_ssh_user }}"
+
+- name: Create the {{ certbot_project_directory }} directory
+  become: true
+  file:
+    dest: "{{ certbot_project_directory }}"
+    state: directory
+    owner: "{{ ansible_ssh_user }}"
+    group: "{{ getent_passwd[ansible_ssh_user][2] }}"
+    mode: 0775
+
+- name: Install requirements.txt
+  copy:
+    src: requirements.txt
+    dest: "{{ certbot_project_directory }}/requirements.txt"
+
+- name: Install certbot
+  pip:
+    virtualenv: "{{ certbot_virtualenv }}"
+    requirements: "{{ certbot_project_directory }}/requirements.txt"
+
+- become: true
+  block:
+    - name: Create certbot symlink
+      file:
+        src: "{{ certbot_virtualenv }}/bin/certbot"
+        dest: /usr/bin/certbot
+        state: link
+
+    - name: Create /etc/letsencrypt
+      file:
+        dest: /etc/letsencrypt/renewal-hooks.post
+        state: directory
+
+    - name: Install certbot config
+      template:
+        src: "{{ item }}.j2"
+        dest: /etc/letsencrypt/{{ item }}
+        mode: 0640
+      loop:
+        - cli.ini
+        - cloudflare.ini
+      register: certbot_config
+
+    - name: Install post renewal hook
+      template:
+        src: reload-webserver.sh.j2
+        dest: /etc/letsencrypt/renewal-hooks/post/reload-webserver.sh
+
+    - name: Get certificates
+      command:
+        cmd: certbot certonly -n
+      when: certbot_config.changed
+      notify: Reload webserver
+
+    - name: Install renewal cron job
+      cron:
+        name: Renew certbot certificates
+        day: "*"
+        hour: "{{ certbot_renew_hour }}"
+        minute: "{{ certbot_renew_minute }}"
+        month: "*"
+        weekday: "*"
+        job: certbot renew -q

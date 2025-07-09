@@ -1,0 +1,22 @@
+- become_user: "{{ handbrake_user }}"
+  become: true
+  block:
+    - name: Install handbrake configuration
+      copy:
+        src: config/
+        dest: "{{ handbrake_directory }}/config"
+        directory_mode: 0775
+        backup: true
+      register: handbrake_config
+
+    - name: Install compose file
+      template:
+        src: docker-compose.yml.j2
+        dest: "{{ handbrake_directory }}/docker-compose.yml"
+      register: handbrake_template
+
+    - name: Start handbrake
+      community.docker.docker_compose_v2:
+        project_src: "{{ handbrake_directory }}"
+        state: "{{ (handbrake_config.changed or handbrake_template.changed) | ternary('restarted', 'present') }}"
+        remove_orphans: true

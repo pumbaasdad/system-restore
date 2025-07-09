@@ -1,0 +1,108 @@
+- include_tasks:
+    file: "{{ ansible_distribution_file_variety | lower }}.yml"
+
+- delegate_to: localhost
+  block:
+    - name: Lookup root domain serial number
+      vars:
+        domain: "{{ bind9_root_domain }}"
+        zone_octets: "{{ ((bind9_ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int }}"
+        reverse_eth_zone: "{{ (bind9_ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+        reverse_wifi_zone: "{{ (bind9_ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+        reverse_ipv6_zone: "{{ ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] }}"
+      set_fact:
+        bind9_serial_numbers: "{{ bind9_serial_numbers | combine({
+          domain: lookup('dig', domain, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_eth_zone: lookup('dig', reverse_eth_zone, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_wifi_zone: lookup('dig', reverse_wifi_zone, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_ipv6_zone: lookup('dig', reverse_ipv6_zone, 'qtype=SOA', 'flat=0').serial | default(0)
+        }) }}"
+
+    - name: Lookup current serial numbers
+      vars:
+        domain: "{{ item.name }}.{{ bind9_root_domain }}"
+        zone_octets: "{{ ((item.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int }}"
+        reverse_eth_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+        reverse_wifi_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+      set_fact:
+        bind9_serial_numbers: "{{ bind9_serial_numbers | combine({
+          domain: lookup('dig', domain, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_eth_zone: lookup('dig', reverse_eth_zone, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_wifi_zone: lookup('dig', reverse_wifi_zone, 'qtype=SOA', 'flat=0').serial | default(0)
+        }) }}"
+      loop: "{{ network.zones }}"
+      loop_control:
+        label: "{{ item.name }}.{{ bind9_root_domain }}"
+
+- become: true
+  block:
+    - name: Install named configuration
+      template:
+        src: "{{ item }}.j2"
+        dest: /etc/bind/{{ item }}
+        group: bind
+      loop:
+        - named.conf.local
+        - named.conf.options
+      notify: Reload named
+
+    - name: Install root zone file
+      vars:
+        zone_serial_number: "{{ bind9_serial_numbers[bind9_root_domain] }}"
+      template:
+        src: db.root_zone.j2
+        dest: /etc/bind/db.{{ bind9_root_domain }}
+      notify: Update root zone serial number
+
+    - name: Install the IPv6 reverse zone file
+      vars:
+        reverse_zone: "{{ ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] }}"
+        zone_serial_number: "{{ bind9_serial_numbers[reverse_zone] }}"
+      template:
+        src: db.reverse_ipv6_link_local_zone.j2
+        dest: /etc/bind/db.{{ reverse_zone | replace('.ip6.arpa', '') }}
+      notify: Update IPv6 reverse zone serial numbers
+
+    - name: Install zone files
+      vars:
+        zone: "{{ item }}"
+        fqdn: "{{ zone.name }}.{{ bind9_root_domain }}"
+        zone_serial_number: "{{ bind9_serial_numbers[fqdn] }}"
+      template:
+        src: db.zone.j2
+        dest: /etc/bind/db.{{ fqdn }}
+      loop: "{{ bind9_zones }}"
+      loop_control:
+        label: "{{ zone.name }}"
+      register: bind9_zone_databases
+      notify: Update zone serial numbers
+
+    - name: Install ethernet reverse zone files
+      vars:
+        zone: "{{ item }}"
+        zone_octets: "{{ ((item.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int }}"
+        reverse_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+        zone_serial_number: "{{ bind9_serial_numbers[reverse_zone] }}"
+      template:
+        src: db.reverse_ipv4_zone.j2
+        dest: /etc/bind/db.{{ reverse_zone | replace('.in-addr.arpa', '') }}
+      loop: "{{ bind9_zones }}"
+      loop_control:
+        label: "{{ zone.name }}"
+      register: bind9_reverse_ethernet_zone_databases
+      notify: Update reverse ethernet zone serial numbers
+
+    - name: Install wifi reverse zone files
+      vars:
+        zone: "{{ item }}"
+        zone_octets: "{{ ((item.ipv4_subnet | ansible.utils.ipaddr('prefix')) / 8) | round(0, 'ceil') | int }}"
+        reverse_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
+        zone_serial_number: "{{ bind9_serial_numbers[reverse_zone] }}"
+      template:
+        src: db.reverse_ipv4_zone.j2
+        dest: /etc/bind/db.{{ reverse_zone | replace('.in-addr.arpa', '') }}
+      loop: "{{ bind9_zones }}"
+      loop_control:
+        label: "{{ zone.name }}"
+      register: bind9_reverse_wifi_zone_databases
+      notify: Update reverse wifi zone serial numbers

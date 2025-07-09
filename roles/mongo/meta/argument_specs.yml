@@ -1,0 +1,16 @@
+---
+argument_specs:
+  main:
+    short_description: Install MongoDB database server
+    description:
+      - Installs MongoDB database server from official MongoDB repository
+      - Configures APT repository with MongoDB GPG key
+      - Installs MongoDB packages including server, tools, and shell
+      - Supports different MongoDB versions
+    author: Pumbaa's Dad
+    options:
+      mongo_version:
+        type: int
+        required: false
+        default: 8
+        description: MongoDB major version to install
