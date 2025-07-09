@@ -22,7 +22,7 @@
 
     - name: Install compose file
       template:
-        src: docker-compose.yml.j2
+        src: docker-compose.yml
         dest: "{{ plex_directory }}/docker-compose.yml"
 
     - name: Start plex

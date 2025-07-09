@@ -11,7 +11,7 @@
 
     - name: Install compose file
       template:
-        src: docker-compose.yml.j2
+        src: docker-compose.yml
         dest: "{{ handbrake_directory }}/docker-compose.yml"
       register: handbrake_template
 
