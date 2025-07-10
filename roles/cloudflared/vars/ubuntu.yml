@@ -8,4 +8,4 @@ cloudflared_packages:
     components:
       - main
     packages:
-      cloudflared: 2025.6.1
+      cloudflared: 2025.7.0
