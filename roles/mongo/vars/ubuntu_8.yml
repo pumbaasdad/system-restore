@@ -8,11 +8,11 @@ mongo_packages:
     components:
       - multiverse
     packages:
-      mongodb-org: 8.0.9
-      mongodb-org-database: 8.0.9
-      mongodb-org-server: 8.0.9
-      mongodb-mongosh: 2.5.1
-      mongodb-org-shell: 8.0.9
-      mongodb-org-mongos: 8.0.9
-      mongodb-org-tools: 8.0.9
-      mongodb-org-database-tools-extra: 8.0.9
+      mongodb-org: 8.0.11
+      mongodb-org-database: 8.0.11
+      mongodb-org-server: 8.0.11
+      mongodb-mongosh: 2.5.5
+      mongodb-org-shell: 8.0.11
+      mongodb-org-mongos: 8.0.11
+      mongodb-org-tools: 8.0.11
+      mongodb-org-database-tools-extra: 8.0.11
