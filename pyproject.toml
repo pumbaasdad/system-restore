@@ -1,5 +1,5 @@
 [project]
-name = "system-restore-next"
+name = "system-restore"
 version = "0.1.0"
 description = "Playbook for regnerating system configuration"
 readme = "README.md"

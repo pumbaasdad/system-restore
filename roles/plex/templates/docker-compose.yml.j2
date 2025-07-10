@@ -1,7 +1,7 @@
 services:
   plex:
     container_name: plex
-    image: linuxserver/plex:1.41.3
+    image: {{ services.plex.image }}
     environment:
       - TZ={{ plex_timezone }}
       - PUID={{ plex_uid }}

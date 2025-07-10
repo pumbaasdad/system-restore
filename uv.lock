@@ -263,7 +263,7 @@ wheels = [
 ]
 
 [[package]]
-name = "system-restore-next"
+name = "system-restore"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [

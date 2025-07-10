@@ -5,12 +5,26 @@ updates:
     schedule:
       interval: "weekly"
       day: "saturday"
-      time: "06:00"
+      time: "01:00"
       timezone: "America/Toronto"
   - package-ecosystem: "pip"
     directory: "/roles/certbot/files"
     schedule:
       interval: "weekly"
       day: "saturday"
-      time: "06:00"
+      time: "01:00"
+      timezone: "America/Toronto"
+  - package-ecosystem: "docker-compose"
+    directory: "/roles/plex/vars"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "01:00"
+      timezone: "America/Toronto"
+  - package-ecosystem: "docker-compose"
+    directory: "/roles/handbrake/vars"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "01:00"
       timezone: "America/Toronto"

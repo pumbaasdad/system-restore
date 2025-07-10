@@ -22,7 +22,7 @@ This playbook is designed to automate the setup and configuration of a home netw
     This project uses `uv` for python dependency management.
     ```bash
     pip install uv
-    uv update
+    uv sync
     ```
 
 3.  **Configure Inventory:**

@@ -1,3 +1,6 @@
+- include_vars:
+    file: docker-compose.yml
+
 - become_user: "{{ plex_user }}"
   become: true
   block:
@@ -22,7 +25,7 @@
 
     - name: Install compose file
       template:
-        src: docker-compose.yml
+        src: docker-compose.yml.j2
         dest: "{{ plex_directory }}/docker-compose.yml"
 
     - name: Start plex

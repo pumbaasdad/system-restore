@@ -1,0 +1,3 @@
+services:
+  handbrake:
+    image: jlesage/handbrake:v25.02.3
