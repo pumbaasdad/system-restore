@@ -8,4 +8,4 @@ java_packages:
     components:
       - main
     packages:
-      temurin-17-jre: 17.0.15.0.0+6-0
+      temurin-17-jre: 17.0.16.0.0+8-0
