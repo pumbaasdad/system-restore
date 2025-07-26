@@ -32,7 +32,7 @@ wait_for_host() {
 }
 
 # Main hook logic
-case "$1" in
+case "$2" in
     pre-start)
         log_message "Pre-start hook triggered for $2 (VMID: $3)"
 
