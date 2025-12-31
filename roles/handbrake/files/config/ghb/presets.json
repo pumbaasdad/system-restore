@@ -10964,7 +10964,7 @@
                     "VideoPreset": "slow",
                     "VideoProfile": "auto",
                     "VideoQSVDecode": false,
-                    "VideoQualitySlider": 28.0,
+                    "VideoQualitySlider": 27.0,
                     "VideoQualityType": 2,
                     "VideoScaler": "swscale",
                     "VideoTune": "",
