@@ -9,3 +9,5 @@ container_static_ip: false
 
 container_firewall_ipsets: []
 container_firewall_rules: {}
+
+container_startup: "{{ omit }}"
