@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.13"
 
 [[package]]
@@ -205,11 +205,11 @@ wheels = [
 
 [[package]]
 name = "proxmoxer"
-version = "2.2.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/6a/54/dc2919eed681ca31220a9021e35935a3995335069b520279b4d55b9df822/proxmoxer-2.2.0.tar.gz", hash = "sha256:3ed63a58e5c0822841afdb3801f9d913a4996955c1c54f7319b5842ba2615006", size = 29666, upload-time = "2024-12-15T02:08:36.351Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/22/2e/5481ad9cc91eff6e585eabac5be94879bc2297b8b615c7427bce610d1447/proxmoxer-2.3.0.tar.gz", hash = "sha256:0b0b2067187af1fc6d4257a46ac68c8fd79cc25d2813637cdae7a9a98fbfd11f", size = 30830, upload-time = "2026-03-04T02:19:48.816Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/2c/9a/0c3570e2ccce07d304c8a25f7238accc5174c234f5eddb3b666e20777898/proxmoxer-2.2.0-py3-none-any.whl", hash = "sha256:7e4431fd38e1a9321eedf6d860ddc373fc2b29ce1845fa8b072d7580d99f6b90", size = 19217, upload-time = "2024-12-15T02:08:34.047Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/fa/598ceae13e96ac97cf8e9b481433587b87edddb4bb9200632bd8bd80e448/proxmoxer-2.3.0-py3-none-any.whl", hash = "sha256:1c03445e95cf9c53b6e50614dbaf561e0e1eb3ec878cf45ddde4bc4421c56743", size = 19796, upload-time = "2026-03-04T02:19:47.724Z" },
 ]
 
 [[package]]
@@ -281,7 +281,7 @@ requires-dist = [
     { name = "dnspython", specifier = ">=2.7.0" },
     { name = "netaddr", specifier = ">=1.3.0" },
     { name = "passlib", specifier = ">=1.7.4" },
-    { name = "proxmoxer", specifier = ">=2.2.0" },
+    { name = "proxmoxer", specifier = ">=2.3.0" },
     { name = "requests", specifier = ">=2.32.3" },
 ]
 
