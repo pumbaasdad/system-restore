@@ -90,8 +90,8 @@
 - name: Disable subscription warning
   replace:
     path: /usr/share/javascript/proxmox-widget-toolkit/proxmoxlib.js
-    regexp: '( ?|^\s{1,}success: function[a-z()\{, ]+)((?:\n.*){16})(\s+orig_cmd.+\n)\s+}\n'
-    replace: \1\3
+    regexp: '(^\s*checked_command:\s*function\s*\(orig_cmd\)\s*\{\s*$)'
+    replace: '\1 return orig_cmd();'
     backup: true
 
 - name: Install python modules
