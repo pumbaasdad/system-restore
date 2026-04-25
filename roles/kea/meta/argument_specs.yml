@@ -63,6 +63,11 @@ argument_specs:
                 type: str
                 required: true
                 description: The name of the host
+              nameservers:
+                type: list
+                elements: str
+                required: false
+                description: A list of nameservers that will be used by this host, if not provided, the network default will be used
               wifi:
                 type: dict
                 required: false

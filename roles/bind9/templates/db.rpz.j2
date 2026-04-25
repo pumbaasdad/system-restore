@@ -1,0 +1,7 @@
+$TTL 3600
+@ IN SOA localhost. root.localhost. (2 1H 1H 1W 1H)
+@ IN NS localhost.
+{% for domain in bind9_blocked_domains %}
+{{ domain }} CNAME .
+*.{{ domain }} CNAME
+{% endfor %}

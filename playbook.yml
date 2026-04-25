@@ -39,6 +39,11 @@
   roles:
     - bind9
 
+- name: Setup DNS Firewall
+  hosts: dns-firewall
+  roles:
+    - bind9
+
 - name: Setup Proxy Cache
   hosts: proxy-cache
   roles:
