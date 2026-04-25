@@ -25,10 +25,14 @@ options {
     auth-nxdomain no;    # conform to RFC1035
     listen-on { any; };
 
+{% if bind9_blocked_domains | length > 0 %}
+    response-policy { zone "rpz.block"; };
+{% endif %}
+
     allow-recursion {
         localhost;
         localnets;
-        {{ network.ipv4_subnet }};
-        {{ network.ipv6_subnet }};
+        {{ bind9_ipv4_subnet }};
+        {{ bind9_ipv6_subnet }};
     };
 };

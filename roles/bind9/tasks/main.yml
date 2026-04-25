@@ -12,11 +12,12 @@
         reverse_ipv6_zone: "{{ ('fe80::' | ansible.utils.ipaddr('revdns'))[32:72] }}"
       set_fact:
         bind9_serial_numbers: "{{ bind9_serial_numbers | combine({
-          domain: lookup('dig', domain, 'qtype=SOA', 'flat=0').serial | default(0),
-          reverse_eth_zone: lookup('dig', reverse_eth_zone, 'qtype=SOA', 'flat=0').serial | default(0),
-          reverse_wifi_zone: lookup('dig', reverse_wifi_zone, 'qtype=SOA', 'flat=0').serial | default(0),
-          reverse_ipv6_zone: lookup('dig', reverse_ipv6_zone, 'qtype=SOA', 'flat=0').serial | default(0)
+          domain: lookup('dig', domain, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_eth_zone: lookup('dig', reverse_eth_zone, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_wifi_zone: lookup('dig', reverse_wifi_zone, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_ipv6_zone: lookup('dig', reverse_ipv6_zone, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0)
         }) }}"
+      when: bind9_manage_root_domain
 
     - name: Lookup current serial numbers
       vars:
@@ -26,11 +27,11 @@
         reverse_wifi_zone: "{{ (item.ipv4_subnet | ansible.utils.ipaddr('network') | ansible.utils.ipmath(256) | ansible.utils.ipaddr('revdns') | split('.'))[(4 - zone_octets | int):] | select() | join('.') }}"
       set_fact:
         bind9_serial_numbers: "{{ bind9_serial_numbers | combine({
-          domain: lookup('dig', domain, 'qtype=SOA', 'flat=0').serial | default(0),
-          reverse_eth_zone: lookup('dig', reverse_eth_zone, 'qtype=SOA', 'flat=0').serial | default(0),
-          reverse_wifi_zone: lookup('dig', reverse_wifi_zone, 'qtype=SOA', 'flat=0').serial | default(0)
+          domain: lookup('dig', domain, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_eth_zone: lookup('dig', reverse_eth_zone, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0),
+          reverse_wifi_zone: lookup('dig', reverse_wifi_zone, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0)
         }) }}"
-      loop: "{{ network.zones }}"
+      loop: "{{ bind9_zones }}"
       loop_control:
         label: "{{ item.name }}.{{ bind9_root_domain }}"
 
@@ -52,6 +53,7 @@
       template:
         src: db.root_zone.j2
         dest: /etc/bind/db.{{ bind9_root_domain }}
+      when: bind9_manage_root_domain
       notify: Update root zone serial number
 
     - name: Install the IPv6 reverse zone file
@@ -61,6 +63,7 @@
       template:
         src: db.reverse_ipv6_link_local_zone.j2
         dest: /etc/bind/db.{{ reverse_zone | replace('.ip6.arpa', '') }}
+      when: bind9_manage_root_domain
       notify: Update IPv6 reverse zone serial numbers
 
     - name: Install zone files
@@ -106,3 +109,10 @@
         label: "{{ zone.name }}"
       register: bind9_reverse_wifi_zone_databases
       notify: Update reverse wifi zone serial numbers
+
+    - name: Install blocked domain zone file
+      template:
+        src: db.rpz.j2
+        dest: /etc/bind/db.rpz
+      when: bind9_blocked_domains | length > 0
+      notify: Reload named

@@ -1,24 +1,30 @@
 hypervisors:
   hosts:
     pve:
+
 ubuntu_vms:
   hosts:
     media:
+
 docker_hosts:
   hosts:
     media:
+
 snowflake_vms:
   hosts:
     home-automation:
+
 ubuntu_lxcs:
   hosts:
     network-management:
     reverse-proxy:
-    dns:
     dhcp:
     http-firewall:
     proxy-cache:
     tunnel:
+  children:
+    nameservers:
+
 storage:
   hosts:
     nas:
@@ -32,10 +38,11 @@ regular_priority_lxcs:
   hosts:
     network-management:
     reverse-proxy:
-    dns:
     http-firewall:
     proxy-cache:
     tunnel:
+  children:
+    nameservers:
 
 reverse_proxies:
   hosts:
@@ -70,3 +77,8 @@ ssh_servers:
     hypervisors:
     ubuntu_vms:
     lxcs:
+
+nameservers:
+  hosts:
+    dns:
+    dns-firewall:
