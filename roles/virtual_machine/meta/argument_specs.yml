@@ -215,6 +215,25 @@ argument_specs:
         description: Proxmox node name where the VM will be created
         type: str
         required: true
+      virtual_machine_proxmox_users:
+        type: list
+        elements: dict
+        required: false
+        description: Proxmox users that will be accessed by this container
+        options:
+          name:
+            type: str
+            required: true
+            description: The name of the user and its role
+          password:
+            type: str
+            required: true
+            description: The password of the user
+          privileges:
+            type: list
+            elements: str
+            required: true
+            descriptions: The privileges that the user will have
       virtual_machine_search_domain:
         description: DNS search domain for the virtual machine
         type: str
