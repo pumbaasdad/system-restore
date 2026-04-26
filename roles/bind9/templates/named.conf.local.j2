@@ -26,6 +26,7 @@ zone "{{ reverse_zone }}"
     file "{{ '/etc/bind/db.' + reverse_zone[:-13] }}";
 };
 {% endfor %}
+{% if bind9_manage_root_domain %}
 zone "{{ bind9_root_domain }}"
 {
     type master;
@@ -39,3 +40,10 @@ zone "{{ bind9_reverse_ipv6_zone }}.ip6.arpa"
     notify no;
     file "{{ '/etc/bind/db.' + bind9_reverse_ipv6_zone }}";
 };
+{% endif %}
+{% if bind9_blocked_domains | length > 0 %}
+zone "rpz.block" {
+    type master;
+    file "ect/bind/db.rpz";
+};
+{% endif %}

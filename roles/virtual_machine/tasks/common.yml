@@ -94,3 +94,57 @@
         api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
         api_host: "{{ virtual_machine_proxmox_host }}"
         state: started
+
+    - name: Find proxmox users
+      community.proxmox.proxmox_user_info:
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        userid: "{{ item.name }}@pve"
+      loop: "{{ virtual_machine_proxmox_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+      register: virtual_machine_existing_proxmox_users
+
+    - name: Create proxmox user
+      vars:
+        existing_users: "{{ virtual_machine_existing_proxmox_users.results | map(attribute='proxmox_users') | flatten | map(attribute='user') | list }}"
+        user_password: "{{ (item.name in existing_users) | ternary(omit, item.password) }}"
+      community.proxmox.proxmox_user:
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        userid: "{{ item.name }}@pve"
+        password: "{{ user_password }}"
+      register: virtual_machine_ugid
+      loop: "{{ virtual_machine_proxmox_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Create proxmox role
+      community.proxmox.proxmox_role:
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        roleid: "{{ item.name}}"
+        privs: "{{ item.privileges }}"
+      loop: "{{ virtual_machine_proxmox_users }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Grant proxmox permissions
+      community.proxmox.proxmox_access_acl:
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        path: /
+        roleid: "{{ item.item.name }}"
+        type: user
+        ugid: "{{ item.userid }}"
+      loop: "{{ virtual_machine_ugid.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"

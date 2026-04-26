@@ -238,6 +238,10 @@ argument_specs:
         type: str
         required: true
         description: SSH public key used to connect to the container
+      container_startup:
+        type: str
+        required: false
+        description: The startup order for the container
       container_static_ip:
         type: bool
         required: false

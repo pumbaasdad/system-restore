@@ -72,6 +72,9 @@ server {
 {% endfor %}
 
     location / {
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
+
         proxy_intercept_errors on;
 
         proxy_pass https://$host;
@@ -93,6 +96,9 @@ server {
 {% endfor %}
 
     location @fallback_http {
+        proxy_no_cache 1;
+        proxy_cache_bypass 1;
+
         proxy_pass http://$host;
     }
 }

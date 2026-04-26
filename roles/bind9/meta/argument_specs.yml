@@ -12,6 +12,11 @@ argument_specs:
         type: int
         required: true
         description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.
+      bind9_blocked_domains:
+        type: list
+        elements: str
+        required: true
+        description: A list of domains for which the BIND9 server will return NXDOMAIN.
       bind9_forwarders:
         type: list
         elements: str
@@ -29,6 +34,14 @@ argument_specs:
         type: str
         required: true
         description: The IPv4 subnet for the network that the BIND9 server is authoritative for.
+      bind9_ipv6_subnet:
+        type: str
+        required: true
+        description: The IPv6 subnet for the network that the BIND9 server is authoritative for.
+      bind9_manage_root_domain:
+        type: bool
+        required: true
+        description: If the BIND9 server should manage the root domain.
       bind9_reverse_ipv6_zone:
         type: str
         required: true

@@ -69,7 +69,7 @@ function process_tv_show {
   fi
 
   DESTINATION_DIRECTORY="/media/{{ plex_nfs_dvr_tv_transcode_path }}/$(echo "$FILENAME" | sed -r 's+^(.*) - (S([[:digit:]]*)E[[:digit:]]*|([[:digit:]]{4})(-[[:digit:]]{2}){2}( [[:digit:]]{2}){3}) - .*$+\1/Season \3\4/+')"
-  mkdir -p "$DESTINATION_DIRECTORY"
+  mkdir -m 775 -p "$DESTINATION_DIRECTORY"
 
   if ! is_someone_watching_live_tv "$FILENAME"; then
     log "Moving $1 to $DESTINATION_DIRECTORY"
@@ -78,13 +78,15 @@ function process_tv_show {
     log "Copying $1 to $DESTINATION_DIRECTORY"
     cp "$1" "$DESTINATION_DIRECTORY"
   fi
+
+  chmod 775 "$1" "$DESTINATION_DIRECTORY"
 }
 
 function process_movie {
   FILENAME=$(basename "$1")
 
   DESTINATION_DIRECTORY="/media/{{ plex_nfs_dvr_movies_transcode_path }}/${FILENAME%.*}"
-  mkdir -p "$DESTINATION_DIRECTORY"
+  mkdir -m 775 -p "$DESTINATION_DIRECTORY"
 
   if ! is_someone_watching_live_movie "$FILENAME"; then
     log "Moving $1 to $DESTINATION_DIRECTORY"
@@ -93,6 +95,8 @@ function process_movie {
     log "Copying $1 to $DESTINATION_DIRECTORY"
     cp "$1" "$DESTINATION_DIRECTORY"
   fi
+
+  chmod 775 "$1" "$DESTINATION_DIRECTORY"
 }
 
 case "$1" in
