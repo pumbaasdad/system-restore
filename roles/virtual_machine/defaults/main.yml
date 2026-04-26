@@ -20,3 +20,5 @@ virtual_machine_static_ip: false
 
 virtual_machine_firewall_ipsets: []
 virtual_machine_firewall_rules: {}
+
+virtual_machine_proxmox_users: []
