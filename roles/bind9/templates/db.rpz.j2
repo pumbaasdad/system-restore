@@ -3,5 +3,5 @@ $TTL 3600
 @ IN NS localhost.
 {% for domain in bind9_blocked_domains %}
 {{ domain }} CNAME .
-*.{{ domain }} CNAME
+*.{{ domain }} CNAME .
 {% endfor %}
