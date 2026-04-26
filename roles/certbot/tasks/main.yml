@@ -9,7 +9,7 @@
     dest: "{{ certbot_project_directory }}"
     state: directory
     owner: "{{ ansible_ssh_user }}"
-    group: "{{ getent_passwd[ansible_ssh_user][2] }}"
+    group: "{{ ansible_facts['getent_passwd'][ansible_ssh_user][2] }}"
     mode: 0775
 
 - name: Install requirements.txt

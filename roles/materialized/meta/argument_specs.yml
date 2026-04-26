@@ -1,0 +1,10 @@
+---
+argument_specs:
+  main:
+    short_description: Materialize values from hostvars that may be useful for group_vars
+    description:
+      - Materialize values from hostvars that may be useful for group_vars
+      - Configures Java environment variables
+      - Supports multiple Java distributions and versions
+    author: Pumbaa's Dad
+    options: {}

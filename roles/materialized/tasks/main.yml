@@ -1,0 +1,34 @@
+- set_fact:
+    materialized_network_zones_infrastructure_hosts_virtualized: >-
+      {%- set virtualized_hosts = [] -%}
+
+      {%- for host in groups['virtualized'] -%}
+        {%- set config = hostvars[host] -%}
+
+        {%- set host_config = {
+          'name': host,
+          'ipv4_offset': config.virtualized_ipv4_address.split('.')[-1] | int,
+          'ethernet': { 'mac': config.virtualized_mac_address },
+          'aliases': config.virtualized_aliases,
+        } -%}
+
+        {%- if config.virtualized_ipv6_interface is defined -%}
+          {%- set _ = host_config['ethernet'].update({'ipv6_interface': config.virtualized_ipv6_interface}) -%}
+        {%- endif -%}
+
+        {%- if config.virtualized_reverse_proxies is defined -%}
+          {%- set _ = host_config.update({'reverse_proxies': config.virtualized_reverse_proxies}) -%}
+        {%- endif -%}
+
+        {%- set _ = virtualized_hosts.append(host_config) -%}
+      {%- endfor -%}
+
+      {{ virtualized_hosts }}
+    materialized_http_proxy_container_name: "{{ hostvars['proxy-cache'].container_name }}"
+    materialized_dns_firewalls:
+      - "{{ hostvars['dns-firewall'].ansible_ssh_host }}"
+    materialized_nameservers:
+      - "{{ hostvars['dns'].ansible_ssh_host }}"
+    materialized_proxmox_host: "{{ hostvars['pve'].ansible_ssh_host }}"
+    materialized_proxmox_user: "{{ hostvars['pve'].ansible_ssh_user }}"
+    materialized_proxmox_impage_directory: "{{ hostvars['pve'].proxmox_image_directory }}"
