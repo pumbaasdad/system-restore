@@ -65,7 +65,7 @@
 - name: Create container
   delegate_to: localhost
   vars:
-    ip_config: "{{ container_static_ip | ternary(container_ip_address + '/' + container_subnet_size, 'dhcp') }}"
+    ip_config: "{{ container_static_ip | ternary(container_ip_address ~ '/' ~ (container_subnet_size | string), 'dhcp') }}"
   proxmox:
     vmid: "{{ container_id }}"
     node: "{{ container_proxmox_node }}"

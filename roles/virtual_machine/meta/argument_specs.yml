@@ -153,7 +153,7 @@ argument_specs:
       virtual_machine_hotplug:
         description: Hotplug configuration for the virtual machine
         type: str
-        required: true
+        required: false
       virtual_machine_id:
         description: Unique identifier for the virtual machine
         type: int

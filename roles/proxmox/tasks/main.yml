@@ -5,16 +5,16 @@
     update_cache: false
   loop:
     - uri: http://deb.debian.org/debian
-      suite: "{{ ansible_distribution_release }}"
+      suite: "{{ ansible_facts['distribution_release'] }}"
       components: main contrib
     - uri: http://deb.debian.org/debian
-      suite: "{{ ansible_distribution_release }}-updates"
+      suite: "{{ ansible_facts['distribution_release'] }}-updates"
       components: main contrib
     - uri: http://security.debian.org/debian-security
-      suite: "{{ ansible_distribution_release }}-security"
+      suite: "{{ ansible_facts['distribution_release'] }}-security"
       components: main contrib
     - uri: http://download.proxmox.com/debian/pve
-      suite: "{{ ansible_distribution_release }}"
+      suite: "{{ ansible_facts['distribution_release'] }}"
       components: pve-no-subscription
 
 - name: Disable pve-enterprise sources
@@ -24,22 +24,22 @@
       update_cache: false
   loop:
       - uri: https://enterprise.proxmox.com/debian/pve
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: pve-enterprise
       - uri: https://enterprise.proxmox.com/debian/ceph-quincy
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: enterprise
       - uri: https://enterprise.proxmox.com/debian/ceph-reef
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: enterprise
       - uri: http://download.proxmox.com/debian/ceph-quincy
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: no-subscription
       - uri: http://download.proxmox.com/debian/ceph-reef
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: no-subscription
       - uri: http://download.proxmox.com/debian/pve
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: pvetest
 
 - name: Disable legacy sources
@@ -49,13 +49,13 @@
       update_cache: false
   loop:
       - uri: http://ftp.ca.debian.org/debian
-        suite: "{{ ansible_distribution_release }}"
+        suite: "{{ ansible_facts['distribution_release'] }}"
         components: main contrib
       - uri: http://ftp.ca.debian.org/debian
-        suite: "{{ ansible_distribution_release }}-updates"
+        suite: "{{ ansible_facts['distribution_release'] }}-updates"
         components: main contrib
       - uri: http://security.debian.org
-        suite: "{{ ansible_distribution_release }}-security"
+        suite: "{{ ansible_facts['distribution_release'] }}-security"
         components: main contrib
 
 - name: Disable free firmware warnings

@@ -1,9 +1,21 @@
+- name: Materialize group variables
+  gather_facts: false
+  hosts: all
+  roles:
+    - materialized
+
 - name: Find reverse proxy subdomains
   gather_facts: false
   hosts: reverse_proxies
   tasks:
     - set_fact:
         reverse_proxies_subdomains: "{{ reverse_proxies_lazy_subdomains }}"
+
+- name: Re-Materialize group variables
+  gather_facts: false
+  hosts: all
+  roles:
+    - materialized
 
 - name: Setup hypervisors
   hosts: hypervisors
