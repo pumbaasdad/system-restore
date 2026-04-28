@@ -14,10 +14,14 @@ argument_specs:
         type: int
         required: true
         description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.
-      proxmox_domain:
+      proxmox_cert_directory:
         type: str
         required: true
-        description: Domain name for Proxmox WebAuthn configuration
+        description: The local directory where proxmox certificates will be stored.
+      proxmox_cert_domain:
+        type: str
+        required: true
+        description: The domain that will be included in proxmox certificates
       proxmox_image_directory:
         type: str
         required: true
@@ -34,3 +38,7 @@ argument_specs:
         type: str
         required: true
         description: Path to Python virtual environment for Proxmox tools
+      proxmox_webauthn_domain:
+        type: str
+        required: true
+        description: Domain name for Proxmox WebAuthn configuration

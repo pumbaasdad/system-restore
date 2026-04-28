@@ -3,7 +3,7 @@ container_bindmount_config: []
 container_uid_map: []
 container_gid_map: []
 
-container_hookscript_local_name: "{{ container_id }}.{{ container_hookscript | default('.') | splitext | last }}"
+container_hookscript_local_name: "{{ container_id }}{{ container_hookscript | default('.') | splitext | last }}"
 
 container_static_ip: false
 

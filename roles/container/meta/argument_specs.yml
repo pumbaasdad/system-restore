@@ -218,6 +218,10 @@ argument_specs:
         type: str
         required: true
         description: Username that will be used to interact with the proxmox API
+      container_proxmox_ca_path:
+        type: str
+        required: true
+        description: Path to a certificate use to validate connections to the proxmox API
       container_proxmox_host:
         type: str
         required: true
@@ -239,7 +243,7 @@ argument_specs:
         required: true
         description: SSH public key used to connect to the container
       container_startup:
-        type: str
+        type: int
         required: false
         description: The startup order for the container
       container_static_ip:

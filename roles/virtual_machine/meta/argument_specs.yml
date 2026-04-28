@@ -199,6 +199,10 @@ argument_specs:
         description: Proxmox API user for authentication
         type: str
         required: true
+      virtual_machine_proxmox_ca_path:
+        type: str
+        required: true
+        description: Path to a certificate use to validate connections to the proxmox API
       virtual_machine_proxmox_host:
         description: Proxmox host IP address or hostname
         type: str
@@ -242,6 +246,10 @@ argument_specs:
         description: SSH public key for user authentication
         type: str
         required: true
+      virtual_machine_startup:
+        type: int
+        required: false
+        description: The startup order for the virtual_machine
       virtual_machine_static_ip:
         description: Use static IP configuration instead of DHCP
         type: bool
