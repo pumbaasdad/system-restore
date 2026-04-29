@@ -2,5 +2,86 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended"
+  ],
+
+  "timezone": "America/Toronto",
+  "schedule": ["*, 0-4, *, *, 6"],
+  "prHourlyLimit": 10,
+
+  "regexManagers": [
+    {
+      "fileMatch": ["^roles/[^/]+/vars/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$"],
+      "matchStrings": [
+        "packages:[\\s\\S]*?\\n\\s*(?<depName>[a-z0-9.+:-]+):\\s*(?<currentValue>[0-9][^\\s]+)"
+      ],
+      "datasourceTemplate": "deb",
+      "versioningTemplate": "deb"
+    }
+  ],
+
+  "packageRules": [
+    {
+      "description": "Cloudflare cloudflared",
+      "matchPackageNames": ["cloudflared"],
+      "registryUrls": ["https://pkg.cloudflare.com/cloudflared"],
+      "additionalProperties": {
+        "suite": "noble"
+      }
+    },
+    {
+      "description": "Fish (Launchpad PPA)",
+      "matchPackageNames": ["fish"],
+      "matchFileNames": ["**/*fish*.yml"],
+      "registryUrls": ["https://ppa.launchpadcontent.net/fish-shell/release-4/ubuntu"],
+      "additionalProperties": {
+        "suite": "noble"
+      }
+    },
+    {
+      "description": "Fish (openSUSE repo)",
+      "matchPackageNames": ["fish"],
+      "matchFileNames": ["**/*Debian_12*.yml"],
+      "registryUrls": ["http://download.opensuse.org/repositories/shells:/fish:/release:/4/Debian_12/"],
+      "additionalProperties": {
+        "suite": "/"
+      }
+    },
+    {
+      "description": "MongoDB packages",
+      "matchPackagePatterns": ["^mongodb-"],
+      "registryUrls": ["https://repo.mongodb.org/apt/ubuntu"],
+      "additionalProperties": {
+        "suite": "noble/mongodb-org/8.0"
+      },
+      "groupName": "mongodb packages"
+    },
+    {
+      "description": "Adoptium Java",
+      "matchPackageNames": ["temurin-17-jre"],
+      "registryUrls": ["https://packages.adoptium.net/artifactory/deb"],
+      "additionalProperties": {
+        "suite": "noble"
+      }
+    },
+    {
+      "description": "UniFi",
+      "matchPackageNames": ["unifi"],
+      "registryUrls": ["https://dl.ui.com/unifi/debian"],
+      "additionalProperties": {
+        "suite": "stable"
+      }
+    },
+    {
+      "description": "Docker packages",
+      "matchPackagePatterns": [
+        "^docker-",
+        "^containerd\\.io$"
+      ],
+      "registryUrls": ["https://download.docker.com/linux/ubuntu"],
+      "additionalProperties": {
+        "suite": "noble"
+      },
+      "groupName": "docker packages"
+    }
   ]
 }
