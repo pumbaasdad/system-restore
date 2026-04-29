@@ -6,5 +6,6 @@
 
   "timezone": "America/Toronto",
   "schedule": ["* 0-4 * * 6"],
-  "prHourlyLimit": 10
+  "prHourlyLimit": 10,
+  "dependencyDashboard": false
 }
