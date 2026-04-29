@@ -20,15 +20,30 @@
     name: proxmox_firewall
     
 - delegate_to: localhost
+  environment:
+    REQUESTS_CA_BUNDLE: "{{ virtual_machine_proxmox_ca_path }}"
   block:
-    - name: Create new VM
-      community.general.proxmox_kvm:
+    - name: Get initial VM config
+      community.proxmox.proxmox_vm_info:
         vmid: "{{ virtual_machine_id }}"
         node: "{{ virtual_machine_proxmox_node }}"
         api_user: "{{ virtual_machine_proxmox_api_user }}"
         api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
         api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
         api_host: "{{ virtual_machine_proxmox_host }}"
+        validate_certs: true
+        config: current
+      register: virtual_machine_config
+
+    - name: Create new VM
+      community.proxmox.proxmox_kvm:
+        vmid: "{{ virtual_machine_id }}"
+        node: "{{ virtual_machine_proxmox_node }}"
+        api_user: "{{ virtual_machine_proxmox_api_user }}"
+        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+        api_host: "{{ virtual_machine_proxmox_host }}"
+        validate_certs: true
         name: "{{ virtual_machine_name }}"
         net:
           net0: "virtio={{ virtual_machine_mac_address }},bridge=vmbr0,firewall={{ virtual_machine_firewall_enabled | ternary(1, 0) }}"
@@ -57,17 +72,18 @@
         searchdomains: "{{ virtual_machine_search_domain }}"
         nameservers: "{{ virtual_machine_nameservers | join(',') }}"
         ipconfig: "{{ virtual_machine_ipconfig }}"
-        hookscript: "{{ virtual_machine_hookscript is defined | ternary('local:snippets:/' + virtual_machine_hookscript_local_name, omit) }}"
+        startup: "{{ (virtual_machine_startup == omit) | ternary(omit, 'order=' + (virtual_machine_startup | string)) }}"
       register: virtual_machine_create
 
     - name: Get the disk size
-      community.general.proxmox_vm_info:
+      community.proxmox.proxmox_vm_info:
         vmid: "{{ virtual_machine_id }}"
         api_user: "{{ virtual_machine_proxmox_api_user }}"
         api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
         api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
         api_host: "{{ virtual_machine_proxmox_host }}"
         config: current
+        validate_certs: true
       register: info
 
     - name: Set the disk size
@@ -75,76 +91,101 @@
         current_size: "{{ info.proxmox_vms[0].config.scsi0.split(',') | select('regex', 'size') | first | split('=' ) | last | human_to_bytes(default_unit='B') }}"
         target_size: "{{ virtual_machine_disk_size | human_to_bytes(default_unit='B') }}"
         required_increase: "{{ target_size | int - current_size | int }}"
-      community.general.proxmox_disk:
+      community.proxmox.proxmox_disk:
         vmid: "{{ virtual_machine_id }}"
         api_user: "{{ virtual_machine_proxmox_api_user }}"
         api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
         api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
         api_host: "{{ virtual_machine_proxmox_host }}"
+        validate_certs: true
         state: "{{ (required_increase | int > 0) | ternary('resized', 'present') }}"
         size: +{{ required_increase }}
         disk: scsi0
 
-    - name: Start the VM
-      community.general.proxmox_kvm:
-        vmid: "{{ virtual_machine_id }}"
-        node: "{{ virtual_machine_proxmox_node }}"
-        api_user: "{{ virtual_machine_proxmox_api_user }}"
-        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
-        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
-        api_host: "{{ virtual_machine_proxmox_host }}"
-        state: started
+- name: Set hookscript
+  delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
+  vars:
+    existing_hookscript: "{{( virtual_machine_config.proxmox_vms | first).config.hookscript | default('') }}"
+    hookscript_path: "{{ virtual_machine_hookscript is defined | ternary('local:snippets/' + virtual_machine_hookscript_local_name, '') }}"
+    set_command: "--hookscript {{ hookscript_path }}"
+    delete_command: "--delete hookscript"
+    command_to_use: "{{ hookscript_path != '' | ternary(set_command, delete_command) }}"
+  command:
+    cmd: pct set {{ virtual_machine_id }} {{ command_to_use }}
+  when: existing_hookscript != hookscript_path
 
-    - name: Find proxmox users
-      community.proxmox.proxmox_user_info:
-        api_user: "{{ virtual_machine_proxmox_api_user }}"
-        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
-        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
-        api_host: "{{ virtual_machine_proxmox_host }}"
-        userid: "{{ item.name }}@pve"
-      loop: "{{ virtual_machine_proxmox_users }}"
-      loop_control:
-        label: "{{ item.name }}"
-      register: virtual_machine_existing_proxmox_users
-
-    - name: Create proxmox user
-      vars:
-        existing_users: "{{ virtual_machine_existing_proxmox_users.results | map(attribute='proxmox_users') | flatten | map(attribute='user') | list }}"
-        user_password: "{{ (item.name in existing_users) | ternary(omit, item.password) }}"
-      community.proxmox.proxmox_user:
-        api_user: "{{ virtual_machine_proxmox_api_user }}"
-        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
-        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
-        api_host: "{{ virtual_machine_proxmox_host }}"
-        userid: "{{ item.name }}@pve"
-        password: "{{ user_password }}"
-      register: virtual_machine_ugid
-      loop: "{{ virtual_machine_proxmox_users }}"
-      loop_control:
-        label: "{{ item.name }}"
-
-    - name: Create proxmox role
-      community.proxmox.proxmox_role:
-        api_user: "{{ virtual_machine_proxmox_api_user }}"
-        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
-        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
-        api_host: "{{ virtual_machine_proxmox_host }}"
-        roleid: "{{ item.name}}"
-        privs: "{{ item.privileges }}"
-      loop: "{{ virtual_machine_proxmox_users }}"
-      loop_control:
-        label: "{{ item.name }}"
-
-    - name: Grant proxmox permissions
-      community.proxmox.proxmox_access_acl:
-        api_user: "{{ virtual_machine_proxmox_api_user }}"
-        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
-        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
-        api_host: "{{ virtual_machine_proxmox_host }}"
-        path: /
-        roleid: "{{ item.item.name }}"
-        type: user
-        ugid: "{{ item.userid }}"
-      loop: "{{ virtual_machine_ugid.results }}"
-      loop_control:
-        label: "{{ item.item.name }}"
+#- delegate_to: localhost
+#  environment:
+#    REQUESTS_CA_BUNDLE: "{{ virtual_machine_proxmox_ca_path }}"
+#  block:
+#    - name: Start the VM
+#      vars:
+#        existing_virtual_machine: "{{ virtual_machine_config.proxmox_vms | length > 0 }}"
+#        desired_state: "{{ (existing_virtual_machine and virtual_machine_create.changed) | ternary('restarted', 'started') }}"
+#      community.proxmox.proxmox_kvm:
+#        vmid: "{{ virtual_machine_id }}"
+#        node: "{{ virtual_machine_proxmox_node }}"
+#        api_user: "{{ virtual_machine_proxmox_api_user }}"
+#        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+#        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+#        api_host: "{{ virtual_machine_proxmox_host }}"
+#        validate_certs: true
+#        state: "{{ desired_state }}"
+#
+#    - name: Find proxmox users
+#      community.proxmox.proxmox_user_info:
+#        api_user: "{{ virtual_machine_proxmox_api_user }}"
+#        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+#        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+#        api_host: "{{ virtual_machine_proxmox_host }}"
+#        validate_certs: true
+#        userid: "{{ item.name }}@pve"
+#      loop: "{{ virtual_machine_proxmox_users }}"
+#      loop_control:
+#        label: "{{ item.name }}"
+#      register: virtual_machine_existing_proxmox_users
+#
+#    - name: Create proxmox user
+#      vars:
+#        existing_users: "{{ virtual_machine_existing_proxmox_users.results | map(attribute='proxmox_users') | flatten | map(attribute='user') | list }}"
+#        user_password: "{{ (item.name in existing_users) | ternary(omit, item.password) }}"
+#      community.proxmox.proxmox_user:
+#        api_user: "{{ virtual_machine_proxmox_api_user }}"
+#        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+#        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+#        api_host: "{{ virtual_machine_proxmox_host }}"
+#        validate_certs: true
+#        userid: "{{ item.name }}@pve"
+#        password: "{{ user_password }}"
+#      register: virtual_machine_ugid
+#      loop: "{{ virtual_machine_proxmox_users }}"
+#      loop_control:
+#        label: "{{ item.name }}"
+#
+#    - name: Create proxmox role
+#      community.proxmox.proxmox_role:
+#        api_user: "{{ virtual_machine_proxmox_api_user }}"
+#        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+#        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+#        api_host: "{{ virtual_machine_proxmox_host }}"
+#        validate_certs: true
+#        roleid: "{{ item.name}}"
+#        privs: "{{ item.privileges }}"
+#      loop: "{{ virtual_machine_proxmox_users }}"
+#      loop_control:
+#        label: "{{ item.name }}"
+#
+#    - name: Grant proxmox permissions
+#      community.proxmox.proxmox_access_acl:
+#        api_user: "{{ virtual_machine_proxmox_api_user }}"
+#        api_token_id: "{{ virtual_machine_proxmox_api_token_id }}"
+#        api_token_secret: "{{ virtual_machine_proxmox_api_token_secret }}"
+#        api_host: "{{ virtual_machine_proxmox_host }}"
+#        validate_certs: true
+#        path: /
+#        roleid: "{{ item.item.name }}"
+#        type: user
+#        ugid: "{{ item.userid }}"
+#      loop: "{{ virtual_machine_ugid.results }}"
+#      loop_control:
+#        label: "{{ item.item.name }}"

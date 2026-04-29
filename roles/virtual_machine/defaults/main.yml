@@ -14,7 +14,7 @@ virtual_machine_searchdomains: "{{ omit }}"
 virtual_machine_nameservers: "{{ omit }}"
 virtual_machine_ipconfig: "{{ omit }}"
 
-virtual_machine_hookscript_local_name: "{{ virtual_machine_id }}.{{ virtual_machine_hookscript | default('.') | splitext | last }}"
+virtual_machine_hookscript_local_name: "{{ virtual_machine_id }}{{ virtual_machine_hookscript | default('.') | splitext | last }}"
 
 virtual_machine_static_ip: false
 

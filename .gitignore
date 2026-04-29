@@ -20,3 +20,5 @@ host_vars/
 
 # Ansible vault
 .ansible-lastpass*
+
+proxmox_certs

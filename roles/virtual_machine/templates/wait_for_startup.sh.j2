@@ -26,7 +26,7 @@ wait_for_host() {
             return 0
         fi
 
-        log_message "Dependency host $DEPENDENCY_HOST not reachable. Waiting $CHECK_INTERVAL seconds... (${elapsed}s/${MAX_WAIT_TIME}s elapsed)"
+        log_message "Dependency host $DEPENDENCY_HOST not reachable. Waiting $CHECK_INTERVAL seconds... (${elapsed}s elapsed)"
         sleep $CHECK_INTERVAL
     done
 }

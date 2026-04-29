@@ -23,9 +23,25 @@
     - proxmox
     - yubikey
 
+- name: Set proxmox certificate paths for containers
+  gather_facts: false
+  hosts: lxcs
+  tasks:
+    - set_fact:
+        container_proxmox_ca_path: "proxmox_certs/{{ container_proxmox_node }}/etc/pve/local/pve-ssl.pem"
+
+- name: Set proxmox certificate paths for virtual machines
+  gather_facts: false
+  hosts: vms
+  tasks:
+    - set_fact:
+        virtual_machine_proxmox_ca_path: "proxmox_certs/{{ virtual_machine_proxmox_node }}/etc/pve/local/pve-ssl.pem"
+
 - name: Setup DHCP Container
   hosts: dhcp
   gather_facts: false
+  vars:
+    container_startup: 1
   roles:
     - container
 

@@ -2,12 +2,15 @@
     file: "{{ container_type }}.yml"
 
 - name: Get the image
-  proxmox_template:
+  environment:
+    REQUESTS_CA_BUNDLE: "{{ container_proxmox_ca_path }}"
+  community.proxmox.proxmox_template:
     node: "{{ container_proxmox_node }}"
     api_user: "{{ container_proxmox_api_user }}"
     api_token_id: "{{ container_proxmox_api_token_id }}"
     api_token_secret: "{{ container_proxmox_api_token_secret }}"
     api_host: "{{ container_proxmox_host }}"
+    validate_certs: true
     url: http://download.proxmox.com/images/system/{{ container_image }}
     force: false
     storage: local
@@ -62,35 +65,50 @@
   include_role:
     name: proxmox_firewall
 
-- name: Create container
-  delegate_to: localhost
-  vars:
-    ip_config: "{{ container_static_ip | ternary(container_ip_address ~ '/' ~ (container_subnet_size | string), 'dhcp') }}"
-  proxmox:
-    vmid: "{{ container_id }}"
-    node: "{{ container_proxmox_node }}"
-    api_user: "{{ container_proxmox_api_user }}"
-    api_token_id: "{{ container_proxmox_api_token_id }}"
-    api_token_secret: "{{ container_proxmox_api_token_secret }}"
-    api_host: "{{ container_proxmox_host }}"
-    hostname: "{{ container_name }}"
-    cores: "{{ container_cores }}"
-    memory: "{{ container_memory }}"
-    nameserver: "{{ container_nameserver }}"
-    onboot: true
-    ostype: "{{ container_type }}"
-    pubkey: "{{ container_ssh_key }}"
-    searchdomain: "{{ container_search_domain }}"
-    timezone: host
-    ostemplate: local:vztmpl/{{ container_image }}
-    hookscript: "{{ container_hookscript is defined | ternary('local:snippets:/' + container_hookscript_local_name, omit) }}"
-    disk_volume:
-      size: "{{ container_disk_size }}"
-      storage: local-zfs
-    netif:
-      net0: "name=eth0,bridge=vmbr0,ip={{ ip_config }},gw={{ container_gateway }},hwaddr={{ container_mac_address }},type=veth,firewall={{ container_firewall_enabled | ternary(1, 0) }}"
-    startup: "{{ container_startup }}"
-  register: container_create
+- delegate_to: localhost
+  environment:
+    REQUESTS_CA_BUNDLE: "{{ container_proxmox_ca_path }}"
+  block:
+    - name: Get initial container config
+      community.proxmox.proxmox_vm_info:
+        vmid: "{{ container_id }}"
+        node: "{{ container_proxmox_node }}"
+        api_user: "{{ container_proxmox_api_user }}"
+        api_token_id: "{{ container_proxmox_api_token_id }}"
+        api_token_secret: "{{ container_proxmox_api_token_secret }}"
+        api_host: "{{ container_proxmox_host }}"
+        validate_certs: true
+        config: current
+      register: container_config
+
+    - name: Create container
+      vars:
+        ip_config: "{{ container_static_ip | ternary(container_ip_address ~ '/' ~ (container_subnet_size | string), 'dhcp') }}"
+      community.proxmox.proxmox:
+        vmid: "{{ container_id }}"
+        node: "{{ container_proxmox_node }}"
+        api_user: "{{ container_proxmox_api_user }}"
+        api_token_id: "{{ container_proxmox_api_token_id }}"
+        api_token_secret: "{{ container_proxmox_api_token_secret }}"
+        api_host: "{{ container_proxmox_host }}"
+        validate_certs: true
+        hostname: "{{ container_name }}"
+        cores: "{{ container_cores }}"
+        memory: "{{ container_memory }}"
+        nameserver: "{{ container_nameserver }}"
+        onboot: true
+        ostype: "{{ container_type }}"
+        pubkey: "{{ container_ssh_key }}"
+        searchdomain: "{{ container_search_domain }}"
+        timezone: host
+        ostemplate: local:vztmpl/{{ container_image }}
+        disk_volume:
+          size: "{{ container_disk_size }}"
+          storage: local-zfs
+        netif:
+          net0: "name=eth0,bridge=vmbr0,ip={{ ip_config }},gw={{ container_gateway }},hwaddr={{ container_mac_address }},type=veth,firewall={{ container_firewall_enabled | ternary(1, 0) }}"
+        startup: "{{ (container_startup == omit) | ternary(omit, 'order=' + (container_startup | string)) }}"
+      register: container_create
 
 - vars:
     line: "mp{{ ansible_loop.index0 }}: /mnt/bindmounts/{{ item.name }},mp={{ item.mountpoint }}"
@@ -133,29 +151,48 @@
     extended: true
 
 - delegate_to: "{{ container_proxmox_inventory_name }}"
-  lineinfile:
-    line: "{{ item }}"
-    path: /etc/pve/lxc/{{ container_id }}.conf
-  loop: "{{ container_bindmount_config + container_uid_map + container_gid_map }}"
-  when: container_bindmounts | length > 0
+  block:
+    - lineinfile:
+        line: "{{ item }}"
+        path: /etc/pve/lxc/{{ container_id }}.conf
+      loop: "{{ container_bindmount_config + container_uid_map + container_gid_map }}"
+      when: container_bindmounts | length > 0
+
+    - name: Set hookscript
+      vars:
+        existing_hookscript: "{{( container_config.proxmox_vms | first).config.hookscript | default('') }}"
+        hookscript_path: "{{ container_hookscript is defined | ternary('local:snippets/' + container_hookscript_local_name, '') }}"
+        set_command: "--hookscript {{ hookscript_path }}"
+        delete_command: "--delete hookscript"
+        command_to_use: "{{ hookscript_path != '' | ternary(set_command, delete_command) }}"
+      command:
+        cmd: pct set {{ container_id }} {{ command_to_use }}
+      when: existing_hookscript != hookscript_path
 
 - name: Start the container
   delegate_to: localhost
-  community.general.proxmox:
+  environment:
+    REQUESTS_CA_BUNDLE: "{{ container_proxmox_ca_path }}"
+  vars:
+    existing_container: "{{ container_config.proxmox_vms | length > 0 }}"
+    desired_state: "{{ (existing_container and container_create.changed) | ternary('restarted', 'started') }}"
+  community.proxmox.proxmox:
     vmid: "{{ container_id }}"
     node: "{{ container_proxmox_node }}"
     api_user: "{{ container_proxmox_api_user }}"
     api_token_id: "{{ container_proxmox_api_token_id }}"
     api_token_secret: "{{ container_proxmox_api_token_secret }}"
     api_host: "{{ container_proxmox_host }}"
-    state: started
+    validate_certs: true
+    state: "{{ desired_state }}"
     timeout: 60
 
 - set_fact:
     container_ssh_user: "{{ ansible_ssh_user }}"
 
 - vars:
-    ansible_ssh_user: "{{ container_create.changed | ternary('root', container_ssh_user) }}"
+    existing_container: "{{ container_config.proxmox_vms | length > 0 }}"
+    ansible_ssh_user: "{{ existing_container | ternary(container_ssh_user, 'root') }}"
   block:
     - name: Wait for Container to start
       wait_for_connection:

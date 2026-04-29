@@ -1,3 +1,24 @@
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    regexp: "{{ inventory_hostname }}"
+    line: "{{ ansible_ssh_host }} {{ inventory_hostname }}.{{ proxmox_cert_domain }} {{ inventory_hostname }}"
+  register: proxmox_etc_hosts_updated
+
+- when: proxmox_etc_hosts_updated.changed
+  block:
+    - name: Update certificates
+      command:
+        cmd: pvecm updatecerts --force
+
+    - name: Reboot proxmox
+      reboot:
+
+- name: Retrieve proxmox certificates
+  fetch:
+    src: /etc/pve/local/pve-ssl.pem
+    dest: "{{ proxmox_cert_directory }}"
+
 - name: Enable apt sources
   apt_repository:
     repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
