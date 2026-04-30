@@ -1,5 +1,5 @@
 - include_vars:
-    file: "{{ ansible_facts['distribution'] | lower }}_{{ mongo_version | lower }}.yml"
+    file: "packages/{{ ansible_facts['distribution'] | lower }}_{{ mongo_version | lower }}.yml"
 
 - vars:
     package_config: "{{ mongo_packages }}"
