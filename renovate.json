@@ -14,11 +14,12 @@
       "customType": "jsonata",
       "fileFormat": "yaml",
       "managerFilePatterns": [
-        "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
+        "/^roles/[^/]+/vars/packages/ubuntu(?:\\.yml|_[^/]+\\.yml)$/"
       ],
       "matchStrings": [
-        "$each($.*.apt.packages, function($version, $package) { {\"depName\": $package, \"currentValue\": $version} })"
+        "$.*.apt.( $each(packages, function($version, $package) { { \"depName\": $package, \"currentValue\": $version, \"repository\": repository, \"arch\": arch, \"components\": $join(components, \",\"), \"distribution\": distribution } }) )"
       ],
+      "registryUrlTemplate": "{{ repository }}?suite={{ distribution }}&components={{ components }}&binaryArch={{ arch }}",
       "datasourceTemplate": "deb",
       "versioningTemplate": "deb"
     }
