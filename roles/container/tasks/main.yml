@@ -108,6 +108,8 @@
         netif:
           net0: "name=eth0,bridge=vmbr0,ip={{ ip_config }},gw={{ container_gateway }},hwaddr={{ container_mac_address }},type=veth,firewall={{ container_firewall_enabled | ternary(1, 0) }}"
         startup: "{{ (container_startup == omit) | ternary(omit, 'order=' + (container_startup | string)) }}"
+        features:
+          - nesting=1
       register: container_create
 
 - vars:
