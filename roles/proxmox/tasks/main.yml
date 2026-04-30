@@ -63,6 +63,14 @@
         suite: "{{ ansible_facts['distribution_release'] }}"
         components: pvetest
 
+- name: Disable pve-enterprise deb822 sources
+  deb822_repository:
+    name: "pve-enterprise"
+    uris: "https://enterprise.proxmox.com/debian/pve"
+    suites: "{{ ansible_facts['distribution_release'] }}"
+    components: "pve-enterprise"
+    enabled: false
+
 - name: Disable legacy sources
   apt_repository:
       repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
