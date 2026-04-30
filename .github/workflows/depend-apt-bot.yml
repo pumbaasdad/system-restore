@@ -23,25 +23,25 @@ jobs:
     strategy:
       matrix:
         include:
-          - file: roles/cloudflared/vars/ubuntu.yml
+          - file: roles/cloudflared/vars/packages/ubuntu.yml
             key: cloudflared_packages
             name: cloudflared
-          - file: roles/mongo/vars/ubuntu_8.yml
+          - file: roles/mongo/vars/packages/ubuntu_8.yml
             key: mongo_packages
             name: mongo
-          - file: roles/core/vars/ubuntu.yml
+          - file: roles/core/vars/packages/ubuntu.yml
             key: core_fish_packages
             name: ubuntu-fish
-          - file: roles/core/vars/debian.yml
+          - file: roles/core/vars/packages/debian.yml
             key: core_fish_packages
             name: debian-fish
-          - file: roles/java/vars/ubuntu_adoptium.yml
+          - file: roles/java/vars/packages/ubuntu_adoptium.yml
             key: java_packages
             name: adoptium-java
-          - file: roles/unifi/vars/ubuntu.yml
+          - file: roles/unifi/vars/packages/ubuntu.yml
             key: unifi_packages
             name: unifi
-          - file: roles/docker_host/vars/ubuntu.yml
+          - file: roles/docker_host/vars/packages/ubuntu.yml
             key: docker_host_packages
             name: docker
       fail-fast: false

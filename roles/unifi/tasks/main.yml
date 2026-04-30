@@ -13,7 +13,7 @@
         shell: /usr/sbin/nologin
 
 - include_vars:
-    file: "{{ ansible_facts['distribution'] | lower }}.yml"
+    file: "packages/{{ ansible_facts['distribution'] | lower }}.yml"
 
 - vars:
     package_config: "{{ unifi_packages }}"

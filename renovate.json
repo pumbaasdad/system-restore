@@ -7,5 +7,41 @@
   "timezone": "America/Toronto",
   "schedule": ["* 0-4 * * 6"],
   "prHourlyLimit": 10,
-  "dependencyDashboard": false
+  "dependencyDashboard": false,
+
+  "customManagers": [
+    {
+      "customType": "jsonata",
+      "fileFormat": "yaml",
+      "managerFilePatterns": [
+        "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
+      ],
+      "matchStrings": [
+        "$each($.*.apt.packages, function($version, $package) { {\"depName\": $package, \"currentValue\": $version} })"
+      ],
+      "datasourceTemplate": "deb",
+      "versioningTemplate": "deb"
+    }
+  ],
+
+  "packageRules": [
+    {
+      "description": "MongoDB packages",
+      "matchPackagePatterns": ["^mongodb-"],
+      "groupName": "mongodb packages"
+    },
+    {
+      "description": "Docker packages",
+      "matchPackagePatterns": [
+        "^docker-",
+        "^containerd\\.io$"
+      ],
+      "groupName": "docker packages"
+    }
+  ]
 }
+
+
+
+
+
