@@ -6,5 +6,6 @@ core_fish_packages:
     distribution: /
     arch: amd64
     components: []
+    repology: opensuse_tumbleweed
     packages:
       fish: 4.6.0-1

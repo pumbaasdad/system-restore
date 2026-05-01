@@ -47,6 +47,10 @@ argument_specs:
                 type: dict
                 required: true
                 description: A dictionary of package names and their versions to be installed.  The key is the package name and the value is the version to be installed.
+              repology:
+                type: str
+                required: false
+                description: Repology repository used to find the most recent version of the package.  Not used by ansible.
               repository:
                 type: str
                 required: true

@@ -14,13 +14,26 @@
       "customType": "jsonata",
       "fileFormat": "yaml",
       "managerFilePatterns": [
-        "/^roles/[^/]+/vars/packages/ubuntu(?:\\.yml|_[^/]+\\.yml)$/"
+        "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
       ],
       "matchStrings": [
-        "$.*.apt.( $each(packages, function($version, $package) { { \"depName\": $package, \"currentValue\": $version, \"repository\": repository, \"arch\": arch, \"components\": $join(components, \",\"), \"distribution\": distribution } }) )"
+        "$.*.apt[$not($exists(repology))].( $each(packages, function($version, $package) { { \"depName\": $package, \"currentValue\": $version, \"repository\": repository, \"arch\": arch, \"components\": $join(components, \",\"), \"distribution\": distribution } }) )"
       ],
       "registryUrlTemplate": "{{ repository }}?suite={{ distribution }}&components={{ components }}&binaryArch={{ arch }}",
       "datasourceTemplate": "deb",
+      "versioningTemplate": "deb"
+    },
+    {
+      "customType": "jsonata",
+      "fileFormat": "yaml",
+      "managerFilePatterns": [
+        "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
+      ],
+      "matchStrings": [
+        "$.*.apt[repology].( $each(packages, function($version, $package) { { \"depName\": repology & \"/\" & name, \"currentValue\": $version } }) )"
+      ],
+      "registryUrlTemplate": "{{ repository }}?suite={{ distribution }}&components={{ components }}&binaryArch={{ arch }}",
+      "datasourceTemplate": "repology",
       "versioningTemplate": "deb"
     }
   ],
