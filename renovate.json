@@ -5,8 +5,13 @@
   ],
 
   "timezone": "America/Toronto",
-  "prHourlyLimit": 10,
+  "schedule": [
+    "* 20-23 * * 5",
+    "* 0-8 * * 6"
+  ],
+  "prHourlyLimit": 100,
   "dependencyDashboard": false,
+  "labels": ["dependencies", "{{ categories }}"],
 
   "customManagers": [
     {
