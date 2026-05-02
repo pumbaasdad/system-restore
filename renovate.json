@@ -11,7 +11,6 @@
   ],
   "prHourlyLimit": 100,
   "dependencyDashboard": false,
-  "labels": ["dependencies", "{{ categories }}"],
 
   "customManagers": [
     {
@@ -42,19 +41,13 @@
 
   "packageRules": [
     {
-      "matchCategories": ["custom"],
-      "matchFileNames": [
-        "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
-      ],
+      "matchJsonata": ["\"custom\" in categories"],
+      "matchFileNames": ["/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"],
       "labels": ["apt"]
     },
     {
-      "matchJsonata": ["\"custom\" in categories"],
-      "labels": ["test:apt"]
-    },
-    {
       "matchJsonata": ["$not(\"custom\" in categories)"],
-      "labels": ["test:{{ categories }}"]
+      "labels": ["{{ categories }}"]
     },
     {
       "description": "MongoDB packages",
