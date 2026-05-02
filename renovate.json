@@ -43,11 +43,11 @@
     {
       "matchJsonata": ["\"custom\" in categories"],
       "matchFileNames": ["/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"],
-      "labels": ["apt"]
+      "labels": ["dependencies", "apt"]
     },
     {
       "matchJsonata": ["$not(\"custom\" in categories)"],
-      "labels": ["{{ categories }}"]
+      "labels": ["dependencies", "{{ categories }}"]
     },
     {
       "description": "MongoDB packages",
