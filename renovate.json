@@ -5,7 +5,6 @@
   ],
 
   "timezone": "America/Toronto",
-  "schedule": ["* 0-4 * * 6"],
   "prHourlyLimit": 10,
   "dependencyDashboard": false,
 
@@ -17,9 +16,8 @@
         "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
       ],
       "matchStrings": [
-        "$.*.apt[$not($exists(repology))].( $each(packages, function($version, $package) { { \"depName\": $package, \"currentValue\": $version, \"repository\": repository, \"arch\": arch, \"components\": $join(components, \",\"), \"distribution\": distribution } }) )"
+        "$.*.apt[$not($exists(repology))].( $each(packages, function($version, $package) { { \"depName\": $package, \"currentValue\": $version, \"registryUrl\": repository & \"?suite=\" & distribution & \"&components=\" & $join(components, \",\") & \"&binaryArch=\" & arch } }) )"
       ],
-      "registryUrlTemplate": "{{ repository }}?suite={{ distribution }}&components={{ components }}&binaryArch={{ arch }}",
       "datasourceTemplate": "deb",
       "versioningTemplate": "deb"
     },
@@ -32,7 +30,6 @@
       "matchStrings": [
         "$.*.apt[repology].( $each(packages, function($version, $package) { { \"depName\": repology & \"/\" & name, \"currentValue\": $version } }) )"
       ],
-      "registryUrlTemplate": "{{ repository }}?suite={{ distribution }}&components={{ components }}&binaryArch={{ arch }}",
       "datasourceTemplate": "repology",
       "versioningTemplate": "deb"
     }
