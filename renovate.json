@@ -42,6 +42,21 @@
 
   "packageRules": [
     {
+      "matchCategories": ["custom"],
+      "matchFileNames": [
+        "/^roles/[^/]+/vars/packages/(ubuntu|debian)(?:\\.yml|_[^/]+\\.yml)$/"
+      ],
+      "labels": ["apt"]
+    },
+    {
+      "matchJsonata": ["\"custom\" in categories"],
+      "labels": ["test:apt"]
+    },
+    {
+      "matchJsonata": ["$not(\"custom\" in categories)"],
+      "labels": ["test:{{ categories }}"]
+    },
+    {
       "description": "MongoDB packages",
       "matchPackagePatterns": ["^mongodb-"],
       "groupName": "mongodb packages"
