@@ -71,7 +71,7 @@ jobs:
 
       - name: Create Pull Request for ${{ matrix.name }}
         if: steps.update-packages.outputs.updated == 'true'
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           branch: depend-apt-bot/${{ matrix.name }}
           commit-message: '[depend-apt-bot] Update ${{ matrix.name }} packages'
