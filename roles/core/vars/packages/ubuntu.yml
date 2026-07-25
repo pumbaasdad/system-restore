@@ -8,4 +8,4 @@ core_fish_packages:
     components:
       - main
     packages:
-      fish: 4.6.0-1~noble
+      fish: 4.8.1-1~noble
