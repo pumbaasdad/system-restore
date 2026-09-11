@@ -4,4 +4,4 @@ collections:
   - name: community.general
     version: 12.6.0
   - name: community.proxmox
-    version: 1.6.0
+    version: 2.0.0
