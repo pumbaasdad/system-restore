@@ -1,0 +1,1 @@
+bind9_dnssec_validation: "{{ (bind9_blocked_domains | length > 0) | ternary('no', 'auto') }}"
