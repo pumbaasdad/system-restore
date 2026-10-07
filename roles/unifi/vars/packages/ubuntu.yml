@@ -8,4 +8,4 @@ unifi_packages:
     components:
       - ubiquiti
     packages:
-      unifi: 10.2.105-33556-1
+      unifi: 10.4.57-34628-1
