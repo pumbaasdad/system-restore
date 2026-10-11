@@ -11,6 +11,9 @@
   ],
   "prHourlyLimit": 100,
   "dependencyDashboard": false,
+  "lockFileMaintenance": {
+    "enabled": true
+  },
 
   "customManagers": [
     {
