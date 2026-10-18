@@ -1,5 +1,5 @@
 - vars:
-    local_image_name: /{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_ubuntu_codename }}.img
+    local_image_name: "{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_ubuntu_codename }}.qcow2"
   block:
     - delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
       block:
@@ -15,7 +15,7 @@
           when: not image.stat.exists
 
     - vars:
-        virtual_machine_image: "{{ local_image_name }}"
+        virtual_machine_image: "{{ virtual_machine_proxmox_image_pool_location }}/{{ virtual_machine_ubuntu_codename }}.qcow2"
       include_tasks:
         file: cloudimg.yml
 
@@ -34,3 +34,18 @@
   command:
     cmd: sudo usermod -p {{ ansible_become_password | password_hash(rounds=4096, salt=password_salt) }} {{ ansible_ssh_user }}
   when: (password_status.stdout_lines | first | split(' '))[1] != 'P'
+
+- become: true
+  block:
+    - name: Install QEMU Guest Agent
+      apt:
+        name: qemu-guest-agent
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Ensure QEMU Guest Agent is enabled and started
+      service:
+        name: qemu-guest-agent
+        state: started
+        enabled: true

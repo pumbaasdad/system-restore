@@ -211,6 +211,10 @@ argument_specs:
         description: Directory path on Proxmox host for storing images
         type: str
         required: true
+      virtual_machine_proxmox_image_pool_location:
+        description: Storage pool location on Proxmox host for storing images
+        type: str
+        required: true
       virtual_machine_proxmox_inventory_name:
         description: Inventory name of the Proxmox host
         type: str

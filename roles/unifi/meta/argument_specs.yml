@@ -9,11 +9,11 @@ argument_specs:
       - Sets up specific UniFi package versions for consistent deployments
     author: Pumbaa's Dad
     options:
-      unifi_group_id:
+      unifi_apt_cache_valid_time:
         type: int
         required: true
-        description: Group ID for the unifi group
-      unifi_user_id:
-        type: int
+        description: The amount of time since the last apt cache update that this role should wait before updating the apt cache again.
+      unifi_installer_directory:
+        type: str
         required: true
-        description: User ID for the unifi user account
+        description: The directory where the unifi OS server installer will be saved

@@ -31,4 +31,4 @@
       - "{{ hostvars['dns'].ansible_ssh_host }}"
     materialized_proxmox_host: "{{ hostvars['pve'].ansible_ssh_host }}"
     materialized_proxmox_user: "{{ hostvars['pve'].ansible_ssh_user }}"
-    materialized_proxmox_impage_directory: "{{ hostvars['pve'].proxmox_image_directory }}"
+    materialized_proxmox_image_directory: "{{ hostvars['pve'].proxmox_image_directory }}/{{ hostvars['pve'].proxmox_image_import_directory }}"

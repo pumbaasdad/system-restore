@@ -17,131 +17,131 @@
   roles:
     - materialized
 
-- name: Setup hypervisors
-  hosts: hypervisors
-  roles:
-    - proxmox
-    - yubikey
-
-- name: Set proxmox certificate paths for containers
-  gather_facts: false
-  hosts: lxcs
-  tasks:
-    - set_fact:
-        container_proxmox_ca_path: "proxmox_certs/{{ container_proxmox_node }}/etc/pve/local/pve-ssl.pem"
-
-- name: Set proxmox certificate paths for virtual machines
-  gather_facts: false
-  hosts: vms
-  tasks:
-    - set_fact:
-        virtual_machine_proxmox_ca_path: "proxmox_certs/{{ virtual_machine_proxmox_node }}/etc/pve/local/pve-ssl.pem"
-
-- name: Setup DHCP Container
-  hosts: dhcp
-  gather_facts: false
-  vars:
-    container_startup: 1
-  roles:
-    - container
-
-- name: Setup DHCP Server
-  hosts: dhcp
-  roles:
-    - kea
-
-- name: Setup Containers
-  hosts: regular_priority_lxcs
-  gather_facts: false
-  roles:
-    - container
-
-- name: Setup VMs
-  hosts: vms
-  gather_facts: false
-  roles:
-    - virtual_machine
-
-- name: Setup DNS Server
-  hosts: dns
-  roles:
-    - bind9
-
-- name: Setup DNS Firewall
-  hosts: dns-firewall
-  roles:
-    - bind9
-
-- name: Setup Proxy Cache
-  hosts: proxy-cache
-  roles:
-    - nginx
-
-- name: Setup Linux Systems
-  hosts: linuxes
-  roles:
-    - core
-
-- name: Setup SSH Servers
-  hosts: ssh_servers
-  roles:
-    - ssh_server
-
-- name: Setup Docker Hosts
-  hosts: docker_hosts
-  roles:
-    - docker_host
-
-- name: Setup Media Server
-  hosts: media
-  roles:
-    - handbrake
-    - plex
-
-- name: Setup Network Management
-  hosts: network-management
-  roles:
-    - unifi
-
+#- name: Setup hypervisors
+#  hosts: hypervisors
+#  roles:
+#    - proxmox
+#    - yubikey
+#
+#- name: Set proxmox certificate paths for containers
+#  gather_facts: false
+#  hosts: lxcs
+#  tasks:
+#    - set_fact:
+#        container_proxmox_ca_path: "proxmox_certs/{{ container_proxmox_node }}/etc/pve/local/pve-ssl.pem"
+#
+#- name: Set proxmox certificate paths for virtual machines
+#  gather_facts: false
+#  hosts: vms
+#  tasks:
+#    - set_fact:
+#        virtual_machine_proxmox_ca_path: "proxmox_certs/{{ virtual_machine_proxmox_node }}/etc/pve/local/pve-ssl.pem"
+#
+#- name: Setup DHCP Container
+#  hosts: dhcp
+#  gather_facts: false
+#  vars:
+#    container_startup: 1
+#  roles:
+#    - container
+#
+#- name: Setup DHCP Server
+#  hosts: dhcp
+#  roles:
+#    - kea
+#
+#- name: Setup Containers
+#  hosts: regular_priority_lxcs
+#  gather_facts: false
+#  roles:
+#    - container
+#
+#- name: Setup VMs
+#  hosts: vms
+#  gather_facts: false
+#  roles:
+#    - virtual_machine
+#
+#- name: Setup DNS Server
+#  hosts: dns
+#  roles:
+#    - bind9
+#
+#- name: Setup DNS Firewall
+#  hosts: dns-firewall
+#  roles:
+#    - bind9
+#
+#- name: Setup Proxy Cache
+#  hosts: proxy-cache
+#  roles:
+#    - nginx
+#
+#- name: Setup Linux Systems
+#  hosts: linuxes
+#  roles:
+#    - core
+#
+#- name: Setup SSH Servers
+#  hosts: ssh_servers
+#  roles:
+#    - ssh_server
+#
+#- name: Setup Docker Hosts
+#  hosts: docker_hosts
+#  roles:
+#    - docker_host
+#
+#- name: Setup Media Server
+#  hosts: media
+#  roles:
+#    - handbrake
+#    - plex
+#
+#- name: Setup Network Management
+#  hosts: network-management
+#  roles:
+#    - unifi
+#
 - name: Setup Reverse Proxy
   hosts: reverse-proxy
   roles:
     - certbot
     - nginx
 
-- name: Setup HTTP Firewall
-  hosts: http-firewall
-  roles:
-    - nginx
-
-- name: Setup cloudflare tunnel
-  hosts: tunnel
-  roles:
-    - cloudflared
-
-- name: Cleanup Docker Hosts
-  hosts: docker_hosts
-  tasks:
-    - include_role:
-        name: docker_host
-        tasks_from: prune.yml
-
-- name: Cleanup Linux Systems
-  hosts: linuxes
-  tasks:
-    - include_role:
-        name: core
-        tasks_from: prune.yml
-
-- name: Copy secrets
-  gather_facts: false
-  hosts:
-    - nas
-  tasks:
-    - synchronize:
-        src: "{{ item }}"
-        dest: "{{ ansible_ssh_host}}:{{ nas_backup_vault_path }}"
-        delete: true
-      loop:
-        - host_vars
-        - group_vars
+#- name: Setup HTTP Firewall
+#  hosts: http-firewall
+#  roles:
+#    - nginx
+#
+#- name: Setup cloudflare tunnel
+#  hosts: tunnel
+#  roles:
+#    - cloudflared
+#
+#- name: Cleanup Docker Hosts
+#  hosts: docker_hosts
+#  tasks:
+#    - include_role:
+#        name: docker_host
+#        tasks_from: prune.yml
+#
+#- name: Cleanup Linux Systems
+#  hosts: linuxes
+#  tasks:
+#    - include_role:
+#        name: core
+#        tasks_from: prune.yml
+#
+#- name: Copy secrets
+#  gather_facts: false
+#  hosts:
+#    - nas
+#  tasks:
+#    - synchronize:
+#        src: "{{ item }}"
+#        dest: "{{ ansible_ssh_host}}:{{ nas_backup_vault_path }}"
+#        delete: true
+#      loop:
+#        - host_vars
+#        - group_vars

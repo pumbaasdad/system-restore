@@ -1,6 +1,7 @@
 - vars:
-    local_download_name: "{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_image_url | basename }}"
-    virtual_machine_image: "{{ virtual_machine_proxmox_image_directory }}/{{ virtual_machine_image_url | basename | splitext | first }}"
+    image_basename: "{{ virtual_machine_image_url | basename }}"
+    local_download_name: "{{ virtual_machine_proxmox_image_directory }}/{{ image_basename }}"
+    virtual_machine_image: "{{ virtual_machine_proxmox_image_directory }}/{{ image_basename | splitext | first }}"
   block:
     - delegate_to: "{{ virtual_machine_proxmox_inventory_name }}"
       block:
@@ -38,5 +39,6 @@
           storage: local-zfs
         virtual_machine_bios: ovmf
         virtual_machine_ostype: l26
+        virtual_machine_image: "{{ virtual_machine_proxmox_image_pool_location }}/{{ image_basename }}"
       include_tasks:
         file: common.yml

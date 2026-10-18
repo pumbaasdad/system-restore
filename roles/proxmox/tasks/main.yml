@@ -132,12 +132,12 @@
 
 - name: Create directory for VM images
   file:
-    path: "{{ proxmox_image_directory }}"
+    path: "{{ proxmox_image_directory }}/{{ proxmox_image_import_directory }}"
     state: directory
 
 - name: Configure local storage
-  copy:
-    src: storage.cfg
+  template:
+    src: storage.cfg.j2
     dest: /etc/pve/storage.cfg
     backup: true
 
