@@ -1,91 +1,113 @@
-- name: Update /etc/hosts
-  lineinfile:
-    path: /etc/hosts
-    regexp: "{{ inventory_hostname }}"
-    line: "{{ ansible_ssh_host }} {{ inventory_hostname }}.{{ proxmox_cert_domain }} {{ inventory_hostname }}"
-  register: proxmox_etc_hosts_updated
+#- name: Update /etc/hosts
+#  lineinfile:
+#    path: /etc/hosts
+#    regexp: "{{ inventory_hostname }}"
+#    line: "{{ ansible_ssh_host }} {{ inventory_hostname }}.{{ proxmox_cert_domain }} {{ inventory_hostname }}"
+#  register: proxmox_etc_hosts_updated
+#
+#- when: proxmox_etc_hosts_updated.changed
+#  block:
+#    - name: Update certificates
+#      command:
+#        cmd: pvecm updatecerts --force
+#
+#    - name: Reboot proxmox
+#      reboot:
+#
+#- name: Retrieve proxmox certificates
+#  fetch:
+#    src: /etc/pve/local/pve-ssl.pem
+#    dest: "{{ proxmox_cert_directory }}"
 
-- when: proxmox_etc_hosts_updated.changed
-  block:
-    - name: Update certificates
-      command:
-        cmd: pvecm updatecerts --force
-
-    - name: Reboot proxmox
-      reboot:
-
-- name: Retrieve proxmox certificates
-  fetch:
-    src: /etc/pve/local/pve-ssl.pem
-    dest: "{{ proxmox_cert_directory }}"
-
-- name: Enable apt sources
-  apt_repository:
-    repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
-    state: present
-    update_cache: false
-  loop:
-    - uri: http://deb.debian.org/debian
-      suite: "{{ ansible_facts['distribution_release'] }}"
-      components: main contrib
-    - uri: http://deb.debian.org/debian
-      suite: "{{ ansible_facts['distribution_release'] }}-updates"
-      components: main contrib
-    - uri: http://security.debian.org/debian-security
-      suite: "{{ ansible_facts['distribution_release'] }}-security"
-      components: main contrib
-    - uri: http://download.proxmox.com/debian/pve
-      suite: "{{ ansible_facts['distribution_release'] }}"
-      components: pve-no-subscription
-
-- name: Disable pve-enterprise sources
-  apt_repository:
-      repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
-      state: absent
-      update_cache: false
-  loop:
-      - uri: https://enterprise.proxmox.com/debian/pve
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: pve-enterprise
-      - uri: https://enterprise.proxmox.com/debian/ceph-quincy
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: enterprise
-      - uri: https://enterprise.proxmox.com/debian/ceph-reef
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: enterprise
-      - uri: http://download.proxmox.com/debian/ceph-quincy
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: no-subscription
-      - uri: http://download.proxmox.com/debian/ceph-reef
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: no-subscription
-      - uri: http://download.proxmox.com/debian/pve
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: pvetest
-
-- name: Disable pve-enterprise deb822 sources
+- name: Configure apt sources
   deb822_repository:
-    name: "pve-enterprise"
-    uris: "https://enterprise.proxmox.com/debian/pve"
-    suites: "{{ ansible_facts['distribution_release'] }}"
-    components: "pve-enterprise"
-    enabled: false
-
-- name: Disable legacy sources
-  apt_repository:
-      repo: deb {{ item.uri }} {{ item.suite }} {{ item.components }}
-      state: absent
-      update_cache: false
+    name: "{{ item.name }}"
+    uris: "{{ item.uris }}"
+    suites: "{{ item.suites }}"
+    components: "{{ item.components }}"
+    enabled: "{{ item.enabled }}"
   loop:
-      - uri: http://ftp.ca.debian.org/debian
-        suite: "{{ ansible_facts['distribution_release'] }}"
-        components: main contrib
-      - uri: http://ftp.ca.debian.org/debian
-        suite: "{{ ansible_facts['distribution_release'] }}-updates"
-        components: main contrib
-      - uri: http://security.debian.org
-        suite: "{{ ansible_facts['distribution_release'] }}-security"
-        components: main contrib
+    - name: debian
+      uris: http://deb.debian.org/debian
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}"
+        - "{{ ansible_facts['distribution_release'] }}-updates"
+      components:
+        - main
+        - contrib
+      enabled: true
+    - name: debian_security
+      uris: http://security.debian.org/debian-security
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}-security"
+      components:
+        - main
+        - contrib
+      enabled: true
+    - name: proxmox
+      uris: http://download.proxmox.com/debian/pve
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}"
+      components:
+        - pve-no-subscription
+      enabled: true
+    - name: pve-enterprise
+      uris: https://enterprise.proxmox.com/debian/pve
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}"
+      components:
+        - pve-enterprise
+      enabled: false
+    - name: ceph
+      uris:
+        - https://enterprise.proxmox.com/debian/ceph-quincy
+        - https://enterprise.proxmox.com/debian/ceph-reef
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}"
+      components:
+        - enterprise
+        - no-subscription
+      enabled: false
+    - name: pvetest
+      uris: http://download.proxmox.com/debian/pve
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}"
+      components:
+        - pvetest
+      enabled: false
+    - name: legacy_debian
+      uris: ftp.ca.debian.org/debian
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}"
+        - "{{ ansible_facts['distribution_release'] }}-updates"
+      components:
+        - main
+        - contrib
+      enabled: false
+    - name: legacy_debian_security
+      uris: security.debian.org
+      suites:
+        - "{{ ansible_facts['distribution_release'] }}-security"
+      components:
+        - main
+        - contrib
+      enabled: false
+
+- name: Find legacy list sources
+  find:
+    paths:
+      - /etc/apt
+      - /etc/apt/sources.list.d
+    patterns: "*.list"
+  register: legacy_lists
+
+- name: Delete legacy list sources
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ legacy_lists.files }}"
+  loop_control:
+    label: "{{ item.path }}"
 
 - name: Disable free firmware warnings
   copy:
