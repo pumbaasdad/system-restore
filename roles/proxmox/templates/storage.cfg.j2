@@ -8,3 +8,8 @@ zfspool: local-zfs
 	content images,rootdir
 	sparse 1
 
+dir: {{ proxmox_import_pool }}
+	path {{ proxmox_image_directory }}
+	content import,iso
+	prune-backups keep-all=1
+	shared 0

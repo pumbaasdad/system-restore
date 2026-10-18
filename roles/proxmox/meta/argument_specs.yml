@@ -21,11 +21,19 @@ argument_specs:
       proxmox_cert_domain:
         type: str
         required: true
-        description: The domain that will be included in proxmox certificates
+        description: The domain that will be included in proxmox certificates.
       proxmox_image_directory:
         type: str
         required: true
-        description: Directory path for storing Proxmox VM/container images
+        description: Directory path for storing Proxmox VM/container images.
+      proxmox_image_import_directory:
+        type: str
+        required: true
+        description: Subdirectory of proxmox_image_directory where images are actually stored.
+      proxmox_import_pool:
+        type: str
+        required: true
+        description: The name of the storage pool that will be used to store VM/container images.
       proxmox_local_network:
         type: str
         required: true

@@ -5,6 +5,7 @@ hypervisors:
 ubuntu_vms:
   hosts:
     media:
+    network-management:
 
 docker_hosts:
   hosts:
@@ -16,7 +17,6 @@ snowflake_vms:
 
 ubuntu_lxcs:
   hosts:
-    network-management:
     reverse-proxy:
     dhcp:
     http-firewall:
@@ -36,7 +36,6 @@ vms:
 
 regular_priority_lxcs:
   hosts:
-    network-management:
     reverse-proxy:
     http-firewall:
     proxy-cache:

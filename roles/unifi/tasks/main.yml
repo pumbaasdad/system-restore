@@ -1,23 +1,48 @@
 - become: true
   block:
-    - name: Create the unifi group
-      group:
-        name: unifi
-        gid: "{{ unifi_group_id }}"
+    - name: Install dependencies
+      apt:
+        name:
+          - podman
+          - slirp4netns
+        update_cache: true
+        cache_valid_time: "{{ unifi_apt_cache_valid_time }}"
 
-    - name: Create the unifi user
-      user:
-        name: unifi
-        uid: "{{ unifi_user_id }}"
-        group: unifi
-        shell: /usr/sbin/nologin
+    - name: Create unifi OS installer directory
+      file:
+        dest: "{{ unifi_installer_directory }}"
+        state: directory
 
-- include_vars:
-    file: "packages/{{ ansible_facts['distribution'] | lower }}.yml"
+    - name: Check if installer exists
+      stat:
+        path: "{{ unifi_installer_directory }}/installer"
+      register: installer
 
-- vars:
-    package_config: "{{ unifi_packages }}"
-    package_allow_releaseinfo_change:
-      - codename
-  include_role:
-    name: package
+    - when: not installer.stat.exists
+      block:
+        - name: Fetch latest UniFi OS Server metadata
+          uri:
+            url: "https://fw-update.ui.com/api/firmware-latest?filter=eq~~product~~unifi-os-server&filter=eq~~platform~~linux-x64&filter=eq~~channel~~release"
+            method: GET
+            return_content: true
+          register: unifi_api_response
+
+        - name: Store UniFi OS Server download URL in variable
+          set_fact:
+            unifi_installer_url: "{{ unifi_api_response.json._embedded.firmware[0]._links.data.href }}"
+
+        - name: Download unifi OS installer
+          get_url:
+            url: "{{ unifi_installer_url }}"
+            dest: "{{ unifi_installer_directory }}/installer"
+            mode: "0755"
+
+        - name: Install unifi OS
+          command:
+            cmd: "{{ unifi_installer_directory }}/installer --non-interactive"
+
+    - name: Ensure unifi OS server is enabled and started
+      service:
+        name: uosserver
+        state: started
+        enabled: true
