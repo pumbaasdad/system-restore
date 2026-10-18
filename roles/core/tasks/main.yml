@@ -1,5 +1,5 @@
 - include_vars:
-    file: "packages/{{ ansible_facts['distribution'] | lower }}.yml"
+    file: "packages/{{ ansible_facts['distribution'] | lower }}_{{ ansible_facts['distribution_release'] | lower }}.yml"
 
 - include_tasks:
     file: "{{ ansible_facts['distribution'] | lower }}.yml"
@@ -28,7 +28,7 @@
     src: fish/
     dest: "{{ ansible_facts['env'].HOME }}/.config/fish"
 
-- name: Create htop configuration directory
+- name: Create htop configuration directoryN
   file:
     dest: "{{ ansible_facts['env'].HOME }}/.config/htop"
     state: directory

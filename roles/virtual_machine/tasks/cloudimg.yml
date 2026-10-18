@@ -17,6 +17,6 @@
     virtual_machine_ciupgrade: true
     virtual_machine_cicustom: user=local:snippets/{{ virtual_machine_id }}.yml
     virtual_machine_ipconfig:
-      ipconfig0: "ip={{ virtual_machine_static_ip | ternary(virtual_machine_static_ip_config, 'dhcp') }} "
+      ipconfig0: "ip={{ virtual_machine_static_ip | ternary(virtual_machine_static_ip_config, 'dhcp') }}"
   include_tasks:
     file: common.yml

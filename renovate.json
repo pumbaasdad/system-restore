@@ -53,11 +53,6 @@
       "labels": ["dependencies", "{{ categories }}"]
     },
     {
-      "description": "MongoDB packages",
-      "matchPackagePatterns": ["^mongodb-"],
-      "groupName": "mongodb packages"
-    },
-    {
       "description": "Docker packages",
       "matchPackagePatterns": [
         "^docker-",
