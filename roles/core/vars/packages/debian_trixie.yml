@@ -8,4 +8,4 @@ core_fish_packages:
     components: []
     repology: opensuse_tumbleweed
     packages:
-      fish: 4.6.0-1
+      fish: 4.9.3-1
