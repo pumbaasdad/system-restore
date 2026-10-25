@@ -1,6 +1,0 @@
-- name: Restart apt.daily timer
-  become: true
-  systemd:
-    name: apt-daily.timer
-    state: restarted
-    daemon_reload: true
