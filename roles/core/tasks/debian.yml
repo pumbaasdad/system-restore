@@ -1,5 +1,21 @@
 - become: true
   block:
+    - name: Setup background downloads
+      copy:
+        src: 20auto-upgrades
+        dest: /etc/apt/apt.conf.d/20auto-upgrades
+
+    - name: Create apt-daily.timer override directory
+      file:
+        path: /etc/systemd/system/apt-daily.timer.d
+        state: directory
+
+    - name: Setup apt daily timer
+      copy:
+        src: apt-daily.timer.override.conf
+        dest: /etc/systemd/system/apt-daily.timer.d/override.conf
+      notify: Restart apt.daily timer
+
     - name: Install common packages
       apt:
         name:
