@@ -15,6 +15,7 @@ options {
         {{ forwarder }};
 {% endfor %}
     };
+    forward only;
 
     //========================================================================
     // If BIND logs error messages about the root key being expired,
