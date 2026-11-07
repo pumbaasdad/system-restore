@@ -1,5 +1,5 @@
-{%- macro print_origin_and_records(origin, records, dns_root_domain, max_pad) -%}
-    {{- print_origin(origin, dns_root_domain)  }}
+{%- macro print_origin_and_records(origin, records, dns_root_domain, origin_subdomain, max_pad) -%}
+    {{- print_origin(origin, dns_root_domain, origin_subdomain)  }}
     {{- '\n' }}{{ print_records(records, max_pad) -}}
 {%- endmacro %}
 
@@ -34,8 +34,8 @@
     {%- include 'db/soa.j2' -%}
 {%- endmacro -%}
 
-{%- macro print_origin(origin, origin_root_domain) -%}
-    {%- set full_origin = [origin, origin_root_domain | default('')] | select() | join('.') -%}
+{%- macro print_origin(origin, origin_root_domain, origin_subdomain) -%}
+    {%- set full_origin = [origin_subdomain | default(''), origin, origin_root_domain | default('')] | select() | join('.') -%}
     {%- include 'db/origin.j2' -%}
 {%- endmacro -%}
 
@@ -53,7 +53,7 @@
     {%- include 'db/ttl.j2' -%}
 {%- endmacro -%}
 
-{%- macro print_file(zone_name, dns_hostname, dns_root_domain, records, record_selector, serial_number, origin_root_domain, max_pad) -%}
+{%- macro print_file(zone_name, dns_hostname, dns_root_domain, records, record_selector, serial_number, origin_root_domain, origin_subdomain, max_pad) -%}
     {%- set grouped_records = records | selectattr(record_selector.field, record_selector.test, record_selector.value) | groupby('origin')  %}
     {%- set hostnames = grouped_records | map(attribute='1') | flatten | map(attribute='host') | map('string') -%}
     {%- set max_pad = max_pad | default(get_max_padding(hostnames)) | int -%}
@@ -75,20 +75,20 @@
     {%- set records = [] -%}
 
     {%- set ipv4_address = zone.ipv4_subnet | ansible.utils.ipaddr(host.ipv4_offset + offset) | ansible.utils.ipaddr('address') -%}
-    {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'A', 'target_host': ipv4_address, 'target_zone': ''}) -%}
+    {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'A', 'target_host': ipv4_address, 'target_zone': '', 'vpn': false}) -%}
 
     {%- if 'ipv6_interface' in host[interface_type] -%}
         {%- set ipv6_address = ((zone.ipv6_prefix | ansible.utils.ipaddr('network')) + host[interface_type].ipv6_interface) -%}
         {%- if ipv6_address | ansible.utils.ipaddr('address') -%}
-            {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'AAAA', 'target_host': ipv6_address, 'target_zone': ''}) -%}
+            {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'AAAA', 'target_host': ipv6_address, 'target_zone': '', 'vpn': false}) -%}
         {%- endif -%}
     {%- else -%}
         {%- set ipv6_address = 'fe80::' | ansible.utils.slaac(host[interface_type].mac) -%}
-        {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'AAAA', 'target_host': ipv6_address, 'target_zone': ''}) -%}
-        {%- set _ = records.append({'origin': link_local_ipv6_origin, 'host': (ipv6_address | ansible.utils.ipaddr('revdns'))[:31], 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' + dns_root_domain + '.' + link_local_ipv6_origin + '.'}) -%}
+        {%- set _ = records.append({'origin': forward_origin, 'host': forward_host, 'type': 'AAAA', 'target_host': ipv6_address, 'target_zone': '', 'vpn': false}) -%}
+        {%- set _ = records.append({'origin': link_local_ipv6_origin, 'host': (ipv6_address | ansible.utils.ipaddr('revdns'))[:31], 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' + dns_root_domain + '.' + link_local_ipv6_origin + '.', 'vpn': false}) -%}
     {%- endif -%}
 
-    {%- set _ = records.append({'origin': reverse_ipv4_origin, 'host': host.ipv4_offset, 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' +  dns_root_domain + '.' + reverse_ipv4_origin + '.'}) -%}
+    {%- set _ = records.append({'origin': reverse_ipv4_origin, 'host': host.ipv4_offset, 'type': 'PTR', 'target_host': forward_host, 'target_zone': forward_origin + '.' +  dns_root_domain + '.' + reverse_ipv4_origin + '.', 'vpn': false}) -%}
 
     {{ records }}
 {%- endmacro %}
@@ -97,7 +97,11 @@
     {%- set records = [] -%}
 
     {%- for alias in host.aliases | default([]) -%}
-        {%- set _ = records.append({'origin': dns_root_domain, 'host': alias, 'type': 'CNAME', 'target_host': host.name, 'target_zone': dns_zone}) -%}
+        {%- set _ = records.append({'origin': dns_root_domain, 'host': alias, 'type': 'CNAME', 'target_host': host.name, 'target_zone': dns_zone, 'vpn': false}) -%}
+
+        {%- if 'vpn' in host -%}
+            {%- set _ = records.append({'origin': dns_root_domain, 'host': alias, 'type': 'CNAME', 'target_host': host.vpn.name, 'target_zone': 'taile2fda3.ts.net.', 'vpn': true}) -%}
+        {%- endif -%}
     {%- endfor -%}
 
     {{ records }}
@@ -107,7 +111,11 @@
     {%- set records = [] -%}
 
     {%- for alias in host.aliases | default([]) -%}
-        {%- set _ = records.append({'origin': alias + '.' + dns_root_domain, 'host': forward_host, 'type': 'CNAME', 'target_host': forward_host + '.' + host.name, 'target_zone': zone.name + '.' + dns_root_domain + '.'}) -%}
+        {%- set _ = records.append({'origin': alias + '.' + dns_root_domain, 'host': forward_host, 'type': 'CNAME', 'target_host': forward_host + '.' + host.name, 'target_zone': zone.name + '.' + dns_root_domain + '.', 'vpn': false}) -%}
+
+        {%- if 'vpn' in host -%}
+            {%- set _ = records.append({'origin': alias + '.' + dns_root_domain, 'host': forward_host, 'type': 'CNAME', 'target_host': host.vpn.name, 'target_zone': 'taile2fda3.ts.net.', 'vpn': true}) -%}
+        {%- endif -%}
     {%- endfor -%}
 
     {{ records }}

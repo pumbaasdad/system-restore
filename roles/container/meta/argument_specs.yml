@@ -234,6 +234,11 @@ argument_specs:
         type: str
         required: true
         description: Proxmox node where the container will be created
+      container_requires_tun:
+        type: bool
+        required: false
+        default: false
+        description: If the container requires a TUN device.
       container_search_domain:
         type: str
         required: true

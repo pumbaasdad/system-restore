@@ -11,3 +11,5 @@ container_firewall_ipsets: []
 container_firewall_rules: {}
 
 container_startup: "{{ omit }}"
+
+container_requires_tun: false

@@ -154,6 +154,15 @@
 
 - delegate_to: "{{ container_proxmox_inventory_name }}"
   block:
+    - name: Add TUN device
+      lineinfile:
+        line: "{{ item }}"
+        path: /etc/pve/lxc/{{ container_id }}.conf
+      loop:
+        - "lxc.cgroup2.devices.allow: c 10:200 rwm"
+        - "lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file"
+      when: container_requires_tun
+
     - lineinfile:
         line: "{{ item }}"
         path: /etc/pve/lxc/{{ container_id }}.conf
