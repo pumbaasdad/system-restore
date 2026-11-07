@@ -9,7 +9,7 @@ docker_host_packages:
       - stable
     packages:
       docker-buildx-plugin: 0.38.1-1~ubuntu.24.04~noble
-      docker-ce: 5:29.9.2-1~ubuntu.24.04~noble
-      docker-ce-cli: 5:29.9.2-1~ubuntu.24.04~noble
-      docker-compose-plugin: 5.6.1-1~ubuntu.24.04~noble
+      docker-ce: 5:29.9.3-1~ubuntu.24.04~noble
+      docker-ce-cli: 5:29.9.3-1~ubuntu.24.04~noble
+      docker-compose-plugin: 5.7.0-1~ubuntu.24.04~noble
       containerd.io: 2.4.2-3~ubuntu.24.04~noble
