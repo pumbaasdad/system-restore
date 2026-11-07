@@ -1,0 +1,20 @@
+view "vpn" {
+    match-clients {
+        {{ bind9_vpn.ipv4_subnet }};
+        {{ bind9_vpn.ipv6_subnet }};
+    };
+
+    allow-recursion {
+        {{ bind9_vpn.ipv4_subnet }};
+        {{ bind9_vpn.ipv6_subnet }};
+    };
+
+    include "/etc/bind/vpn/named.conf.vpn.zones";
+{% if bind9_blocked_domains | length > 0 %}
+
+    zone "rpz.block" {
+        type master;
+        file "/etc/bind/db.rpz";
+    };
+{% endif %}
+};

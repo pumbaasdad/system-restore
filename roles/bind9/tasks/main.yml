@@ -35,6 +35,15 @@
       loop_control:
         label: "{{ item.name }}.{{ bind9_root_domain }}"
 
+    - name: Lookup vpn serial number
+      vars:
+        domain: "{{ bind9_vpn_subdomain }}.{{ bind9_root_domain }}"
+      set_fact:
+        bind9_serial_numbers: "{{ bind9_serial_numbers | combine({
+          domain: lookup('dig', domain, '@' + ansible_ssh_host, 'qtype=SOA', 'flat=0').serial | default(0)
+        }) }}"
+      when: bind9_vpn_defined
+
 - become: true
   block:
     - name: Install named configuration
@@ -43,6 +52,9 @@
         dest: /etc/bind/{{ item }}
         group: bind
       loop:
+        - named.conf
+        - named.conf.views
+        - named.conf.default
         - named.conf.local
         - named.conf.options
       notify: Reload named
@@ -55,6 +67,30 @@
         dest: /etc/bind/db.{{ bind9_root_domain }}
       when: bind9_manage_root_domain
       notify: Update root zone serial number
+
+    - when: bind9_vpn_defined
+      block:
+        - name: Install named VPN view configuration
+          template:
+            src: named.conf.vpn.j2
+            dest: /etc/bind/named.conf.vpn
+            group: bind
+          notify: Reload named
+
+        - include_tasks:
+            file: vpn.yml
+          loop:
+            - dest: vpn
+              zone: "{{ bind9_root_domain }}"
+            - dest: default
+              zone: "{{ bind9_vpn_subdomain }}.{{ bind9_root_domain }}"
+
+        - name: Install VPN reverse zone file
+          template:
+            src: named.conf.vpn-reverse.j2
+            dest: /etc/bind/named.conf.vpn-reverse
+            group: bind
+          notify: Reload named
 
     - name: Install the IPv6 reverse zone file
       vars:

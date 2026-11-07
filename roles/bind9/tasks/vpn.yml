@@ -1,0 +1,29 @@
+- name: Create {{ item.dest }} view configuration directory
+  file:
+    dest: /etc/bind/{{ item.dest }}
+    owner: bind
+    state: directory
+
+- name: Install {{ item.dest }} view vpn configuration
+  vars:
+    full_reverse_ipv6_zone: "{{ bind9_vpn.ipv6_subnet | ansible.utils.ipaddr('revdns') }}"
+    ipv6_nibbles: "{{ (bind9_vpn.ipv6_subnet.split('/')[1] | int) // 4 }}"
+    reverse_ipv6_zone: "{{ (full_reverse_ipv6_zone.split('.')[(32 - ipv6_nibbles):] | join('.'))[:-1] }}"
+    zone_name: "{{ item.zone }}"
+    db_dir: "{{ item.dest }}"
+  template:
+    src: named.conf.vpn.zones.j2
+    dest: /etc/bind/{{ db_dir }}/named.conf.vpn.zones
+    group: bind
+  notify: Reload named
+
+- name: Install {{ item.dest }} view vpn zone files
+  vars:
+    zone_serial_number: "{{ bind9_serial_numbers[bind9_vpn_subdomain + '.' + bind9_root_domain] }}"
+    zone_name: "{{ item.zone }}"
+  template:
+    src: db.vpn_zone.j2
+    dest: /etc/bind/{{ item.dest }}/db.{{ zone_name }}
+    group: bind
+  register: bind9_vpn_zone_databases
+  notify: Update vpn zone serial numbers

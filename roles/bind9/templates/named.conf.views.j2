@@ -1,0 +1,4 @@
+{% if bind9_vpn_defined %}
+include "/etc/bind/named.conf.vpn";
+{% endif %}
+include "/etc/bind/named.conf.default";

@@ -7,6 +7,23 @@
     dest: /etc/bind/db.{{ bind9_root_domain }}
   notify: Reload named
 
+- name: Update vpn zone serial numbers
+  become: true
+  vars:
+    zone_serial_number: "{{ bind9_serial_numbers[bind9_vpn_subdomain + '.' + bind9_root_domain] + 1 }}"
+    zone_name: "{{ item.zone }}"
+  template:
+    src: db.vpn_zone.j2
+    dest: /etc/bind/{{ item.dest }}/db.{{ zone_name }}
+  loop:
+    - dest: vpn
+      zone: "{{ bind9_root_domain }}"
+    - dest: default
+      zone: "{{ bind9_vpn_subdomain }}.{{ bind9_root_domain }}"
+  loop_control:
+    label: "{{ item.dest }}"
+  notify: Reload named
+
 - name: Update IPv6 reverse zone serial numbers
   become: true
   vars:
