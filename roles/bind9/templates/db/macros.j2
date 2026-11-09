@@ -1,5 +1,5 @@
-{%- macro print_origin_and_records(origin, records, dns_root_domain, max_pad) -%}
-    {{- print_origin(origin, dns_root_domain)  }}
+{%- macro print_origin_and_records(origin, records, dns_root_domain, origin_subdomain, max_pad) -%}
+    {{- print_origin(origin, dns_root_domain, origin_subdomain)  }}
     {{- '\n' }}{{ print_records(records, max_pad) -}}
 {%- endmacro %}
 
@@ -34,8 +34,8 @@
     {%- include 'db/soa.j2' -%}
 {%- endmacro -%}
 
-{%- macro print_origin(origin, origin_root_domain) -%}
-    {%- set full_origin = [origin, origin_root_domain | default('')] | select() | join('.') -%}
+{%- macro print_origin(origin, origin_root_domain, origin_subdomain) -%}
+    {%- set full_origin = [origin_subdomain | default(''), origin, origin_root_domain | default('')] | select() | join('.') -%}
     {%- include 'db/origin.j2' -%}
 {%- endmacro -%}
 
@@ -53,7 +53,7 @@
     {%- include 'db/ttl.j2' -%}
 {%- endmacro -%}
 
-{%- macro print_file(zone_name, dns_hostname, dns_root_domain, records, record_selector, serial_number, origin_root_domain, max_pad) -%}
+{%- macro print_file(zone_name, dns_hostname, dns_root_domain, records, record_selector, serial_number, origin_root_domain, origin_subdomain, max_pad) -%}
     {%- set grouped_records = records | selectattr(record_selector.field, record_selector.test, record_selector.value) | groupby('origin')  %}
     {%- set hostnames = grouped_records | map(attribute='1') | flatten | map(attribute='host') | map('string') -%}
     {%- set max_pad = max_pad | default(get_max_padding(hostnames)) | int -%}

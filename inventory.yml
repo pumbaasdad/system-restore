@@ -81,3 +81,7 @@ nameservers:
   hosts:
     dns:
     dns-firewall:
+
+vpns:
+  hosts:
+    dns-firewall:
