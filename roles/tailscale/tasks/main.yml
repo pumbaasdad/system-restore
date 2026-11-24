@@ -1,0 +1,41 @@
+- include_vars:
+    file: "packages/{{ ansible_facts['distribution'] | lower }}.yml"
+
+- vars:
+    package_config: "{{ tailscale_packages }}"
+  include_role:
+    name: package
+
+- become: true
+  block:
+    - name: Get tailscale status
+      command:
+        cmd: "tailscale status --json"
+      register: tailscale_status_raw
+      changed_when: false
+
+    - name: Ensure tailscale is enabled and started
+      service:
+        name: tailscaled
+        state: started
+        enabled: true
+
+    - name: Parse tailscale state
+      set_fact:
+        tailscale_state: "{{ (tailscale_status_raw.stdout | from_json).BackendState if tailscale_status_raw.rc == 0 else 'Not Installed' }}"
+
+    - name: Start tailscale
+      command:
+        cmd: "tailscale up --auth-key={{ tailscale_auth_key }} --accept-dns={{ tailscale_accept_dns }}"
+      when: tailscale_state != 'Running'
+
+    - name: Get tailscale DNS status
+      command:
+        cmd: "tailscale get accept-dns"
+      register: tailscale_dns_active
+      changed_when: false
+
+    - name: Configure tailscale DNS
+      command:
+        cmd: "tailscale set --accept-dns={{ tailscale_accept_dns }}"
+      when: (tailscale_dns_active.stdout | bool) != tailscale_accept_dns

@@ -1,0 +1,27 @@
+zone "{{ zone_name }}" {
+    type master;
+    notify no;
+    file "/etc/bind/{{ db_dir }}/db.{{ zone_name }}";
+};
+
+zone "{{ bind9_vpn.domain }}.{{ bind9_vpn.suffix }}" {
+    type forward;
+    forward only;
+    forwarders {
+{% for forwarder in bind9_vpn.forwarders %}
+        {{ forwarder }};
+{% endfor %}
+    };
+};
+
+include "/etc/bind/named.conf.vpn-reverse";
+
+zone "{{ reverse_ipv6_zone }}" {
+    type forward;
+    forward only;
+    forwarders {
+{% for forwarder in bind9_vpn.forwarders %}
+        {{ forwarder }};
+    };
+{% endfor %}
+};

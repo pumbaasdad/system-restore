@@ -87,6 +87,11 @@
   roles:
     - ssh_server
 
+- name: Setup VPN Hosts
+  hosts: vpns
+  roles:
+    - tailscale
+
 - name: Setup Docker Hosts
   hosts: docker_hosts
   roles:

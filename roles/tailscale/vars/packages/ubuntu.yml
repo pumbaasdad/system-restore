@@ -1,0 +1,11 @@
+tailscale_packages:
+  apt:
+    name: tailscale
+    key: https://pkgs.tailscale.com/stable/ubuntu/noble.gpg
+    repository: https://pkgs.tailscale.com/stable/ubuntu
+    distribution: noble
+    arch: amd64
+    components:
+      - main
+    packages:
+      tailscale: 1.104.7

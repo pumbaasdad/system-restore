@@ -19,6 +19,10 @@
         {%- if config.virtualized_reverse_proxies is defined -%}
           {%- set _ = host_config.update({'reverse_proxies': config.virtualized_reverse_proxies}) -%}
         {%- endif -%}
+      
+        {%- if config.virtualized_vpn is defined -%}
+          {%- set _ = host_config.update({'vpn': { 'name': config.virtualized_vpn.name } }) -%}
+        {%- endif -%}
 
         {%- set _ = virtualized_hosts.append(host_config) -%}
       {%- endfor -%}

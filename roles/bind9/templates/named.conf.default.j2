@@ -1,0 +1,8 @@
+view "default" {
+    match-clients { any; };
+
+    include "/etc/bind/named.conf.local";
+{% if bind9_vpn_defined %}
+    include "/etc/bind/default/named.conf.vpn.zones";
+{% endif %}
+};

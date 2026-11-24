@@ -1,0 +1,13 @@
+{% for n in range(bind9_vpn.ipv4_subnet | ansible.utils.ipsubnet(16) | int) %}
+{% set octets = (bind9_vpn.ipv4_subnet | ansible.utils.ipsubnet(16, n)).split('/')[0].split('.') %}
+zone "{{ octets[1] }}.{{ octets[0] }}.in-addr.arpa" {
+    type forward;
+    forward only;
+    forwarders {
+{% for forwarder in bind9_vpn.forwarders %}
+        {{ forwarder }};
+{% endfor %}
+    };
+};
+
+{% endfor %}
