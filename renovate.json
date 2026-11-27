@@ -6,8 +6,8 @@
 
   "timezone": "America/Toronto",
   "schedule": [
-    "* 20-23 * * 5",
-    "* 0-8 * * 6"
+    "* 20-23 * * *",
+    "* 0-8 * * *"
   ],
   "prHourlyLimit": 100,
   "dependencyDashboard": false,
