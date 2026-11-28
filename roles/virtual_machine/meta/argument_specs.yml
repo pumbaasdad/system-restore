@@ -15,6 +15,10 @@ argument_specs:
         description: IP address of host to wait for during startup
         type: str
         required: false
+      virtual_machine_dependency_mount:
+        description: Name of the NFS mount to wait for during startup
+        type: str
+        required: false
       virtual_machine_disk_size:
         description: Disk size for the virtual machine
         type: str

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DEPENDENCY_HOST="{{ virtual_machine_dependency_address }}"
+NFS_EXPORT="{{ virtual_machine_dependency_mount }}"
 CHECK_INTERVAL=1   # Check interval in seconds
 TIMEOUT=3          # Ping timeout in seconds
 
@@ -10,24 +11,25 @@ log_message() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') [HOOK] $1"
 }
 
-# Function to check if host is reachable
-check_host() {
-    ping -c 1 -W $TIMEOUT "$DEPENDENCY_HOST" >/dev/null 2>&1
-    return $?
+# Check that the server is responding and lists the expected export
+check_nfs() {
+    timeout "$TIMEOUT" showmount -e "$DEPENDENCY_HOST" 2>/dev/null \
+        | awk -v export="$NFS_EXPORT" 'NR>1 && $1==export {found=1} END {exit !found}'
 }
 
-# Function to wait for host to be available
-wait_for_host() {
-    log_message "Checking if dependency host $DEPENDENCY_HOST is reachable..."
+wait_for_nfs() {
+    local elapsed=0
+    log_message "Waiting for export $NFS_EXPORT on $DEPENDENCY_HOST..."
 
     while true; do
-        if check_host; then
-            log_message "Dependency host $DEPENDENCY_HOST is reachable. Proceeding with startup."
+        if check_nfs; then
+            log_message "Export $NFS_EXPORT on $DEPENDENCY_HOST is available after ${elapsed}s. Proceeding."
             return 0
         fi
 
-        log_message "Dependency host $DEPENDENCY_HOST not reachable. Waiting $CHECK_INTERVAL seconds... (${elapsed}s elapsed)"
-        sleep $CHECK_INTERVAL
+        log_message "Export not available yet. Retrying in ${CHECK_INTERVAL}s... (${elapsed}s elapsed)"
+        sleep "$CHECK_INTERVAL"
+        elapsed=$((elapsed + CHECK_INTERVAL + TIMEOUT))
     done
 }
 
@@ -36,7 +38,7 @@ case "$2" in
     pre-start)
         log_message "Pre-start hook triggered for $2 (VMID: $3)"
 
-        wait_for_host;
+        wait_for_nfs;
 
         log_message "Dependency check passed for $2 (VMID: $3)"
         exit 0
